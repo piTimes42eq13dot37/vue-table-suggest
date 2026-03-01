@@ -22,26 +22,16 @@
     "dist/lib"
   ],
   "scripts": {
-    "dev": "vite",
-    "build": "npm run build:app",
-    "build:app": "vue-tsc -b && vite build",
-    "build:lib": "vite build -c vite.lib.config.ts && vue-tsc -p tsconfig.lib.json && vite build -c vite.codepen.config.ts",
-    "build:codepen": "vite build -c vite.codepen.config.ts",
-    "prepack": "npm run build:lib",
-    "preview": "npm run build && vite preview",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest",
-    "lint": "eslint . --ext .ts,.vue",
-    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json",
-    "check": "npm run typecheck && npm run lint && npm run test"
+    "build": "vue-tsc -b && vite build && vite build -c vite.lib.config.ts && vue-tsc -p tsconfig.lib.json && vite build -c vite.codepen.config.ts",
+    "test": "npm run build && vue-tsc --noEmit -p tsconfig.app.json && eslint src tests --ext .ts,.vue && vitest run --coverage && playwright test",
+    "watch": "vite build --watch"
   },
-  "dependencies": {},
   "peerDependencies": {
     "quasar": "^2.18.5",
     "vue": "^3.5.25"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@quasar/extras": "^1.17.0",
     "@types/node": "^24.10.1",
     "@typescript-eslint/eslint-plugin": "^8.56.1",

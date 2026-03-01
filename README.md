@@ -72,7 +72,7 @@ Then open the local Vite URL shown in the terminal.
 - `npm run build` - typecheck + production build
 - `npm run build:lib` - build library bundle + type declarations for external consumption
 - `npm run preview` - preview production build
-- `npm run test` - run Vitest once
+- `npm run test` - run Vitest once and then Playwright E2E (local Chrome/Canary autodiscovery)
 - `npm run test:coverage` - run tests with coverage thresholds (fails below threshold)
 - `npm run test:watch` - run Vitest in watch mode
 - `npm run lint` - run ESLint

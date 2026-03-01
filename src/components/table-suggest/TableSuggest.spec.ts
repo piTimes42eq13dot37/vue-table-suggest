@@ -194,6 +194,39 @@ describe('TableSuggest', () => {
     expect(idHeader!.find('.sort-icon[data-name="arrow_downward"]').exists()).toBe(true)
   })
 
+  it('keeps a stable sort icon slot in headers when toggling sort', async () => {
+    const wrapper = mountTableSuggest()
+
+    const idHeader = wrapper
+      .findAll('th')
+      .find((th) => th.text().includes('id'))
+    const snackHeader = wrapper
+      .findAll('th')
+      .find((th) => th.text().includes('Snack'))
+
+    expect(idHeader).toBeTruthy()
+    expect(snackHeader).toBeTruthy()
+
+    const slotsBefore = wrapper.findAll('th .sort-icon-slot')
+    const iconsBefore = wrapper.findAll('th .sort-icon')
+    expect(slotsBefore.length).toBe(wrapper.findAll('th').length)
+    expect(iconsBefore.length).toBe(wrapper.findAll('th').length)
+
+    expect(idHeader!.find('.sort-icon--hidden').exists()).toBe(false)
+    expect(snackHeader!.find('.sort-icon--hidden').exists()).toBe(true)
+
+    await snackHeader!.trigger('click')
+    await nextTick()
+
+    const slotsAfter = wrapper.findAll('th .sort-icon-slot')
+    const iconsAfter = wrapper.findAll('th .sort-icon')
+    expect(slotsAfter.length).toBe(slotsBefore.length)
+    expect(iconsAfter.length).toBe(iconsBefore.length)
+
+    expect(idHeader!.find('.sort-icon--hidden').exists()).toBe(true)
+    expect(snackHeader!.find('.sort-icon--hidden').exists()).toBe(false)
+  })
+
   it('shows initial sort icon on first sortable visible column when id is absent', () => {
     const annotations = demoAnnotations()
     const columnsWithoutId = annotations.columns.filter((column) => column.key !== 'id')

@@ -16,8 +16,10 @@ export default defineConfig({
     },
   },
   test: {
+    include: ['src/**/*.spec.ts'],
     environment: 'jsdom',
     globals: true,
+    exclude: ['tests/e2e/**', 'playwright.config.ts', '**/node_modules/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],

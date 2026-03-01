@@ -478,12 +478,14 @@ const dateHint = (item: TItem): string => {
               class="header-icon"
             />
             <span>{{ column.label }}</span>
-            <q-icon
-              v-if="sortIcon(column.key)"
-              :name="sortIcon(column.key)!"
-              size="14px"
-              class="sort-icon"
-            />
+            <span class="sort-icon-slot">
+              <q-icon
+                :name="sortIcon(column.key) ?? 'arrow_upward'"
+                size="14px"
+                class="sort-icon"
+                :class="{ 'sort-icon--hidden': !sortIcon(column.key) }"
+              />
+            </span>
           </th>
         </tr>
       </thead>
@@ -626,8 +628,18 @@ const dateHint = (item: TItem): string => {
 }
 
 .sort-icon {
-  margin-left: 4px;
   vertical-align: text-bottom;
+}
+
+.sort-icon-slot {
+  display: inline-flex;
+  width: 14px;
+  margin-left: 4px;
+  justify-content: center;
+}
+
+.sort-icon--hidden {
+  visibility: hidden;
 }
 
 .subline-value {
