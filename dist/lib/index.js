@@ -384,7 +384,7 @@ const Z = (t) => {
         date_exact: "Stardate exact",
         date_relative: "Stardate",
         fulltext: "Full-Text",
-        scope: "In Sector"
+        scope: "In Column"
       }[o.type];
       if (f) return f;
       const k = o.key ?? o.type;
@@ -605,7 +605,7 @@ const Z = (t) => {
   for (const [n, s] of e)
     r[n] = s;
   return r;
-}, Nt = /* @__PURE__ */ It(At, [["__scopeId", "data-v-f0fea1cf"]]), qt = {
+}, Nt = /* @__PURE__ */ It(At, [["__scopeId", "data-v-c15768fa"]]), qt = {
   install(t) {
     t.component("TableSuggest", Nt);
   }

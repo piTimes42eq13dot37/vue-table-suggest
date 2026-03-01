@@ -282,7 +282,7 @@ const chipTypeLabel = (token: SearchToken): string => {
     date_exact: 'Stardate exact',
     date_relative: 'Stardate',
     fulltext: 'Full-Text',
-    scope: 'In Sector',
+    scope: 'In Column',
   }
 
   const mappedLabel = map[token.type]
