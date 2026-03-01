@@ -178,6 +178,22 @@ describe('TableSuggest', () => {
     expect(headers).toEqual(['id', 'Snack', 'Hangar', 'Manifest', 'Captain', 'date', 'Mission State'])
   })
 
+  it('shows sort icon and toggles direction on header click', async () => {
+    const wrapper = mountTableSuggest()
+
+    const idHeader = wrapper
+      .findAll('th')
+      .find((th) => th.text().includes('id'))
+
+    expect(idHeader).toBeTruthy()
+    expect(idHeader!.find('.sort-icon[data-name="arrow_upward"]').exists()).toBe(true)
+
+    await idHeader!.trigger('click')
+    await nextTick()
+
+    expect(idHeader!.find('.sort-icon[data-name="arrow_downward"]').exists()).toBe(true)
+  })
+
   it('adds a fulltext chip through q-select new-value event', async () => {
     const wrapper = mountTableSuggest()
     const select = wrapper.findComponent({ name: 'QSelect' })

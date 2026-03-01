@@ -349,6 +349,11 @@ const toggleSort = (key: string): void => {
   sortState.value = { key, asc: !sortState.value.asc }
 }
 
+const sortIcon = (key: string): string | null => {
+  if (sortState.value.key !== key) return null
+  return sortState.value.asc ? 'arrow_upward' : 'arrow_downward'
+}
+
 const cellSegments = (item: TItem, key: string): HighlightSegment[] => {
   const value = renderCellValue(item, key)
   if (!showHighlightForColumn(key)) return [{ text: value, highlighted: false }]
@@ -462,6 +467,12 @@ const dateHint = (item: TItem): string => {
               class="header-icon"
             />
             <span>{{ column.label }}</span>
+            <q-icon
+              v-if="sortIcon(column.key)"
+              :name="sortIcon(column.key)!"
+              size="14px"
+              class="sort-icon"
+            />
           </th>
         </tr>
       </thead>
@@ -600,6 +611,11 @@ const dateHint = (item: TItem): string => {
 
 .header-icon {
   margin-right: 4px;
+  vertical-align: text-bottom;
+}
+
+.sort-icon {
+  margin-left: 4px;
   vertical-align: text-bottom;
 }
 
