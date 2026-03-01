@@ -194,6 +194,132 @@ describe('TableSuggest', () => {
     expect(idHeader!.find('.sort-icon[data-name="arrow_downward"]').exists()).toBe(true)
   })
 
+  it('shows initial sort icon on first sortable visible column when id is absent', () => {
+    const annotations = demoAnnotations()
+    const columnsWithoutId = annotations.columns.filter((column) => column.key !== 'id')
+
+    const wrapper = mount(TableSuggest, {
+      props: {
+        items: demoRows() as unknown as object[],
+        annotations: {
+          ...annotations,
+          columns: columnsWithoutId,
+        } as unknown as {
+          modelName: string
+          columns: Array<{ key: string; label: string }>
+        },
+      },
+      global: {
+        stubs: {
+          QSelect: QSelectStub,
+          QChip: QChipStub,
+          QItem: QItemStub,
+          QItemSection: QItemSectionStub,
+          QItemLabel: QItemLabelStub,
+          QIcon: QIconStub,
+          QAvatar: QAvatarStub,
+        },
+      },
+    })
+
+    const firstHeader = wrapper.findAll('th')[0]
+    expect(firstHeader).toBeTruthy()
+    expect(firstHeader!.find('.sort-icon[data-name="arrow_upward"]').exists()).toBe(true)
+  })
+
+  it('sorts numeric id values naturally instead of lexicographically', () => {
+    const rows = [
+      { id: 10, product: 'ten', date: '01.03.2026' },
+      { id: 2, product: 'two', date: '28.02.2026' },
+      { id: 1, product: 'one', date: '27.02.2026' },
+    ]
+
+    const wrapper = mount(TableSuggest, {
+      props: {
+        items: rows as unknown as object[],
+        annotations: {
+          modelName: 'SortModel',
+          columns: [
+            { key: 'id', label: 'id', sortable: true, searchable: true },
+            { key: 'product', label: 'Product', sortable: true, searchable: true },
+            { key: 'date', label: 'date', sortable: true, searchable: true },
+          ],
+        } as unknown as {
+          modelName: string
+          columns: Array<{ key: string; label: string }>
+        },
+      },
+      global: {
+        stubs: {
+          QSelect: QSelectStub,
+          QChip: QChipStub,
+          QItem: QItemStub,
+          QItemSection: QItemSectionStub,
+          QItemLabel: QItemLabelStub,
+          QIcon: QIconStub,
+          QAvatar: QAvatarStub,
+        },
+      },
+    })
+
+    const ids = wrapper.findAll('tbody tr td:first-child').map((cell) => cell.text().trim())
+    expect(ids).toEqual(['1', '2', '10'])
+  })
+
+  it('sorts date column correctly for dd.mm.yyyy and iso date values', async () => {
+    const rows = [
+      { id: 1, product: 'a', date: '2026-02-28' },
+      { id: 2, product: 'b', date: '01.03.2026' },
+      { id: 3, product: 'c', date: '2026-01-15' },
+    ]
+
+    const wrapper = mount(TableSuggest, {
+      props: {
+        items: rows as unknown as object[],
+        annotations: {
+          modelName: 'DateSortModel',
+          columns: [
+            { key: 'id', label: 'id', sortable: true, searchable: true },
+            { key: 'product', label: 'Product', sortable: true, searchable: true },
+            { key: 'date', label: 'date', sortable: true, searchable: true },
+          ],
+        } as unknown as {
+          modelName: string
+          columns: Array<{ key: string; label: string }>
+        },
+      },
+      global: {
+        stubs: {
+          QSelect: QSelectStub,
+          QChip: QChipStub,
+          QItem: QItemStub,
+          QItemSection: QItemSectionStub,
+          QItemLabel: QItemLabelStub,
+          QIcon: QIconStub,
+          QAvatar: QAvatarStub,
+        },
+      },
+    })
+
+    const dateHeader = wrapper
+      .findAll('th')
+      .find((header) => header.text().includes('date'))
+
+    expect(dateHeader).toBeTruthy()
+
+    await dateHeader!.trigger('click')
+    await nextTick()
+
+    const ascDates = wrapper.findAll('tbody tr td:nth-child(3)').map((cell) => cell.text().trim())
+    expect(ascDates).toEqual(['2026-01-15', '2026-02-28', '01.03.2026'])
+
+    await dateHeader!.trigger('click')
+    await nextTick()
+
+    const descDates = wrapper.findAll('tbody tr td:nth-child(3)').map((cell) => cell.text().trim())
+    expect(descDates).toEqual(['01.03.2026', '2026-02-28', '2026-01-15'])
+  })
+
   it('adds a fulltext chip through q-select new-value event', async () => {
     const wrapper = mountTableSuggest()
     const select = wrapper.findComponent({ name: 'QSelect' })

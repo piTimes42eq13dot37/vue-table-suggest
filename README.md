@@ -182,4 +182,17 @@ If you also need component styles in an external app, import:
 import 'vue-table-suggest/style.css'
 ```
 
+## Troubleshooting
+
+- Sort direction icons are not visible:
+  - Ensure Quasar icon assets are loaded in the host app entry:
+
+```ts
+import 'quasar/dist/quasar.css'
+import '@quasar/extras/material-icons/material-icons.css'
+```
+
+  - Ensure `QIcon` is registered in your Quasar `components` list.
+  - For CodePen, add the same Material Icons CSS as an external stylesheet resource.
+
 For a complete typed example, use `src/lib/demo-model.ts` + `src/lib/demo-data.ts` as the template.

@@ -5,15 +5,15 @@ export const startOfDay = (date: Date): Date => {
 }
 
 export const parseDateInput = (value: string): Date | null => {
-  const match = String(value ?? '')
-    .trim()
-    .match(/^(\d{2})\.(\d{2})\.(\d{4})$/)
+  const input = String(value ?? '').trim()
+  const dotFormatMatch = input.match(/^(\d{2})\.(\d{2})\.(\d{4})$/)
+  const isoFormatMatch = input.match(/^(\d{4})-(\d{2})-(\d{2})$/)
 
-  if (!match) return null
+  if (!dotFormatMatch && !isoFormatMatch) return null
 
-  const day = Number(match[1])
-  const month = Number(match[2])
-  const year = Number(match[3])
+  const year = Number(dotFormatMatch ? dotFormatMatch[3] : isoFormatMatch![1])
+  const month = Number(dotFormatMatch ? dotFormatMatch[2] : isoFormatMatch![2])
+  const day = Number(dotFormatMatch ? dotFormatMatch[1] : isoFormatMatch![3])
   const parsed = new Date(year, month - 1, day)
   parsed.setHours(0, 0, 0, 0)
 

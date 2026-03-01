@@ -13,7 +13,10 @@ const props = defineProps<{
 
 const query = ref('')
 const selected = ref<SearchToken[]>([])
-const sortState = ref<{ key: string; asc: boolean }>({ key: 'id', asc: true })
+const resolveInitialSortKey = (): string =>
+  props.annotations.columns.find((column) => !column.renderAsSublineOf && column.sortable !== false)?.key ?? ''
+
+const sortState = ref<{ key: string; asc: boolean }>({ key: resolveInitialSortKey(), asc: true })
 const filterOptions = ref<SearchToken[]>([])
 const qSelectRef = ref<{
   updateInputValue?: Function
@@ -21,6 +24,9 @@ const qSelectRef = ref<{
 } | null>(null)
 
 const locale = computed(() => props.annotations.locale ?? resolveEnglishLocale())
+const textCollator = computed(
+  () => new Intl.Collator(locale.value, { numeric: true, sensitivity: 'base' }),
+)
 
 const suggestions = computed(() =>
   buildSuggestions(props.items, props.annotations, selected.value, query.value),
@@ -63,14 +69,16 @@ const sortedRows = computed(() => {
     if (column.key === 'date') {
       const aDate = parseDateInput(aValue)
       const bDate = parseDateInput(bValue)
-      const aTime = aDate ? aDate.getTime() : -Infinity
-      const bTime = bDate ? bDate.getTime() : -Infinity
-      return sortState.value.asc ? aTime - bTime : bTime - aTime
+      if (aDate && bDate) {
+        const aTime = aDate.getTime()
+        const bTime = bDate.getTime()
+        return sortState.value.asc ? aTime - bTime : bTime - aTime
+      }
     }
 
     return sortState.value.asc
-      ? aValue.localeCompare(bValue)
-      : bValue.localeCompare(aValue)
+      ? textCollator.value.compare(aValue, bValue)
+      : textCollator.value.compare(bValue, aValue)
   })
 
   return rows
@@ -342,6 +350,9 @@ const getTooltip = (item: TItem, key: string): string => {
 }
 
 const toggleSort = (key: string): void => {
+  const column = getColumnByKey(key)
+  if (column?.sortable === false) return
+
   if (sortState.value.key !== key) {
     sortState.value = { key, asc: true }
     return

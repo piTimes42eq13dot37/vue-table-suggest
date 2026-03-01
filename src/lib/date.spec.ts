@@ -24,10 +24,16 @@ describe('date', () => {
     expect(formatDate(parsed!)).toBe('28.02.2026')
   })
 
+  it('parses iso yyyy-mm-dd dates', () => {
+    const parsed = parseDateInput('2026-02-28')
+    expect(parsed).not.toBeNull()
+    expect(formatDate(parsed!)).toBe('28.02.2026')
+  })
+
   it('rejects invalid date inputs', () => {
     expect(parseDateInput('')).toBeNull()
-    expect(parseDateInput('2026-02-28')).toBeNull()
     expect(parseDateInput('31.02.2026')).toBeNull()
+    expect(parseDateInput('2026-13-28')).toBeNull()
   })
 
   it('returns monday-first index', () => {
