@@ -22,7 +22,8 @@
     "dist/lib"
   ],
   "scripts": {
-    "build": "vue-tsc -b && vite build && vite build -c vite.lib.config.ts && vue-tsc -p tsconfig.lib.json && vite build -c vite.codepen.config.ts",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && vue-tsc -b && vite build && vite build -c vite.lib.config.ts && vue-tsc -p tsconfig.lib.json && vite build -c vite.codepen.config.ts",
     "test": "npm run build && vue-tsc --noEmit -p tsconfig.app.json && eslint src tests --ext .ts,.vue && vitest run --coverage && playwright test",
     "watch": "vite"
   },
