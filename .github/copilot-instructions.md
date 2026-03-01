@@ -1,0 +1,6 @@
+- Build reusable Vue 3 + TypeScript components with strict typing.
+- Keep search/filter logic in composables, keep UI components presentational.
+- Prefer small pure functions for date parsing, scoring, and suggestion generation.
+- Add or update tests for any behavior change in filter/suggestion/date logic.
+- Avoid hardcoded UI copy when values can be configured via props or metadata.
+- absolute goal is to have the same functionality as the current implementation, but with better code structure and maintainability. use the legacy tabsearch codepen implementation as the behavioral baseline.

@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": false,
+    "declarationDir": "dist/lib",
+    "outDir": "dist/lib",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.lib.tsbuildinfo"
+  },
+  "include": ["src/index.ts", "src/plugin.ts", "src/components/**/*.vue"],
+  "exclude": [
+    "src/**/*.spec.ts",
+    "src/main.ts",
+    "src/App.vue",
+    "src/demo.ts",
+    "src/lib/demo-data.ts",
+    "src/lib/demo-model.ts"
+  ]
+}

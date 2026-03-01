@@ -1,0 +1,408 @@
+import { mount } from '@vue/test-utils'
+import { describe, expect, it } from 'vitest'
+import { nextTick } from 'vue'
+import { defineComponent, h } from 'vue'
+import TableSuggest from './TableSuggest.vue'
+import { demoRows } from '../../lib/demo-data'
+import { demoAnnotations } from '../../lib/demo-model'
+
+const QSelectStub = defineComponent({
+  name: 'QSelect',
+  props: {
+    modelValue: {
+      type: Array,
+      default: () => [],
+    },
+    options: {
+      type: Array,
+      default: () => [],
+    },
+  },
+  emits: ['update:modelValue', 'new-value', 'filter'],
+  methods: {
+    removeAtIndex(index: number) {
+      const next = [...(this.modelValue as unknown[])]
+      next.splice(index, 1)
+      this.$emit('update:modelValue', next)
+    },
+    selectOption(option: unknown) {
+      this.$emit('update:modelValue', [...(this.modelValue as unknown[]), option])
+    },
+  },
+  render() {
+    const selected = (this.modelValue as unknown[]) || []
+    const options = (this.options as unknown[]) || []
+
+    return h('div', { class: 'q-select-stub' }, [
+      h(
+        'div',
+        { class: 'q-select-selected' },
+        selected.map((opt, index) =>
+          this.$slots['selected-item']
+            ? this.$slots['selected-item']({
+                opt,
+                index,
+                removeAtIndex: (idx: number) => this.removeAtIndex(idx),
+              })
+            : null,
+        ),
+      ),
+      h(
+        'div',
+        { class: 'q-select-options' },
+        options.map((opt) =>
+          this.$slots.option
+            ? this.$slots.option({
+                opt,
+                itemProps: {
+                  onClick: () => this.selectOption(opt),
+                },
+              })
+            : null,
+        ),
+      ),
+    ])
+  },
+})
+
+const QChipStub = defineComponent({
+  name: 'QChip',
+  inheritAttrs: true,
+  emits: ['remove'],
+  setup(_, { emit, slots, attrs }) {
+    return () =>
+      h(
+        'button',
+        {
+          class: 'chip',
+          type: 'button',
+          ...attrs,
+          onClick: () => emit('remove'),
+        },
+        slots.default ? slots.default() : [],
+      )
+  },
+})
+
+const QItemStub = defineComponent({
+  name: 'QItem',
+  inheritAttrs: true,
+  setup(_, { slots, attrs }) {
+    return () => h('button', { class: 'suggest-item', type: 'button', ...attrs }, slots.default?.())
+  },
+})
+
+const QItemSectionStub = defineComponent({
+  name: 'QItemSection',
+  setup(_, { slots }) {
+    return () => h('div', {}, slots.default?.())
+  },
+})
+
+const QItemLabelStub = defineComponent({
+  name: 'QItemLabel',
+  inheritAttrs: true,
+  setup(_, { slots, attrs }) {
+    return () => h('div', { ...attrs }, slots.default?.())
+  },
+})
+
+const QIconStub = defineComponent({
+  name: 'QIcon',
+  inheritAttrs: true,
+  props: {
+    name: {
+      type: String,
+      default: '',
+    },
+  },
+  setup(props, { attrs }) {
+    return () =>
+      h('i', {
+        ...attrs,
+        class: ['q-icon', attrs.class],
+        'data-name': props.name,
+      })
+  },
+})
+
+const QAvatarStub = defineComponent({
+  name: 'QAvatar',
+  inheritAttrs: true,
+  props: {
+    icon: {
+      type: String,
+      default: '',
+    },
+  },
+  setup(props, { attrs }) {
+    return () =>
+      h('span', {
+        ...attrs,
+        class: ['q-avatar', attrs.class],
+        'data-icon': props.icon,
+      })
+  },
+})
+
+const mountTableSuggest = () =>
+  mount(TableSuggest, {
+    props: {
+      items: demoRows() as unknown as object[],
+      annotations: demoAnnotations() as unknown as {
+        modelName: string
+        columns: Array<{ key: string; label: string }>
+      },
+    },
+    global: {
+      stubs: {
+        QSelect: QSelectStub,
+        QChip: QChipStub,
+        QItem: QItemStub,
+        QItemSection: QItemSectionStub,
+        QItemLabel: QItemLabelStub,
+        QIcon: QIconStub,
+        QAvatar: QAvatarStub,
+      },
+    },
+  })
+
+describe('TableSuggest', () => {
+  it('renders q-select wrapper and original visible columns', () => {
+    const wrapper = mountTableSuggest()
+
+    expect(wrapper.findComponent({ name: 'QSelect' }).exists()).toBe(true)
+    expect(wrapper.findAll('.q-icon').length).toBeGreaterThan(0)
+
+    const headers = wrapper.findAll('th').map((th) => th.text())
+    expect(headers).toEqual(['id', 'Snack', 'Hangar', 'Manifest', 'Captain', 'date', 'Mission State'])
+  })
+
+  it('adds a fulltext chip through q-select new-value event', async () => {
+    const wrapper = mountTableSuggest()
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    select.vm.$emit('new-value', 'alpha', () => undefined)
+    await nextTick()
+
+    expect(wrapper.text()).toContain('Full-Text:')
+    expect(wrapper.text()).toContain('alpha')
+  })
+
+  it('shows before monday suggestions as before last and before next', async () => {
+    const wrapper = mountTableSuggest()
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    select.vm.$emit('filter', 'before monday', (update: () => void) => update())
+    await nextTick()
+
+    const suggestionText = wrapper.findAll('.suggest-item').map((item) => item.text().toLowerCase())
+    expect(suggestionText.some((text) => text.includes('before last monday'))).toBe(true)
+    expect(suggestionText.some((text) => text.includes('before next monday'))).toBe(true)
+  })
+
+  it('highlights numeric query across grouped separators in suggestions', async () => {
+    const wrapper = mountTableSuggest()
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    select.vm.$emit('filter', '021304', (update: () => void) => update())
+    await nextTick()
+
+    const highlighted = wrapper.findAll('.suggest-title mark').map((node) => node.text())
+    expect(highlighted.some((text) => text.includes('021.304'))).toBe(true)
+  })
+
+  it('highlights compact numeric query in grouped suggestions', async () => {
+    const wrapper = mountTableSuggest()
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    select.vm.$emit('filter', '213', (update: () => void) => update())
+    await nextTick()
+
+    const highlighted = wrapper.findAll('.suggest-title mark').map((node) => node.text())
+    expect(highlighted.some((text) => text.includes('21.3'))).toBe(true)
+  })
+
+  it('renders grouped number display in table subline column', () => {
+    const wrapper = mountTableSuggest()
+    const firstSubline = wrapper.find('.subline-value')
+
+    expect(firstSubline.exists()).toBe(true)
+    expect(firstSubline.text()).toContain('10.000.021.304')
+    expect(wrapper.text()).toContain('45.234.234.234.234')
+  })
+
+  it('renders date tooltip label in table', () => {
+    const wrapper = mountTableSuggest()
+
+    const dateTooltip = wrapper.find('span[title^="KW "]')
+    expect(dateTooltip.exists()).toBe(true)
+  })
+
+  it('highlights fulltext matches in multiple columns when no scope is selected', async () => {
+    const wrapper = mountTableSuggest()
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    select.vm.$emit('new-value', 'moon', () => undefined)
+    await nextTick()
+
+    const productMarks = wrapper.findAll('tbody tr td:nth-child(2) mark')
+    const depotMarks = wrapper.findAll('tbody tr td:nth-child(3) > div:first-child mark')
+
+    expect(productMarks.length).toBeGreaterThan(0)
+    expect(depotMarks.length).toBeGreaterThan(0)
+  })
+
+  it('keeps existing tags and replaces typed input context when clicking a suggestion', async () => {
+    const wrapper = mountTableSuggest()
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    select.vm.$emit('new-value', 'alpha', () => undefined)
+    await nextTick()
+
+    select.vm.$emit('filter', 'before monday', (update: () => void) => update())
+    await nextTick()
+
+    const optionsBefore = wrapper.findAll('.suggest-item')
+    expect(optionsBefore.length).toBeGreaterThan(0)
+
+    await optionsBefore[0]!.trigger('click')
+    await nextTick()
+
+    const chips = wrapper.findAll('.chip').map((chip) => chip.text().toLowerCase())
+    expect(chips.some((text) => text.includes('full-text:') && text.includes('alpha'))).toBe(true)
+    expect(chips.length).toBeGreaterThan(1)
+
+    expect(wrapper.findAll('.suggest-item').length).toBe(0)
+  })
+
+  it('uses original default dynamic colors for chips and suggestion icons', async () => {
+    const wrapper = mountTableSuggest()
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    select.vm.$emit('new-value', 'donut', () => undefined)
+    await nextTick()
+
+    const fulltextChip = wrapper.find('.chip[color="teal-9"]')
+    expect(fulltextChip.exists()).toBe(true)
+
+    select.vm.$emit('filter', 'orbital', (update: () => void) => update())
+    await nextTick()
+
+    const defaultIconColor = wrapper.find('.suggest-icon[color="indigo-9"]')
+    expect(defaultIconColor.exists()).toBe(true)
+  })
+
+  it('uses subcolumn default color for subline tokens', async () => {
+    const wrapper = mountTableSuggest()
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    select.vm.$emit('update:modelValue', [
+      {
+        uid: 'hangarCode|10000021304',
+        type: 'hangarCode',
+        key: 'hangarCode',
+        title: '10000021304',
+        category: 'Hangar Code',
+        icon: 'pin',
+      },
+    ])
+    await nextTick()
+
+    expect(wrapper.find('.chip[color="light-blue-9"]').exists()).toBe(true)
+  })
+
+  it('supports overriding dynamic colors from annotation metadata', async () => {
+    const wrapper = mount(TableSuggest, {
+      props: {
+        items: demoRows() as unknown as object[],
+        annotations: {
+          ...(demoAnnotations() as unknown as {
+            modelName: string
+            columns: Array<{ key: string; label: string }>
+          }),
+          tokenColorByType: {
+            fulltext: 'amber-8',
+          },
+          tokenDefaultColor: 'grey-8',
+        },
+      },
+      global: {
+        stubs: {
+          QSelect: QSelectStub,
+          QChip: QChipStub,
+          QItem: QItemStub,
+          QItemSection: QItemSectionStub,
+          QItemLabel: QItemLabelStub,
+          QIcon: QIconStub,
+          QAvatar: QAvatarStub,
+        },
+      },
+    })
+
+    const select = wrapper.findComponent({ name: 'QSelect' })
+    select.vm.$emit('new-value', 'donut', () => undefined)
+    await nextTick()
+    expect(wrapper.find('.chip[color="amber-8"]').exists()).toBe(true)
+
+    select.vm.$emit('filter', 'orbital', (update: () => void) => update())
+    await nextTick()
+
+    const options = wrapper.findAll('.suggest-item')
+    expect(options.length).toBeGreaterThan(0)
+    await options[0]!.trigger('click')
+    await nextTick()
+
+    expect(wrapper.find('.chip[color="grey-8"]').exists()).toBe(true)
+
+  })
+
+  it('ignores empty input when creating a fulltext token', async () => {
+    const wrapper = mountTableSuggest()
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    select.vm.$emit('new-value', '   ', () => undefined)
+    await nextTick()
+
+    expect(wrapper.findAll('.chip').length).toBe(0)
+  })
+
+  it('deduplicates duplicate tokens emitted through model updates', async () => {
+    const wrapper = mountTableSuggest()
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    const duplicate = {
+      uid: 'fulltext|alpha',
+      type: 'fulltext',
+      title: 'alpha',
+      category: 'Fulltext',
+      icon: 'search',
+    }
+
+    select.vm.$emit('update:modelValue', [duplicate, duplicate])
+    await nextTick()
+
+    const chips = wrapper.findAll('.chip').map((chip) => chip.text())
+    expect(chips.length).toBe(1)
+    expect(chips[0]).toContain('alpha')
+  })
+
+  it('removes scope tokens when no fulltext token remains', async () => {
+    const wrapper = mountTableSuggest()
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    const scopeToken = {
+      uid: 'scope|owner',
+      type: 'scope',
+      key: 'owner',
+      title: 'owner',
+      category: 'In Column',
+      icon: 'arrow_right_alt',
+    }
+
+    select.vm.$emit('update:modelValue', [scopeToken])
+    await nextTick()
+
+    expect(wrapper.findAll('.chip').length).toBe(0)
+  })
+})
