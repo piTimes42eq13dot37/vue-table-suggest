@@ -23,7 +23,7 @@ const annotations: SearchModelDefinition<DemoItem> = {
   modelName: 'DemoItem',
   locale,
   maxSuggestions: 7,
-  maxWeekdaySuggestions: 3,
+  maxWeekdaySuggestions: 4,
   columns: [
     { key: 'id', label: 'id', icon: 'tag', sortable: true, searchable: true },
     { key: 'product', label: 'Snack', icon: 'category', sortable: true, searchable: true },

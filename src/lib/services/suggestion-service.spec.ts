@@ -42,6 +42,30 @@ describe('suggestion-service', () => {
     expect(suggestions.some((token) => token.title.toLowerCase().includes('after last'))).toBe(true)
   })
 
+  it('returns four expected suggestions for after t', () => {
+    const suggestions = buildSuggestions(demoRows(), demoAnnotations(), [], 'after t')
+    const titles = suggestions.map((token) => token.title)
+
+    expect(titles).toEqual([
+      'after last Tuesday',
+      'after next Tuesday',
+      'after last Thursday',
+      'after next Thursday',
+    ])
+  })
+
+  it('returns four expected suggestions for before t', () => {
+    const suggestions = buildSuggestions(demoRows(), demoAnnotations(), [], 'before t')
+    const titles = suggestions.map((token) => token.title)
+
+    expect(titles).toEqual([
+      'before last Tuesday',
+      'before next Tuesday',
+      'before last Thursday',
+      'before next Thursday',
+    ])
+  })
+
   it('returns relative suggestions for after last thursday phrase', () => {
     const suggestions = buildSuggestions(demoRows(), demoAnnotations(), [], 'after last thursday')
 

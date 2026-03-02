@@ -42,7 +42,9 @@ const escapeRegExp = (value: string): string =>
 
 const parseRelativeQuery = (rawInput: string) => {
   const needle = rawInput.trim().toLowerCase()
-  if (!needle) return null
+  if (!needle) {
+    return null
+  }
 
   const normalizedNeedle = needle.startsWith('date ') ? needle.slice(5).trim() : needle
 
@@ -51,7 +53,9 @@ const parseRelativeQuery = (rawInput: string) => {
     const direction = String(fullMatch[1]).toLowerCase() as SearchDirection
     const anchor = (String(fullMatch[2] || '').toLowerCase() as SearchAnchor | '') || null
     const weekdayPart = String(fullMatch[3] || '').trim().toLowerCase()
-    if (!weekdayPart) return null
+    if (!weekdayPart) {
+      return null
+    }
     return { direction, anchor, weekdayPart, needle: normalizedNeedle }
   }
 
@@ -59,11 +63,40 @@ const parseRelativeQuery = (rawInput: string) => {
   if (shortMatch) {
     const anchor = String(shortMatch[1]).toLowerCase() as SearchAnchor
     const weekdayPart = String(shortMatch[2] || '').trim().toLowerCase()
-    if (!weekdayPart) return null
+    if (!weekdayPart) {
+      return null
+    }
     return { direction: 'on' as SearchDirection, anchor, weekdayPart, needle: normalizedNeedle }
   }
 
   return null
+}
+
+const buildRelativeTitlePrefix = (
+  direction: SearchDirection,
+  anchor: SearchAnchor,
+): string => {
+  if (direction === 'before') {
+    return anchor === 'last' ? 'before last' : 'before next'
+  }
+
+  if (direction === 'after') {
+    return anchor === 'last' ? 'after last' : 'after next'
+  }
+
+  return anchor === 'last' ? 'on last' : 'on next'
+}
+
+const getRelativeCategory = (direction: SearchDirection): string => {
+  if (direction === 'before') {
+    return 'date before'
+  }
+
+  if (direction === 'after') {
+    return 'date after'
+  }
+
+  return 'date exact'
 }
 
 const getRelativeCandidates = <TItem>(
@@ -73,11 +106,15 @@ const getRelativeCandidates = <TItem>(
 ): SearchToken[] => {
   if (String(rawInput || '').trim().length < 4 ||
   selected.some((value) => value.type === 'date_relative')
-) return []
+) {
+    return []
+  }
 
 
   const parsed = parseRelativeQuery(rawInput)
-  if (!parsed) return []
+  if (!parsed) {
+    return []
+  }
 
   const locale = annotations.locale ?? resolveEnglishLocale()
   const weekdays = getLocalizedWeekdaysMondayFirst(locale)
@@ -90,32 +127,24 @@ const getRelativeCandidates = <TItem>(
 
   const anchorModes: SearchAnchor[] = parsed.anchor
     ? [parsed.anchor]
-    : parsed.direction === 'before'
-      ? ['last', 'next']
-      : ['next', 'last']
+    : ['last', 'next']
+
+  const orderedWeekdays = weekdays.slice()
 
   const results: SearchToken[] = []
   const seen = new Set<string>()
 
-  anchorModes.forEach((anchor) => {
-    weekdays.forEach((entry) => {
+  orderedWeekdays.forEach((entry) => {
+    anchorModes.forEach((anchor) => {
       const target = getAnchorWeekdayDate(anchor, entry.weekdayIndexMonday)
       const dateText = formatDate(target)
-      const titlePrefix =
-        parsed.direction === 'before'
-          ? anchor === 'last'
-            ? 'before last'
-            : 'before next'
-          : parsed.direction === 'after'
-            ? anchor === 'last'
-              ? 'after last'
-              : 'after next'
-            : anchor === 'last'
-              ? 'on last'
-              : 'on next'
+      const titlePrefix = buildRelativeTitlePrefix(parsed.direction, anchor)
 
       const title = `${titlePrefix} ${entry.weekday}`
-      if (seen.has(title)) return
+      if (seen.has(title)) {
+        return
+      }
+
       seen.add(title)
 
       results.push({
@@ -123,12 +152,7 @@ const getRelativeCandidates = <TItem>(
         type: 'date_relative',
         title,
         rawTitle: dateText,
-        category:
-          parsed.direction === 'before'
-            ? 'date before'
-            : parsed.direction === 'after'
-              ? 'date after'
-              : 'date exact',
+        category: getRelativeCategory(parsed.direction),
         icon: 'event_repeat',
         direction: parsed.direction,
         anchor,
@@ -138,19 +162,27 @@ const getRelativeCandidates = <TItem>(
 
   const getPriority = (title: string): number => {
     const normalized = title.toLowerCase()
-    if (normalized === parsed.needle) return 3
-    if (normalized.startsWith(parsed.needle)) return 2
-    if (normalized.includes(parsed.needle)) return 1
+    if (normalized === parsed.needle) {
+      return 3
+    }
+
+    if (normalized.startsWith(parsed.needle)) {
+      return 2
+    }
+
+    if (normalized.includes(parsed.needle)) {
+      return 1
+    }
+
     return 0
   }
 
   return results
     .sort((a, b) => {
       const diff = getPriority(b.title) - getPriority(a.title)
-      if (diff !== 0) return diff
-      return a.title.localeCompare(b.title)
+      return diff
     })
-    .slice(0, annotations.maxWeekdaySuggestions ?? 3)
+    .slice(0, annotations.maxWeekdaySuggestions ?? 4)
 }
 
 const getDateOperationCandidates = (
@@ -158,7 +190,9 @@ const getDateOperationCandidates = (
   rawInput: string,
 ): SearchToken[] => {
   const parsedDate = parseDateInput(rawInput)
-  if (!parsedDate) return []
+  if (!parsedDate) {
+    return []
+  }
 
   const selectedTypes = new Set(selected.map((token) => token.type))
   const dateText = formatDate(parsedDate)
@@ -182,16 +216,30 @@ const getDateOperationCandidates = (
 }
 
 const getPositionWeight = (text: string, needle: string): number => {
-  if (!needle) return 0
+  if (!needle) {
+    return 0
+  }
+
   const index = text.indexOf(needle)
-  if (index < 0) return -1
-  if (index === 0) return SCORE_START
-  if (index + needle.length === text.length) return SCORE_END
+  if (index < 0) {
+    return -1
+  }
+
+  if (index === 0) {
+    return SCORE_START
+  }
+
+  if (index + needle.length === text.length) {
+    return SCORE_END
+  }
+
   return SCORE_MIDDLE
 }
 
 const getBestWordMatchScore = (text: string, needle: string): number => {
-  if (!needle) return 0
+  if (!needle) {
+    return 0
+  }
 
   const words = String(text || '')
     .split(/\s+/)
@@ -200,21 +248,29 @@ const getBestWordMatchScore = (text: string, needle: string): number => {
   let best = -1
   words.forEach((word, wordIndex) => {
     const locationScore = getPositionWeight(word, needle)
-    if (locationScore < 0) return
+    if (locationScore < 0) {
+      return
+    }
 
     const score = WORD_SCORE_BASE - wordIndex * WORD_INDEX_WEIGHT + locationScore
-    if (score > best) best = score
+    if (score > best) {
+      best = score
+    }
   })
 
   return best
 }
 
 const scoreSuggestion = (title: string, category: string, needle: string): number => {
-  if (!needle) return 1
+  if (!needle) {
+    return 1
+  }
 
   const normalizedTitle = String(title || '').toLowerCase()
   const wordMatchScore = getBestWordMatchScore(normalizedTitle, needle)
-  if (wordMatchScore < 0) return -1
+  if (wordMatchScore < 0) {
+    return -1
+  }
 
   const normalizedCategory = String(category || '').toLowerCase()
   const categoryScore = normalizedCategory.includes(needle) ? SCORE_CATEGORY_MATCH : 0
@@ -229,7 +285,9 @@ const scoreSuggestion = (title: string, category: string, needle: string): numbe
 
 const countTermOccurrencesInValue = (value: string, term: string): number => {
   const source = String(value ?? '').toLowerCase()
-  if (!source || !term) return 0
+  if (!source || !term) {
+    return 0
+  }
 
   const numeric = normalizeNumberLike(term)
   const isDigitsOnly = numeric.length > 0 && numeric === String(term)
@@ -251,7 +309,9 @@ const countColumnMatchesForTerms = <TItem>(
   columnKey: string,
   fulltextTerms: string[],
 ): number => {
-  if (!fulltextTerms.length) return 0
+  if (!fulltextTerms.length) {
+    return 0
+  }
 
   const searchKeys = [columnKey]
 
@@ -317,7 +377,10 @@ const buildNormalCandidates = <TItem>(
     })
 
   const sortByScoreThenTitle = (a: RankedSearchToken, b: RankedSearchToken): number => {
-    if (b._score !== a._score) return b._score - a._score
+    if (b._score !== a._score) {
+      return b._score - a._score
+    }
+
     return a.title.localeCompare(b.title)
   }
 
@@ -327,7 +390,10 @@ const buildNormalCandidates = <TItem>(
   const usedTypes = new Set<string>()
 
   sorted.slice(0, TOP_SCORE_FIRST_COUNT).forEach((candidate) => {
-    if (usedUids.has(candidate.uid)) return
+    if (usedUids.has(candidate.uid)) {
+      return
+    }
+
     usedUids.add(candidate.uid)
     usedTypes.add(candidate._columnType)
     result.push(candidate)
@@ -336,14 +402,20 @@ const buildNormalCandidates = <TItem>(
   const tail = sorted.slice(TOP_SCORE_FIRST_COUNT)
 
   tail.forEach((candidate) => {
-    if (usedUids.has(candidate.uid) || usedTypes.has(candidate._columnType)) return
+    if (usedUids.has(candidate.uid) || usedTypes.has(candidate._columnType)) {
+      return
+    }
+
     usedUids.add(candidate.uid)
     usedTypes.add(candidate._columnType)
     result.push(candidate)
   })
 
   tail.forEach((candidate) => {
-    if (usedUids.has(candidate.uid)) return
+    if (usedUids.has(candidate.uid)) {
+      return
+    }
+
     usedUids.add(candidate.uid)
     result.push(candidate)
   })
@@ -412,7 +484,10 @@ const mergeByUid = (...lists: SearchToken[][]): SearchToken[] => {
   const seen = new Set<string>()
 
   lists.flat().forEach((token) => {
-    if (seen.has(token.uid)) return
+    if (seen.has(token.uid)) {
+      return
+    }
+
     seen.add(token.uid)
     merged.push(token)
   })
