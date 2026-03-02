@@ -20,7 +20,17 @@ export const useTableSuggestTokenView = <TItem extends object>(
   modelDefinition: SearchModelDefinition<TItem>,
   getColumnByKey: (key: string) => SearchColumnDefinition<TItem> | undefined,
 ) => {
+  const isSubColumnToken = (token: SearchToken): boolean => {
+    const key = token.key ?? token.type
+    const column = getColumnByKey(key)
+    return Boolean(column?.renderAsSublineOf)
+  }
+
   const chipTypeLabel = (token: SearchToken): string => {
+    if (token.type === 'scope' && isSubColumnToken(token)) {
+      return 'In SubColumn'
+    }
+
     const mappedLabel =
       modelDefinition.tokenTypeLabelByType?.[token.type] ??
       defaultTokenTypeLabelByType[token.type]
@@ -66,6 +76,16 @@ export const useTableSuggestTokenView = <TItem extends object>(
   const suggestionCategoryLabel = (token: SearchToken): string => {
     const mappedLabel = modelDefinition.suggestionCategoryLabelByType?.[token.type]
     if (mappedLabel) return mappedLabel
+
+    if (isSubColumnToken(token)) {
+      const key = token.key ?? token.type
+      const column = getColumnByKey(key)
+      const parentLabel = column?.renderAsSublineOf
+        ? getColumnByKey(column.renderAsSublineOf)?.label
+        : undefined
+      return `${parentLabel ?? column?.label ?? token.category ?? token.type}-SubColumn`
+    }
+
     return token.category ?? token.type
   }
 

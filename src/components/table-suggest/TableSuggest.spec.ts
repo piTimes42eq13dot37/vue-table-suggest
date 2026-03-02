@@ -401,6 +401,53 @@ describe('TableSuggest', () => {
     expect(wrapper.text()).not.toContain('Full-Text:')
   })
 
+  it('uses In SubColumn chip label for scope tokens that target sub-columns', async () => {
+    const wrapper = mountTableSuggest()
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    select.vm.$emit('update:modelValue', [
+      {
+        uid: 'fulltext|21304',
+        type: 'fulltext',
+        title: '21304',
+      },
+      {
+        uid: 'scope|hangarCode',
+        type: 'scope',
+        key: 'hangarCode',
+        title: 'Hangar Code',
+        category: 'Fulltext scope',
+      },
+    ])
+    await nextTick()
+
+    expect(wrapper.text()).toContain('In SubColumn:')
+    expect(wrapper.text()).not.toContain('In Column:')
+  })
+
+  it('keeps In Column chip label for non-sub-column scope tokens', async () => {
+    const wrapper = mountTableSuggest()
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    select.vm.$emit('update:modelValue', [
+      {
+        uid: 'fulltext|orbital',
+        type: 'fulltext',
+        title: 'orbital',
+      },
+      {
+        uid: 'scope|hangar',
+        type: 'scope',
+        key: 'hangar',
+        title: 'Hangar',
+        category: 'Fulltext scope',
+      },
+    ])
+    await nextTick()
+
+    expect(wrapper.text()).toContain('In Column:')
+  })
+
   it('uses configurable suggestion category labels from model definition metadata', async () => {
     const modelDefinition = demoModelDefinition()
 
@@ -440,6 +487,17 @@ describe('TableSuggest', () => {
 
     const suggestionMeta = wrapper.findAll('.suggest-meta').map((node) => node.text())
     expect(suggestionMeta.some((text) => text.includes('Search Scope'))).toBe(true)
+  })
+
+  it('shows parent sub-column category label for sub-column suggestions', async () => {
+    const wrapper = mountTableSuggest()
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    select.vm.$emit('filter', '21304', (update: () => void) => update())
+    await nextTick()
+
+    const suggestionMeta = wrapper.findAll('.suggest-meta').map((node) => node.text())
+    expect(suggestionMeta.some((text) => text.includes('Hangar-SubColumn'))).toBe(true)
   })
 
   it('adds date-relative chip for after last tuesday when submitted by enter', async () => {
