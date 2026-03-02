@@ -266,6 +266,23 @@ watch(selected, (current) => {
 const addQueryAsFulltext = (rawValue: string): void => {
   const value = String(rawValue || '').trim()
   if (!value) return
+
+  const normalizedValue = value.toLowerCase()
+  const matchingSuggestion = buildSuggestions(
+    props.items,
+    props.annotations,
+    selected.value,
+    value,
+  ).find((token) => {
+    if (!String(token.type).startsWith('date_')) return false
+    return String(token.title || '').trim().toLowerCase() === normalizedValue
+  })
+
+  if (matchingSuggestion) {
+    addToken(matchingSuggestion)
+    return
+  }
+
   addToken({
     uid: `fulltext|${value}`,
     type: 'fulltext',

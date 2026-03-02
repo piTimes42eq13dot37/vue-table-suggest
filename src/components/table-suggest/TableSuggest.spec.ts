@@ -364,6 +364,18 @@ describe('TableSuggest', () => {
     expect(wrapper.text()).toContain('alpha')
   })
 
+  it('adds date-relative chip for after last tuesday when submitted by enter', async () => {
+    const wrapper = mountTableSuggest()
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    select.vm.$emit('new-value', 'after last tuesday', () => undefined)
+    await nextTick()
+
+    const chips = wrapper.findAll('.chip').map((chip) => chip.text().toLowerCase())
+    expect(chips.some((text) => text.includes('stardate:') && text.includes('after last'))).toBe(true)
+    expect(chips.some((text) => text.includes('full-text:') && text.includes('after last'))).toBe(false)
+  })
+
   it('shows before monday suggestions as before last and before next', async () => {
     const wrapper = mountTableSuggest()
     const select = wrapper.findComponent({ name: 'QSelect' })

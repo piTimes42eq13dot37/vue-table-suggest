@@ -42,6 +42,19 @@ describe('suggestion-service', () => {
     expect(suggestions.some((token) => token.title.toLowerCase().includes('after last'))).toBe(true)
   })
 
+  it('returns relative suggestions for after last thursday phrase', () => {
+    const suggestions = buildSuggestions(demoRows(), demoAnnotations(), [], 'after last thursday')
+
+    expect(suggestions.some((token) => token.type === 'date_relative')).toBe(true)
+    expect(
+      suggestions.some(
+        (token) =>
+          token.title.toLowerCase().includes('after last') &&
+          token.title.toLowerCase().includes('thursday'),
+      ),
+    ).toBe(true)
+  })
+
   it('does not include date_relative suggestions when one is already selected', () => {
     const suggestions = buildSuggestions(
       demoRows(),

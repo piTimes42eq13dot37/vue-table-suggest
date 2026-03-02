@@ -1,42 +1,42 @@
-import { defineComponent as Ae, ref as K, computed as N, watch as Ie, nextTick as Ne, resolveComponent as W, openBlock as y, createElementBlock as h, createElementVNode as L, createVNode as P, withCtx as q, createBlock as X, mergeProps as Fe, Fragment as T, renderList as M, toDisplayString as $, createTextVNode as V, createCommentVNode as U, normalizeStyle as We, normalizeClass as qe } from "vue";
+import { defineComponent as Ie, ref as K, computed as N, watch as Ne, nextTick as Fe, resolveComponent as W, openBlock as y, createElementBlock as h, createElementVNode as L, createVNode as V, withCtx as q, createBlock as X, mergeProps as We, Fragment as C, renderList as M, toDisplayString as $, createTextVNode as P, createCommentVNode as U, normalizeStyle as qe, normalizeClass as Be } from "vue";
 const Z = (t) => {
   const e = new Date(t);
   return e.setHours(0, 0, 0, 0), e;
-}, H = (t) => {
+}, z = (t) => {
   const e = String(t ?? "").trim(), r = e.match(/^(\d{2})\.(\d{2})\.(\d{4})$/), n = e.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!r && !n) return null;
-  const s = Number(r ? r[3] : n[1]), l = Number(r ? r[2] : n[2]), i = Number(r ? r[1] : n[3]), p = new Date(s, l - 1, i);
-  return p.setHours(0, 0, 0, 0), p.getFullYear() !== s || p.getMonth() !== l - 1 || p.getDate() !== i ? null : p;
-}, ye = (t) => {
+  const s = Number(r ? r[3] : n[1]), l = Number(r ? r[2] : n[2]), c = Number(r ? r[1] : n[3]), p = new Date(s, l - 1, c);
+  return p.setHours(0, 0, 0, 0), p.getFullYear() !== s || p.getMonth() !== l - 1 || p.getDate() !== c ? null : p;
+}, me = (t) => {
   const e = Z(t), r = String(e.getDate()).padStart(2, "0"), n = String(e.getMonth() + 1).padStart(2, "0"), s = e.getFullYear();
   return `${r}.${n}.${s}`;
-}, Be = (t) => (Z(t).getDay() + 6) % 7, Pe = (t = "en-US") => {
+}, Ve = (t) => (Z(t).getDay() + 6) % 7, Pe = (t = "en-US") => {
   const e = new Intl.DateTimeFormat(t, { weekday: "long" }), r = new Date(2024, 0, 1);
   return Array.from({ length: 7 }, (n, s) => {
     const l = new Date(r);
     return l.setDate(r.getDate() + s), e.format(l);
   });
-}, Ve = (t, e, r = /* @__PURE__ */ new Date()) => {
-  const n = Z(r), s = Be(n), l = new Date(n);
+}, ze = (t, e, r = /* @__PURE__ */ new Date()) => {
+  const n = Z(r), s = Ve(n), l = new Date(n);
   if (t === "last") {
     const p = (s - e + 7) % 7 || 7;
     return l.setDate(n.getDate() - p), l;
   }
-  const i = (e - s + 7) % 7 || 7;
-  return l.setDate(n.getDate() + i), l;
+  const c = (e - s + 7) % 7 || 7;
+  return l.setDate(n.getDate() + c), l;
 }, He = (t) => {
   const e = Z(t), r = (e.getDay() + 6) % 7, n = new Date(e);
   n.setDate(e.getDate() - r + 3);
-  const s = n.getFullYear(), l = new Date(s, 0, 4), i = (l.getDay() + 6) % 7;
-  return l.setDate(l.getDate() - i + 3), { weekNo: 1 + Math.round((n.getTime() - l.getTime()) / 6048e5), weekYear: s };
-}, ze = (t, e = "en-US") => {
-  const r = H(t);
+  const s = n.getFullYear(), l = new Date(s, 0, 4), c = (l.getDay() + 6) % 7;
+  return l.setDate(l.getDate() - c + 3), { weekNo: 1 + Math.round((n.getTime() - l.getTime()) / 6048e5), weekYear: s };
+}, Ge = (t, e = "en-US") => {
+  const r = z(t);
   if (!r) return "";
   const n = new Intl.DateTimeFormat(e, {
     weekday: "long"
   }).format(r), { weekNo: s, weekYear: l } = He(r);
   return `KW ${String(s).padStart(2, "0")}/${l} - ${n}`;
-}, Y = (t) => String(t ?? "").replace(/[^0-9]/g, ""), he = (t) => {
+}, Y = (t) => String(t ?? "").replace(/[^0-9]/g, ""), _e = (t) => {
   const e = Y(t);
   return e ? e.replace(/\B(?=(\d{3})+(?!\d))/g, ".") : String(t ?? "");
 }, J = (t, e) => {
@@ -44,86 +44,86 @@ const Z = (t) => {
     return String(e.accessor(t) ?? "");
   const r = e.key;
   return String(t[r] ?? "");
-}, Ge = (t, e) => {
+}, Ke = (t, e) => {
   if (!e.length)
     return t.columns.filter((s) => s.searchable !== !1);
   const r = new Set(e), n = /* @__PURE__ */ new Set();
   return t.columns.forEach((s) => {
     r.has(s.key) && s.scopeGroup && n.add(s.scopeGroup);
   }), t.columns.filter((s) => !r.has(s.key) && !n.has(s.scopeGroup ?? "") ? !1 : s.searchable !== !1);
-}, Ke = (t, e, r) => {
+}, Ue = (t, e, r) => {
   const n = e.columns.find((s) => s.key === r);
   return n ? J(t, n) : String(t[r] ?? "");
-}, ie = (t) => String(t).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), ce = (t) => String(t ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;"), me = () => typeof globalThis > "u" || typeof globalThis.navigator > "u" || !Array.isArray(globalThis.navigator.languages) ? "en-US" : globalThis.navigator.languages.find((t) => String(t).toLowerCase().startsWith("en")) ?? "en-US", Ue = (t, e) => {
-  const r = ce(t), n = e.map((s) => String(s || "").trim()).filter((s) => s.length > 0);
+}, ce = (t) => String(t).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), ue = (t) => String(t ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;"), Se = () => typeof globalThis > "u" || typeof globalThis.navigator > "u" || !Array.isArray(globalThis.navigator.languages) ? "en-US" : globalThis.navigator.languages.find((t) => String(t).toLowerCase().startsWith("en")) ?? "en-US", Ye = (t, e) => {
+  const r = ue(t), n = e.map((s) => String(s || "").trim()).filter((s) => s.length > 0);
   return n.length ? n.reduce((s, l) => {
-    const i = Y(l), _ = i.length > 0 && i === String(l) ? i.split("").map((u) => ie(u)).join("[^0-9]*") : ie(ce(l)), a = new RegExp(_, "gi");
+    const c = Y(l), S = c.length > 0 && c === String(l) ? c.split("").map((u) => ce(u)).join("[^0-9]*") : ce(ue(l)), a = new RegExp(S, "gi");
     return s.replace(a, (u) => `<mark>${u}</mark>`);
   }, r) : r;
-}, Ye = (t) => ({
+}, je = (t) => ({
   fullTextTokens: t.filter((e) => e.type === "fulltext"),
   exactTokens: t.filter((e) => !["fulltext", "scope"].includes(e.type)),
   scopedColumnKeys: t.filter((e) => e.type === "scope" && e.key).map((e) => e.key)
-}), je = (t) => t.type === "date_before" || t.type === "date_after" || t.type === "date_exact" || t.type === "date_relative", Qe = (t) => t.key ?? (t.type.startsWith("date_") || t.type === "date_relative" ? "date" : t.type), ne = (t, e, r) => {
-  const { fullTextTokens: n, exactTokens: s, scopedColumnKeys: l } = Ye(r), i = Ge(e, l);
+}), Qe = (t) => t.type === "date_before" || t.type === "date_after" || t.type === "date_exact" || t.type === "date_relative", Xe = (t) => t.key ?? (t.type.startsWith("date_") || t.type === "date_relative" ? "date" : t.type), ne = (t, e, r) => {
+  const { fullTextTokens: n, exactTokens: s, scopedColumnKeys: l } = je(r), c = Ke(e, l);
   return t.filter((p) => {
-    for (const _ of s) {
-      const a = Qe(_), u = e.columns.find((D) => D.key === a), m = u ? J(p, u) : "";
-      if (je(_)) {
-        const D = H(m), R = H(_.rawTitle || _.title);
+    for (const S of s) {
+      const a = Xe(S), u = e.columns.find((D) => D.key === a), _ = u ? J(p, u) : "";
+      if (Qe(S)) {
+        const D = z(_), R = z(S.rawTitle || S.title);
         if (!D || !R) return !1;
-        const g = D.getTime(), v = R.getTime();
-        if ((_.type === "date_before" || _.direction === "before") && !(g < v) || (_.type === "date_after" || _.direction === "after") && !(g > v) || (_.type === "date_exact" || _.direction === "on") && g !== v)
+        const g = D.getTime(), x = R.getTime();
+        if ((S.type === "date_before" || S.direction === "before") && !(g < x) || (S.type === "date_after" || S.direction === "after") && !(g > x) || (S.type === "date_exact" || S.direction === "on") && g !== x)
           return !1;
         continue;
       }
       if (u?.valueType === "number-like") {
-        if (Y(m) !== Y(_.title))
+        if (Y(_) !== Y(S.title))
           return !1;
         continue;
       }
-      if (String(m).toLowerCase() !== String(_.title || "").toLowerCase())
+      if (String(_).toLowerCase() !== String(S.title || "").toLowerCase())
         return !1;
     }
-    for (const _ of n) {
-      const a = String(_.title || "").toLowerCase();
+    for (const S of n) {
+      const a = String(S.title || "").toLowerCase();
       if (!a) continue;
-      if (!i.some(
-        (m) => String(J(p, m)).toLowerCase().includes(a)
+      if (!c.some(
+        (_) => String(J(p, _)).toLowerCase().includes(a)
       )) return !1;
     }
     return !0;
   });
-}, Xe = 1, Je = 300, Ze = 200, et = 100, tt = 1e4, nt = 1e3, ot = 40, rt = 50, st = 30, at = 6, ue = 3, lt = (t, e) => `${t}|${e}`, de = (t) => t.valueType === "number-like", fe = (t) => String(t).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), it = (t) => {
+}, Je = 1, Ze = 300, et = 200, tt = 100, nt = 1e4, ot = 1e3, rt = 40, st = 50, at = 30, lt = 6, de = 3, it = (t, e) => `${t}|${e}`, fe = (t) => t.valueType === "number-like", ge = (t) => String(t).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), ct = (t) => {
   const e = t.trim().toLowerCase();
   if (!e) return null;
   const r = e.startsWith("date ") ? e.slice(5).trim() : e, n = r.match(/^(before|after|on)(?:\s+(last|next))?\s+(.+)$/i);
   if (n) {
-    const l = String(n[1]).toLowerCase(), i = String(n[2] || "").toLowerCase() || null, p = String(n[3] || "").trim().toLowerCase();
-    return p ? { direction: l, anchor: i, weekdayPart: p, needle: r } : null;
+    const l = String(n[1]).toLowerCase(), c = String(n[2] || "").toLowerCase() || null, p = String(n[3] || "").trim().toLowerCase();
+    return p ? { direction: l, anchor: c, weekdayPart: p, needle: r } : null;
   }
   const s = r.match(/^(last|next)\s+(.+)$/i);
   if (s) {
-    const l = String(s[1]).toLowerCase(), i = String(s[2] || "").trim().toLowerCase();
-    return i ? { direction: "on", anchor: l, weekdayPart: i, needle: r } : null;
+    const l = String(s[1]).toLowerCase(), c = String(s[2] || "").trim().toLowerCase();
+    return c ? { direction: "on", anchor: l, weekdayPart: c, needle: r } : null;
   }
   return null;
-}, ct = (t, e, r) => {
+}, ut = (t, e, r) => {
   if (String(r || "").trim().length < 4 || e.some((u) => u.type === "date_relative")) return [];
-  const n = it(r);
+  const n = ct(r);
   if (!n) return [];
-  const s = t.locale ?? me(), l = Pe(s).map((u, m) => ({
+  const s = t.locale ?? Se(), l = Pe(s).map((u, _) => ({
     weekday: u,
-    weekdayIndexMonday: m,
+    weekdayIndexMonday: _,
     weekdayLower: u.toLowerCase()
-  })).filter((u) => u.weekdayLower.startsWith(n.weekdayPart)), i = n.anchor ? [n.anchor] : n.direction === "before" ? ["last", "next"] : ["next", "last"], p = [], _ = /* @__PURE__ */ new Set();
-  i.forEach((u) => {
-    l.forEach((m) => {
-      const D = Ve(u, m.weekdayIndexMonday), R = ye(D), v = `${n.direction === "before" ? u === "last" ? "before last" : "before next" : n.direction === "after" ? u === "last" ? "after last" : "after next" : u === "last" ? "on last" : "on next"} ${m.weekday}`;
-      _.has(v) || (_.add(v), p.push({
-        uid: `date_relative|${n.direction}|${u}|${m.weekdayIndexMonday}|${R}`,
+  })).filter((u) => u.weekdayLower.startsWith(n.weekdayPart)), c = n.anchor ? [n.anchor] : n.direction === "before" ? ["last", "next"] : ["next", "last"], p = [], S = /* @__PURE__ */ new Set();
+  c.forEach((u) => {
+    l.forEach((_) => {
+      const D = ze(u, _.weekdayIndexMonday), R = me(D), x = `${n.direction === "before" ? u === "last" ? "before last" : "before next" : n.direction === "after" ? u === "last" ? "after last" : "after next" : u === "last" ? "on last" : "on next"} ${_.weekday}`;
+      S.has(x) || (S.add(x), p.push({
+        uid: `date_relative|${n.direction}|${u}|${_.weekdayIndexMonday}|${R}`,
         type: "date_relative",
-        title: v,
+        title: x,
         rawTitle: R,
         category: n.direction === "before" ? "date before" : n.direction === "after" ? "date after" : "date exact",
         icon: "event_repeat",
@@ -133,81 +133,81 @@ const Z = (t) => {
     });
   });
   const a = (u) => {
-    const m = u.toLowerCase();
-    return m === n.needle ? 3 : m.startsWith(n.needle) ? 2 : m.includes(n.needle) ? 1 : 0;
+    const _ = u.toLowerCase();
+    return _ === n.needle ? 3 : _.startsWith(n.needle) ? 2 : _.includes(n.needle) ? 1 : 0;
   };
-  return p.sort((u, m) => {
-    const D = a(m.title) - a(u.title);
-    return D !== 0 ? D : u.title.localeCompare(m.title);
+  return p.sort((u, _) => {
+    const D = a(_.title) - a(u.title);
+    return D !== 0 ? D : u.title.localeCompare(_.title);
   }).slice(0, t.maxWeekdaySuggestions ?? 3);
-}, ut = (t, e) => {
-  const r = H(e);
+}, dt = (t, e) => {
+  const r = z(e);
   if (!r) return [];
-  const n = new Set(t.map((i) => i.type)), s = ye(r);
+  const n = new Set(t.map((c) => c.type)), s = me(r);
   return [
     { type: "date_before", category: "date before", icon: "event_busy" },
     { type: "date_after", category: "date after", icon: "event_available" },
     { type: "date_exact", category: "date exact", icon: "event" }
-  ].filter((i) => !n.has(i.type)).map((i) => ({
-    uid: `${i.type}|${s}`,
-    type: i.type,
+  ].filter((c) => !n.has(c.type)).map((c) => ({
+    uid: `${c.type}|${s}`,
+    type: c.type,
     title: s,
     rawTitle: s,
-    category: i.category,
-    icon: i.icon
+    category: c.category,
+    icon: c.icon
   }));
-}, dt = (t, e) => {
+}, ft = (t, e) => {
   if (!e) return 0;
   const r = t.indexOf(e);
-  return r < 0 ? -1 : r === 0 ? Je : r + e.length === t.length ? et : Ze;
-}, ft = (t, e) => {
+  return r < 0 ? -1 : r === 0 ? Ze : r + e.length === t.length ? tt : et;
+}, gt = (t, e) => {
   if (!e) return 0;
   const r = String(t || "").split(/\s+/).filter((s) => s.length > 0);
   let n = -1;
   return r.forEach((s, l) => {
-    const i = dt(s, e);
-    if (i < 0) return;
-    const p = tt - l * nt + i;
+    const c = ft(s, e);
+    if (c < 0) return;
+    const p = nt - l * ot + c;
     p > n && (n = p);
   }), n;
-}, _e = (t, e, r) => {
+}, ke = (t, e, r) => {
   if (!r) return 1;
-  const n = String(t || "").toLowerCase(), s = ft(n, r);
+  const n = String(t || "").toLowerCase(), s = gt(n, r);
   if (s < 0) return -1;
-  const i = String(e || "").toLowerCase().includes(r) ? ot : 0, p = n === r ? rt : 0, _ = Math.min(
-    st,
-    Math.floor(n.length / at)
+  const c = String(e || "").toLowerCase().includes(r) ? rt : 0, p = n === r ? st : 0, S = Math.min(
+    at,
+    Math.floor(n.length / lt)
   );
-  return s + i + p - _;
-}, gt = (t, e) => {
+  return s + c + p - S;
+}, pt = (t, e) => {
   const r = String(t ?? "").toLowerCase();
   if (!r || !e) return 0;
-  const n = Y(e), l = n.length > 0 && n === String(e) ? n.split("").map((_) => fe(_)).join("[^0-9]*") : fe(String(e)), i = new RegExp(l, "gi"), p = r.match(i);
+  const n = Y(e), l = n.length > 0 && n === String(e) ? n.split("").map((S) => ge(S)).join("[^0-9]*") : ge(String(e)), c = new RegExp(l, "gi"), p = r.match(c);
   return p ? p.length : 0;
-}, pt = (t, e, r, n) => {
+}, yt = (t, e, r, n) => {
   if (!n.length) return 0;
   const s = [r];
-  return t.reduce((l, i) => {
-    const p = n.reduce((_, a) => {
-      const u = s.reduce((m, D) => m + gt(Ke(i, e, D), a), 0);
-      return _ + u;
+  return t.reduce((l, c) => {
+    const p = n.reduce((S, a) => {
+      const u = s.reduce((_, D) => _ + pt(Ue(c, e, D), a), 0);
+      return S + u;
     }, 0);
     return l + p;
   }, 0);
-}, ge = (t, e, r, n) => {
+}, pe = (t, e, r, n) => {
   const s = new Set(
     r.map((g) => g.type).filter((g) => g && !["fulltext", "scope"].includes(g))
-  ), l = [], i = /* @__PURE__ */ new Set(), p = ne(t, e, r);
+  ), l = [], c = /* @__PURE__ */ new Set(), p = ne(t, e, r);
   e.columns.filter((g) => g.suggestionEnabled !== !1).forEach((g) => {
-    s.has(g.key) || new Set(p.map((v) => J(v, g))).forEach((v) => {
-      const A = String(v ?? "");
+    s.has(g.key) || new Set(p.map((x) => J(x, g))).forEach((x) => {
+      const A = String(x ?? "");
       if (!A) return;
-      const z = lt(g.key, A);
-      if (i.has(z)) return;
-      i.add(z);
-      const F = de(g) ? he(A) : A, j = de(g) ? A : F, G = _e(j, g.label, n);
+      const H = it(g.key, A);
+      if (c.has(H)) return;
+      c.add(H);
+      const F = fe(g) ? _e(A) : A, j = fe(g) ? A : F, G = ke(j, g.label, n);
       G < 0 && n.length > 0 || l.push({
-        uid: z,
+        uid: H,
         type: g.key,
         key: g.key,
         title: F,
@@ -219,25 +219,25 @@ const Z = (t) => {
       });
     });
   });
-  const _ = (g, v) => v._score !== g._score ? v._score - g._score : g.title.localeCompare(v.title), a = l.slice().sort(_), u = [], m = /* @__PURE__ */ new Set(), D = /* @__PURE__ */ new Set();
-  a.slice(0, ue).forEach((g) => {
-    m.has(g.uid) || (m.add(g.uid), D.add(g._columnType), u.push(g));
+  const S = (g, x) => x._score !== g._score ? x._score - g._score : g.title.localeCompare(x.title), a = l.slice().sort(S), u = [], _ = /* @__PURE__ */ new Set(), D = /* @__PURE__ */ new Set();
+  a.slice(0, de).forEach((g) => {
+    _.has(g.uid) || (_.add(g.uid), D.add(g._columnType), u.push(g));
   });
-  const R = a.slice(ue);
+  const R = a.slice(de);
   return R.forEach((g) => {
-    m.has(g.uid) || D.has(g._columnType) || (m.add(g.uid), D.add(g._columnType), u.push(g));
+    _.has(g.uid) || D.has(g._columnType) || (_.add(g.uid), D.add(g._columnType), u.push(g));
   }), R.forEach((g) => {
-    m.has(g.uid) || (m.add(g.uid), u.push(g));
+    _.has(g.uid) || (_.add(g.uid), u.push(g));
   }), u.map((g) => {
-    const v = { ...g };
-    return delete v._score, delete v._columnType, v;
+    const x = { ...g };
+    return delete x._score, delete x._columnType, x;
   });
-}, yt = (t, e, r, n) => {
-  const s = r.filter((a) => a.type === "fulltext").map((a) => String(a.title || "").toLowerCase()).filter((a) => a.length > 0), l = r.filter((a) => !["fulltext", "scope"].includes(a.type)), i = ne(t, e, l), p = new Set(
+}, ht = (t, e, r, n) => {
+  const s = r.filter((a) => a.type === "fulltext").map((a) => String(a.title || "").toLowerCase()).filter((a) => a.length > 0), l = r.filter((a) => !["fulltext", "scope"].includes(a.type)), c = ne(t, e, l), p = new Set(
     r.filter((a) => a.type === "scope" && a.key).map((a) => a.key)
   );
   return e.columns.filter((a) => a.searchable !== !1).filter((a) => !p.has(a.key)).map((a) => {
-    const u = pt(i, e, a.key, s), m = n.length === 0 ? 1 : _e(a.label, "Fulltext scope", n);
+    const u = yt(c, e, a.key, s), _ = n.length === 0 ? 1 : ke(a.label, "Fulltext scope", n);
     return {
       uid: `scope|${a.key}`,
       type: "scope",
@@ -246,139 +246,150 @@ const Z = (t) => {
       category: "Fulltext scope",
       icon: a.icon,
       matchCount: u,
-      _score: m
+      _score: _
     };
   }).filter((a) => a.matchCount > 0).filter((a) => n.length === 0 || a._score >= 0).sort((a, u) => u.matchCount !== a.matchCount ? u.matchCount - a.matchCount : u._score !== a._score ? u._score - a._score : a.title.localeCompare(u.title)).map((a) => {
     const u = { ...a };
     return delete u._score, u;
   });
-}, pe = (...t) => {
+}, ye = (...t) => {
   const e = [], r = /* @__PURE__ */ new Set();
   return t.flat().forEach((n) => {
     r.has(n.uid) || (r.add(n.uid), e.push(n));
   }), e;
-}, ht = (t, e, r, n) => {
-  const s = String(n || "").trim().toLowerCase(), l = e.maxSuggestions ?? 7, i = ut(r, n), p = ct(e, r, n);
+}, mt = (t, e, r, n) => {
+  const s = String(n || "").trim().toLowerCase(), l = e.maxSuggestions ?? 7, c = dt(r, n), p = ut(e, r, n);
   if (r.some((a) => a.type === "fulltext")) {
-    const a = yt(t, e, r, s), u = ge(t, e, r, s);
-    return pe(i, p, a, u).slice(0, l);
+    const a = ht(t, e, r, s), u = pe(t, e, r, s);
+    return ye(c, p, a, u).slice(0, l);
   }
-  return i.length > 0 || p.length > 0 ? pe(i, p).slice(0, l) : s.length < Xe ? [] : ge(t, e, r, s).slice(0, l);
-}, mt = () => me(), Wt = (t, e) => Ue(t, e), _t = (t, e, r) => ne(t, e, r), kt = (t, e, r, n) => ht(t, e, r, n), St = { class: "table-suggest" }, vt = { class: "search-wrap" }, xt = { key: 0 }, wt = { key: 1 }, Tt = { class: "data-table" }, Ct = ["onClick"], bt = { class: "sort-icon-slot" }, Dt = { key: 0 }, $t = ["title"], Et = { key: 0 }, Lt = ["title"], Ot = { key: 0 }, Rt = ["title"], Mt = { key: 0 }, At = /* @__PURE__ */ Ae({
+  return c.length > 0 || p.length > 0 ? ye(c, p).slice(0, l) : s.length < Je ? [] : pe(t, e, r, s).slice(0, l);
+}, _t = () => Se(), Wt = (t, e) => Ye(t, e), St = (t, e, r) => ne(t, e, r), he = (t, e, r, n) => mt(t, e, r, n), kt = { class: "table-suggest" }, vt = { class: "search-wrap" }, xt = { key: 0 }, wt = { key: 1 }, Tt = { class: "data-table" }, Ct = ["onClick"], bt = { class: "sort-icon-slot" }, Dt = { key: 0 }, $t = ["title"], Et = { key: 0 }, Lt = ["title"], Ot = { key: 0 }, Rt = ["title"], Mt = { key: 0 }, At = /* @__PURE__ */ Ie({
   __name: "TableSuggest",
   props: {
     items: {},
     annotations: {}
   },
   setup(t) {
-    const e = t, r = K(""), n = K([]), l = K({ key: e.annotations.columns.find((o) => !o.renderAsSublineOf && o.sortable !== !1)?.key ?? "", asc: !0 }), i = K([]), p = K(null), _ = N(() => e.annotations.locale ?? mt()), a = N(
-      () => new Intl.Collator(_.value, { numeric: !0, sensitivity: "base" })
+    const e = t, r = K(""), n = K([]), l = K({ key: e.annotations.columns.find((o) => !o.renderAsSublineOf && o.sortable !== !1)?.key ?? "", asc: !0 }), c = K([]), p = K(null), S = N(() => e.annotations.locale ?? _t()), a = N(
+      () => new Intl.Collator(S.value, { numeric: !0, sensitivity: "base" })
     ), u = N(
-      () => kt(e.items, e.annotations, n.value, r.value)
-    ), m = N(
+      () => he(e.items, e.annotations, n.value, r.value)
+    ), _ = N(
       () => e.annotations.columns.filter((o) => !o.renderAsSublineOf)
     ), D = N(() => {
       const o = /* @__PURE__ */ new Map();
-      return e.annotations.columns.forEach((c) => {
-        const f = c.renderAsSublineOf;
-        if (!f) return;
-        const k = o.get(f) ?? [];
-        o.set(f, [...k, c]);
+      return e.annotations.columns.forEach((i) => {
+        const d = i.renderAsSublineOf;
+        if (!d) return;
+        const m = o.get(d) ?? [];
+        o.set(d, [...m, i]);
       }), o;
-    }), R = N(() => _t(e.items, e.annotations, n.value)), g = N(() => {
-      const o = e.annotations.columns.find((f) => f.key === l.value.key), c = R.value.slice();
-      return !o || o.sortable === !1 || c.sort((f, k) => {
-        const C = (E) => o.accessor ? String(o.accessor(E) ?? "") : String(E[o.key] ?? ""), x = C(f), O = C(k);
+    }), R = N(() => St(e.items, e.annotations, n.value)), g = N(() => {
+      const o = e.annotations.columns.find((d) => d.key === l.value.key), i = R.value.slice();
+      return !o || o.sortable === !1 || i.sort((d, m) => {
+        const v = (E) => o.accessor ? String(o.accessor(E) ?? "") : String(E[o.key] ?? ""), w = v(d), O = v(m);
         if (o.key === "date") {
-          const E = H(x), B = H(O);
+          const E = z(w), B = z(O);
           if (E && B) {
-            const d = E.getTime(), w = B.getTime();
-            return l.value.asc ? d - w : w - d;
+            const f = E.getTime(), T = B.getTime();
+            return l.value.asc ? f - T : T - f;
           }
         }
-        return l.value.asc ? a.value.compare(x, O) : a.value.compare(O, x);
-      }), c;
-    }), v = N(
+        return l.value.asc ? a.value.compare(w, O) : a.value.compare(O, w);
+      }), i;
+    }), x = N(
       () => n.value.filter((o) => o.type === "fulltext").map((o) => o.title)
     ), A = N(
       () => n.value.filter((o) => o.type === "scope" && o.key).map((o) => o.key)
-    ), z = (o) => {
-      if (!v.value.length) return !1;
+    ), H = (o) => {
+      if (!x.value.length) return !1;
       if (!A.value.length) return !0;
-      const c = new Set(A.value), f = e.annotations.columns.filter((x) => c.has(x.key)), k = new Set(f.map((x) => x.scopeGroup).filter(Boolean));
-      if (c.has(o)) return !0;
-      const C = e.annotations.columns.find((x) => x.key === o);
-      return C?.scopeGroup ? k.has(C.scopeGroup) : !1;
-    }, F = (o) => e.annotations.columns.find((c) => c.key === o), j = (o) => D.value.get(o) ?? [], G = (o) => String(o).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), Se = (o) => String(o || "").replace(/[^0-9]/g, ""), ve = (o) => {
-      const c = Se(o);
-      return c.length > 0 && c === o ? c.split("").map((k) => G(k)).join("[^0-9]*") : G(o);
-    }, xe = (o) => {
+      const i = new Set(A.value), d = e.annotations.columns.filter((w) => i.has(w.key)), m = new Set(d.map((w) => w.scopeGroup).filter(Boolean));
+      if (i.has(o)) return !0;
+      const v = e.annotations.columns.find((w) => w.key === o);
+      return v?.scopeGroup ? m.has(v.scopeGroup) : !1;
+    }, F = (o) => e.annotations.columns.find((i) => i.key === o), j = (o) => D.value.get(o) ?? [], G = (o) => String(o).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), xe = (o) => String(o || "").replace(/[^0-9]/g, ""), we = (o) => {
+      const i = xe(o);
+      return i.length > 0 && i === o ? i.split("").map((m) => G(m)).join("[^0-9]*") : G(o);
+    }, Te = (o) => {
       if (!o.length) return [];
-      const c = o.slice().sort((k, C) => k.start - C.start), f = [c[0]];
-      return c.slice(1).forEach((k) => {
-        const C = f[f.length - 1];
-        if (k.start <= C.end) {
-          C.end = Math.max(C.end, k.end);
+      const i = o.slice().sort((m, v) => m.start - v.start), d = [i[0]];
+      return i.slice(1).forEach((m) => {
+        const v = d[d.length - 1];
+        if (m.start <= v.end) {
+          v.end = Math.max(v.end, m.end);
           return;
         }
-        f.push({ ...k });
-      }), f;
-    }, oe = (o, c) => {
-      const f = String(o ?? ""), k = Array.from(
-        new Set(c.map((S) => String(S || "").trim()).filter((S) => S.length > 0))
+        d.push({ ...m });
+      }), d;
+    }, oe = (o, i) => {
+      const d = String(o ?? ""), m = Array.from(
+        new Set(i.map((k) => String(k || "").trim()).filter((k) => k.length > 0))
       );
-      if (!k.length)
-        return [{ text: f, highlighted: !1 }];
-      const C = k.slice().sort((S, b) => b.length - S.length).map((S) => ve(S)).join("|"), x = new RegExp(C, "gi"), O = [];
-      let E = x.exec(f);
+      if (!m.length)
+        return [{ text: d, highlighted: !1 }];
+      const v = m.slice().sort((k, b) => b.length - k.length).map((k) => we(k)).join("|"), w = new RegExp(v, "gi"), O = [];
+      let E = w.exec(d);
       for (; E; ) {
-        const S = E[0] ?? "";
-        S.length > 0 && O.push({ start: E.index, end: E.index + S.length }), S.length === 0 && (x.lastIndex += 1), E = x.exec(f);
+        const k = E[0] ?? "";
+        k.length > 0 && O.push({ start: E.index, end: E.index + k.length }), k.length === 0 && (w.lastIndex += 1), E = w.exec(d);
       }
       if (!O.length)
-        return [{ text: f, highlighted: !1 }];
-      const B = xe(O), d = [];
-      let w = 0;
-      return B.forEach((S) => {
-        S.start > w && d.push({ text: f.slice(w, S.start), highlighted: !1 }), d.push({ text: f.slice(S.start, S.end), highlighted: !0 }), w = S.end;
-      }), w < f.length && d.push({ text: f.slice(w), highlighted: !1 }), d;
-    }, re = (o, c) => {
-      const f = F(c), k = (x) => f?.valueType === "number-like" ? he(x) : String(x ?? "");
-      return f?.accessor ? k(f.accessor(o)) : k(o[c]);
-    }, we = (o) => {
-      if (n.value.some((c) => c.uid === o.uid)) {
-        r.value = "", i.value = [];
+        return [{ text: d, highlighted: !1 }];
+      const B = Te(O), f = [];
+      let T = 0;
+      return B.forEach((k) => {
+        k.start > T && f.push({ text: d.slice(T, k.start), highlighted: !1 }), f.push({ text: d.slice(k.start, k.end), highlighted: !0 }), T = k.end;
+      }), T < d.length && f.push({ text: d.slice(T), highlighted: !1 }), f;
+    }, re = (o, i) => {
+      const d = F(i), m = (w) => d?.valueType === "number-like" ? _e(w) : String(w ?? "");
+      return d?.accessor ? m(d.accessor(o)) : m(o[i]);
+    }, se = (o) => {
+      if (n.value.some((i) => i.uid === o.uid)) {
+        r.value = "", c.value = [];
         return;
       }
-      n.value = [...n.value, o], r.value = "", i.value = [];
+      n.value = [...n.value, o], r.value = "", c.value = [];
     };
-    Ie(n, (o) => {
-      const c = o.filter(
-        (k, C, x) => x.findIndex((O) => O.uid === k.uid) === C
+    Ne(n, (o) => {
+      const i = o.filter(
+        (m, v, w) => w.findIndex((O) => O.uid === m.uid) === v
       );
-      if (c.length !== o.length) {
-        n.value = c;
+      if (i.length !== o.length) {
+        n.value = i;
         return;
       }
-      if (!o.some((k) => k.type === "fulltext") && o.some((k) => k.type === "scope")) {
-        n.value = o.filter((k) => k.type !== "scope");
+      if (!o.some((m) => m.type === "fulltext") && o.some((m) => m.type === "scope")) {
+        n.value = o.filter((m) => m.type !== "scope");
         return;
       }
-      r.value = "", i.value = [], Ne(() => {
+      r.value = "", c.value = [], Fe(() => {
         p.value?.updateInputValue?.("", !0, !0), p.value?.hidePopup?.();
       });
     });
-    const Te = (o) => {
-      const c = String(o || "").trim();
-      c && we({
-        uid: `fulltext|${c}`,
+    const Ce = (o) => {
+      const i = String(o || "").trim();
+      if (!i) return;
+      const d = i.toLowerCase(), m = he(
+        e.items,
+        e.annotations,
+        n.value,
+        i
+      ).find((v) => String(v.type).startsWith("date_") ? String(v.title || "").trim().toLowerCase() === d : !1);
+      if (m) {
+        se(m);
+        return;
+      }
+      se({
+        uid: `fulltext|${i}`,
         type: "fulltext",
-        title: c,
+        title: i,
         category: "Fulltext",
         icon: "search"
       });
-    }, Ce = (o) => {
-      const f = {
+    }, be = (o) => {
+      const d = {
         date_before: "Stardate before",
         date_after: "Stardate after",
         date_exact: "Stardate exact",
@@ -386,28 +397,28 @@ const Z = (t) => {
         fulltext: "Full-Text",
         scope: "In Column"
       }[o.type];
-      if (f) return f;
-      const k = o.key ?? o.type;
-      return F(k)?.label ?? o.category ?? o.type;
+      if (d) return d;
+      const m = o.key ?? o.type;
+      return F(m)?.label ?? o.category ?? o.type;
     }, ee = {
       fulltext: "teal-9",
       scope: "green-8",
       subcolumn: "light-blue-9"
-    }, be = (o) => {
+    }, De = (o) => {
       if (ee[o.type]) return ee[o.type];
-      const c = o.key ?? o.type;
-      if (F(c)?.renderAsSublineOf)
+      const i = o.key ?? o.type;
+      if (F(i)?.renderAsSublineOf)
         return ee.subcolumn;
-    }, se = (o, c, f) => c?.[o.type] ?? be(o) ?? f ?? e.annotations.tokenDefaultColor ?? "indigo-9", te = (o) => se(o, e.annotations.tokenColorByType), De = (o) => se(o, e.annotations.optionBadgeColorByType, te(o)), $e = (o, c) => {
-      Te(o), c(null);
-    }, Ee = (o, c) => {
-      c(() => {
-        r.value = o, i.value = u.value.filter((f) => f.type !== "fulltext");
+    }, ae = (o, i, d) => i?.[o.type] ?? De(o) ?? d ?? e.annotations.tokenDefaultColor ?? "indigo-9", te = (o) => ae(o, e.annotations.tokenColorByType), $e = (o) => ae(o, e.annotations.optionBadgeColorByType, te(o)), Ee = (o, i) => {
+      Ce(o), i(null);
+    }, Le = (o, i) => {
+      i(() => {
+        r.value = o, c.value = u.value.filter((d) => d.type !== "fulltext");
       });
-    }, ae = (o, c) => {
-      const f = F(c);
-      return f?.tooltipHint ? typeof f.tooltipHint == "function" ? f.tooltipHint(o) : f.tooltipHint : "";
-    }, Le = (o) => {
+    }, le = (o, i) => {
+      const d = F(i);
+      return d?.tooltipHint ? typeof d.tooltipHint == "function" ? d.tooltipHint(o) : d.tooltipHint : "";
+    }, Oe = (o) => {
       if (F(o)?.sortable !== !1) {
         if (l.value.key !== o) {
           l.value = { key: o, asc: !0 };
@@ -415,22 +426,22 @@ const Z = (t) => {
         }
         l.value = { key: o, asc: !l.value.asc };
       }
-    }, le = (o) => l.value.key !== o ? null : l.value.asc ? "arrow_upward" : "arrow_downward", Q = (o, c) => {
-      const f = re(o, c);
-      return z(c) ? oe(f, v.value) : [{ text: f, highlighted: !1 }];
-    }, Oe = (o) => oe(o, [r.value]), Re = (o) => {
-      const c = re(o, "date");
-      return ze(c, _.value);
+    }, ie = (o) => l.value.key !== o ? null : l.value.asc ? "arrow_upward" : "arrow_downward", Q = (o, i) => {
+      const d = re(o, i);
+      return H(i) ? oe(d, x.value) : [{ text: d, highlighted: !1 }];
+    }, Re = (o) => oe(o, [r.value]), Me = (o) => {
+      const i = re(o, "date");
+      return Ge(i, S.value);
     };
-    return (o, c) => {
-      const f = W("q-avatar"), k = W("q-chip"), C = W("q-item-label"), x = W("q-icon"), O = W("q-item-section"), E = W("q-item"), B = W("q-select");
-      return y(), h("div", St, [
+    return (o, i) => {
+      const d = W("q-avatar"), m = W("q-chip"), v = W("q-item-label"), w = W("q-icon"), O = W("q-item-section"), E = W("q-item"), B = W("q-select");
+      return y(), h("div", kt, [
         L("div", vt, [
-          P(B, {
+          V(B, {
             ref_key: "qSelectRef",
             ref: p,
             modelValue: n.value,
-            "onUpdate:modelValue": c[0] || (c[0] = (d) => n.value = d),
+            "onUpdate:modelValue": i[0] || (i[0] = (f) => n.value = f),
             class: "search-field",
             "input-class": "search-input",
             label: "Search",
@@ -440,63 +451,63 @@ const Z = (t) => {
             "input-debounce": "0",
             "option-label": "title",
             "option-value": "uid",
-            options: i.value,
-            onNewValue: $e,
-            onFilter: Ee
+            options: c.value,
+            onNewValue: Ee,
+            onFilter: Le
           }, {
-            "selected-item": q((d) => [
-              P(k, {
+            "selected-item": q((f) => [
+              V(m, {
                 removable: "",
                 dense: "",
                 class: "chip",
-                color: te(d.opt),
+                color: te(f.opt),
                 "text-color": "white",
-                onRemove: (w) => d.removeAtIndex(d.index)
+                onRemove: (T) => f.removeAtIndex(f.index)
               }, {
                 default: q(() => [
-                  d.opt.icon ? (y(), X(f, {
+                  f.opt.icon ? (y(), X(d, {
                     key: 0,
                     color: "white",
-                    "text-color": te(d.opt),
-                    icon: d.opt.icon
+                    "text-color": te(f.opt),
+                    icon: f.opt.icon
                   }, null, 8, ["text-color", "icon"])) : U("", !0),
-                  L("span", null, $(Ce(d.opt)) + ":", 1),
-                  L("span", null, $(d.opt.title), 1)
+                  L("span", null, $(be(f.opt)) + ":", 1),
+                  L("span", null, $(f.opt.title), 1)
                 ]),
                 _: 2
               }, 1032, ["color", "onRemove"])
             ]),
-            option: q((d) => [
-              d.opt.type !== "fulltext" ? (y(), X(E, Fe({ key: 0 }, d.itemProps, { class: "suggest-item" }), {
+            option: q((f) => [
+              f.opt.type !== "fulltext" ? (y(), X(E, We({ key: 0 }, f.itemProps, { class: "suggest-item" }), {
                 default: q(() => [
-                  P(O, null, {
+                  V(O, null, {
                     default: q(() => [
-                      P(C, { class: "suggest-title" }, {
+                      V(v, { class: "suggest-title" }, {
                         default: q(() => [
-                          (y(!0), h(T, null, M(Oe(d.opt.title), (w, S) => (y(), h(T, {
-                            key: `${d.opt.uid}-title-${S}`
+                          (y(!0), h(C, null, M(Re(f.opt.title), (T, k) => (y(), h(C, {
+                            key: `${f.opt.uid}-title-${k}`
                           }, [
-                            w.highlighted ? (y(), h("mark", xt, $(w.text), 1)) : (y(), h(T, { key: 1 }, [
-                              V($(w.text), 1)
+                            T.highlighted ? (y(), h("mark", xt, $(T.text), 1)) : (y(), h(C, { key: 1 }, [
+                              P($(T.text), 1)
                             ], 64))
                           ], 64))), 128))
                         ]),
                         _: 2
                       }, 1024),
-                      P(C, {
+                      V(v, {
                         caption: "",
                         class: "suggest-meta"
                       }, {
                         default: q(() => [
-                          d.opt.icon ? (y(), X(x, {
+                          f.opt.icon ? (y(), X(w, {
                             key: 0,
-                            name: d.opt.icon,
-                            color: De(d.opt),
+                            name: f.opt.icon,
+                            color: $e(f.opt),
                             size: "14px",
                             class: "suggest-icon"
                           }, null, 8, ["name", "color"])) : U("", !0),
-                          V(" " + $(d.opt.category), 1),
-                          (d.opt.matchCount ?? 0) > 0 ? (y(), h("span", wt, " - " + $(d.opt.matchCount) + " x", 1)) : U("", !0)
+                          P(" " + $(f.opt.category), 1),
+                          (f.opt.matchCount ?? 0) > 0 ? (y(), h("span", wt, " - " + $(f.opt.matchCount) + " x", 1)) : U("", !0)
                         ]),
                         _: 2
                       }, 1024)
@@ -512,84 +523,84 @@ const Z = (t) => {
         ]),
         L("table", Tt, [
           L("colgroup", null, [
-            (y(!0), h(T, null, M(m.value, (d) => (y(), h("col", {
-              key: `col-${d.key}`,
-              style: We(d.key === "id" ? { width: "9ch" } : void 0)
+            (y(!0), h(C, null, M(_.value, (f) => (y(), h("col", {
+              key: `col-${f.key}`,
+              style: qe(f.key === "id" ? { width: "9ch" } : void 0)
             }, null, 4))), 128))
           ]),
           L("thead", null, [
             L("tr", null, [
-              (y(!0), h(T, null, M(m.value, (d) => (y(), h("th", {
-                key: d.key,
-                onClick: (w) => Le(d.key)
+              (y(!0), h(C, null, M(_.value, (f) => (y(), h("th", {
+                key: f.key,
+                onClick: (T) => Oe(f.key)
               }, [
-                d.icon ? (y(), X(x, {
+                f.icon ? (y(), X(w, {
                   key: 0,
-                  name: d.icon,
+                  name: f.icon,
                   size: "16px",
                   class: "header-icon"
                 }, null, 8, ["name"])) : U("", !0),
-                L("span", null, $(d.label), 1),
+                L("span", null, $(f.label), 1),
                 L("span", bt, [
-                  P(x, {
-                    name: le(d.key) ?? "arrow_upward",
+                  V(w, {
+                    name: ie(f.key) ?? "arrow_upward",
                     size: "14px",
-                    class: qe(["sort-icon", { "sort-icon--hidden": !le(d.key) }])
+                    class: Be(["sort-icon", { "sort-icon--hidden": !ie(f.key) }])
                   }, null, 8, ["name", "class"])
                 ])
               ], 8, Ct))), 128))
             ])
           ]),
           L("tbody", null, [
-            (y(!0), h(T, null, M(g.value, (d, w) => (y(), h("tr", { key: w }, [
-              (y(!0), h(T, null, M(m.value, (S) => (y(), h("td", {
-                key: S.key
+            (y(!0), h(C, null, M(g.value, (f, T) => (y(), h("tr", { key: T }, [
+              (y(!0), h(C, null, M(_.value, (k) => (y(), h("td", {
+                key: k.key
               }, [
-                j(S.key).length > 0 ? (y(), h(T, { key: 0 }, [
+                j(k.key).length > 0 ? (y(), h(C, { key: 0 }, [
                   L("div", null, [
-                    (y(!0), h(T, null, M(Q(d, S.key), (b, I) => (y(), h(T, {
-                      key: `${S.key}-${w}-${I}`
+                    (y(!0), h(C, null, M(Q(f, k.key), (b, I) => (y(), h(C, {
+                      key: `${k.key}-${T}-${I}`
                     }, [
-                      b.highlighted ? (y(), h("mark", Dt, $(b.text), 1)) : (y(), h(T, { key: 1 }, [
-                        V($(b.text), 1)
+                      b.highlighted ? (y(), h("mark", Dt, $(b.text), 1)) : (y(), h(C, { key: 1 }, [
+                        P($(b.text), 1)
                       ], 64))
                     ], 64))), 128))
                   ]),
-                  (y(!0), h(T, null, M(j(S.key), (b) => (y(), h("span", {
-                    key: `${S.key}-${b.key}-${w}`,
+                  (y(!0), h(C, null, M(j(k.key), (b) => (y(), h("span", {
+                    key: `${k.key}-${b.key}-${T}`,
                     class: "subline-value",
-                    title: ae(d, b.key)
+                    title: le(f, b.key)
                   }, [
                     L("span", null, [
-                      (y(!0), h(T, null, M(Q(d, b.key), (I, Me) => (y(), h(T, {
-                        key: `${b.key}-${w}-${Me}`
+                      (y(!0), h(C, null, M(Q(f, b.key), (I, Ae) => (y(), h(C, {
+                        key: `${b.key}-${T}-${Ae}`
                       }, [
-                        I.highlighted ? (y(), h("mark", Et, $(I.text), 1)) : (y(), h(T, { key: 1 }, [
-                          V($(I.text), 1)
+                        I.highlighted ? (y(), h("mark", Et, $(I.text), 1)) : (y(), h(C, { key: 1 }, [
+                          P($(I.text), 1)
                         ], 64))
                       ], 64))), 128))
                     ])
                   ], 8, $t))), 128))
-                ], 64)) : S.key === "date" ? (y(), h("span", {
+                ], 64)) : k.key === "date" ? (y(), h("span", {
                   key: 1,
-                  title: Re(d)
+                  title: Me(f)
                 }, [
-                  (y(!0), h(T, null, M(Q(d, S.key), (b, I) => (y(), h(T, {
-                    key: `date-${w}-${I}`
+                  (y(!0), h(C, null, M(Q(f, k.key), (b, I) => (y(), h(C, {
+                    key: `date-${T}-${I}`
                   }, [
-                    b.highlighted ? (y(), h("mark", Ot, $(b.text), 1)) : (y(), h(T, { key: 1 }, [
-                      V($(b.text), 1)
+                    b.highlighted ? (y(), h("mark", Ot, $(b.text), 1)) : (y(), h(C, { key: 1 }, [
+                      P($(b.text), 1)
                     ], 64))
                   ], 64))), 128))
                 ], 8, Lt)) : (y(), h("span", {
                   key: 2,
-                  title: ae(d, S.key)
+                  title: le(f, k.key)
                 }, [
-                  (y(!0), h(T, null, M(Q(d, S.key), (b, I) => (y(), h(T, {
-                    key: `${S.key}-${w}-${I}`
+                  (y(!0), h(C, null, M(Q(f, k.key), (b, I) => (y(), h(C, {
+                    key: `${k.key}-${T}-${I}`
                   }, [
-                    b.highlighted ? (y(), h("mark", Mt, $(b.text), 1)) : (y(), h(T, { key: 1 }, [
-                      V($(b.text), 1)
+                    b.highlighted ? (y(), h("mark", Mt, $(b.text), 1)) : (y(), h(C, { key: 1 }, [
+                      P($(b.text), 1)
                     ], 64))
                   ], 64))), 128))
                 ], 8, Rt))
@@ -605,14 +616,14 @@ const Z = (t) => {
   for (const [n, s] of e)
     r[n] = s;
   return r;
-}, Nt = /* @__PURE__ */ It(At, [["__scopeId", "data-v-c15768fa"]]), qt = {
+}, Nt = /* @__PURE__ */ It(At, [["__scopeId", "data-v-edb0f8da"]]), qt = {
   install(t) {
     t.component("TableSuggest", Nt);
   }
-}, ke = /* @__PURE__ */ new WeakMap(), Bt = (t, e) => {
-  ke.set(t, e);
-}, Pt = (t) => {
-  const e = ke.get(t);
+}, ve = /* @__PURE__ */ new WeakMap(), Bt = (t, e) => {
+  ve.set(t, e);
+}, Vt = (t) => {
+  const e = ve.get(t);
   if (!e)
     throw new Error(`No model annotations registered for ${t.name}`);
   return e;
@@ -620,20 +631,20 @@ const Z = (t) => {
 export {
   Nt as TableSuggest,
   qt as TableSuggestPlugin,
-  kt as buildSuggestions,
+  he as buildSuggestions,
   qt as default,
   Bt as defineModelAnnotations,
-  _t as filterItems,
-  ye as formatDate,
-  Ve as getAnchorWeekdayDate,
-  ze as getDateMouseoverLabel,
+  St as filterItems,
+  me as formatDate,
+  ze as getAnchorWeekdayDate,
+  Ge as getDateMouseoverLabel,
   He as getIsoWeekInfo,
   Pe as getLocalizedWeekdaysMondayFirst,
-  Pt as getModelAnnotations,
-  Be as getMondayIndexFromDate,
+  Vt as getModelAnnotations,
+  Ve as getMondayIndexFromDate,
   Wt as highlightText,
-  H as parseDateInput,
+  z as parseDateInput,
   qt as plugin,
-  mt as resolveEnglishLocale,
+  _t as resolveEnglishLocale,
   Z as startOfDay
 };
