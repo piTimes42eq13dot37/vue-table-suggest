@@ -3,8 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { nextTick } from 'vue'
 import { defineComponent, h } from 'vue'
 import TableSuggest from './TableSuggest.vue'
-import { demoRows } from '../../lib/demo-data'
-import { demoModelDefinition } from '../../lib/demo-model'
+import { demoModelDefinition, demoRows } from '../../testing/demo-fixtures'
 
 const QSelectStub = defineComponent({
   name: 'QSelect',

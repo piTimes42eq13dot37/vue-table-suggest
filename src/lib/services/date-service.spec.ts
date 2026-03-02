@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { dateDomainService } from './services/date-service'
+import { dateDomainService } from './date-service'
 
-describe('date', () => {
+describe('date-service', () => {
   it('normalizes start of day', () => {
     const value = dateDomainService.startOfDay(new Date('2026-02-28T18:45:13'))
     expect(value.getHours()).toBe(0)

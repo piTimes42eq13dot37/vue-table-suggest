@@ -6,8 +6,7 @@ import {
   highlightText,
   searchEngine,
 } from './search-engine'
-import { demoModelDefinition, DemoItem } from './demo-model'
-import { demoRows } from './demo-data'
+import { DemoItem, demoModelDefinition, demoRows } from '../testing/demo-fixtures'
 import type { SearchToken } from './models/internal'
 
 describe('search-engine', () => {

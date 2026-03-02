@@ -1,2 +1,1 @@
-export * from './lib/demo-data'
-export * from './lib/demo-model'
+export * from './testing/demo-fixtures'

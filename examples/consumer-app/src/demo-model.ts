@@ -1,6 +1,5 @@
-import { defineModelDefinition, getModelDefinition } from './model-definition'
-import { dateDomainService } from './services/date-service'
-import type { SearchModelDefinition } from './models/external'
+import { defineModelDefinition, getModelDefinition } from 'vue-table-suggest'
+import type { SearchModelDefinition } from 'vue-table-suggest'
 
 export class DemoItem {
   id = 0
@@ -12,16 +11,9 @@ export class DemoItem {
   status = ''
 }
 
-const locale =
-  (typeof globalThis !== 'undefined' &&
-    typeof globalThis.navigator !== 'undefined' &&
-    Array.isArray(globalThis.navigator.languages) &&
-    globalThis.navigator.languages.find((lang) => String(lang).toLowerCase().startsWith('en'))) ||
-  'en-US'
-
 const modelDefinition: SearchModelDefinition<DemoItem> = {
   modelName: 'DemoItem',
-  locale,
+  locale: 'en-US',
   maxSuggestions: 7,
   maxWeekdaySuggestions: 4,
   columns: [
@@ -50,14 +42,7 @@ const modelDefinition: SearchModelDefinition<DemoItem> = {
     },
     { key: 'number', label: 'Manifest', icon: 'pin', sortable: true, searchable: true },
     { key: 'owner', label: 'Captain', icon: 'badge', sortable: true, searchable: true },
-    {
-      key: 'date',
-      label: 'date',
-      icon: 'event',
-      sortable: true,
-      searchable: true,
-      tooltipHint: (item) => dateDomainService.getDateMouseoverLabel(item.date, locale),
-    },
+    { key: 'date', label: 'date', icon: 'event', sortable: true, searchable: true },
     { key: 'status', label: 'Mission State', icon: 'task_alt', sortable: true, searchable: true },
   ],
 }

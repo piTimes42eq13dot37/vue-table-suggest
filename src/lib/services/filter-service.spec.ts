@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { dateDomainService } from './date-service'
-import { demoRows } from '../demo-data'
-import { demoModelDefinition } from '../demo-model'
+import { demoModelDefinition, demoRows } from '../../testing/demo-fixtures'
 import { filterItems } from './filter-service'
 
 describe('filter-service', () => {

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { demoRows } from '../demo-data'
-import { demoModelDefinition } from '../demo-model'
+import { demoModelDefinition, demoRows } from '../../testing/demo-fixtures'
 import type { SearchModelDefinition } from '../models/external'
 import { buildSuggestions } from './suggestion-service'
 

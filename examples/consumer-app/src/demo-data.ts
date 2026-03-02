@@ -1,12 +1,19 @@
-import { dateDomainService } from './services/date-service'
 import type { DemoItem } from './demo-model'
 
+const formatDate = (date: Date): string => {
+  const year = String(date.getFullYear())
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 const getCurrentWeekDatesMondayFirst = (): Date[] => {
-  const today = dateDomainService.startOfDay(new Date())
-  const jsDay = today.getDay()
+  const today = new Date()
+  const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  const jsDay = startOfDay.getDay()
   const mondayOffset = (jsDay + 6) % 7
-  const monday = new Date(today)
-  monday.setDate(today.getDate() - mondayOffset)
+  const monday = new Date(startOfDay)
+  monday.setDate(startOfDay.getDate() - mondayOffset)
 
   return Array.from({ length: 7 }, (_, idx) => {
     const date = new Date(monday)
@@ -120,8 +127,6 @@ export const demoRows = (): DemoItem[] =>
     },
     number: entry.manifestNo,
     owner: entry.captainAlias,
-    date: dateDomainService.formatDate(
-      galacticWeekDates[index % galacticWeekDates.length] ?? galacticWeekDates[0] ?? new Date(),
-    ),
+    date: formatDate(galacticWeekDates[index % galacticWeekDates.length] ?? galacticWeekDates[0] ?? new Date()),
     status: entry.missionState,
   }))

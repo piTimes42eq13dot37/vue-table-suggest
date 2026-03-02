@@ -35,8 +35,7 @@ createApp(App)
 The app in `src/App.vue` is a complete working demo of the module.
 
 - Uses `TableSuggest` from `src/components/table-suggest/TableSuggest.vue`
-- Uses seeded demo rows from `src/lib/demo-data.ts`
-- Uses strongly typed column/search metadata from `src/lib/demo-model.ts`
+- Uses seeded demo fixtures from `src/testing/demo-fixtures.ts`
 
 There is also an external-consumer sample in `examples/consumer-app` that imports this package via
 `file:../..` to validate real host-app integration.
@@ -68,7 +67,7 @@ When you run the app, you can try these demo searches in the input:
 
 ```bash
 npm install
-npm run dev
+npm run watch
 ```
 
 Then open the local Vite URL shown in the terminal.
@@ -80,6 +79,7 @@ Then open the local Vite URL shown in the terminal.
 - `npm run build` - clean, compile, and build app + library + codepen bundles
 - `npm run test` - run `build`, typecheck, lint (`src` + `tests`), Vitest with coverage, then Playwright E2E
 - `npm run watch` - start Vite dev server with local URL output
+- `npm run check:cdn` - compare local `dist/lib` JS/CSS checksums against jsDelivr `@main`
 
 ## Architecture decisions
 
@@ -120,10 +120,10 @@ Then open the local Vite URL shown in the terminal.
 
 ## Reusing the module
 
-`TableSuggest` stays presentational and receives all model behavior via annotations.
+`TableSuggest` stays presentational and receives all model behavior via model definition metadata.
 
 ```ts
-import { defineModelAnnotations, getModelAnnotations } from 'vue-table-suggest'
+import { defineModelDefinition, getModelDefinition } from 'vue-table-suggest'
 
 class ItemModel {
   id = 0
@@ -132,7 +132,7 @@ class ItemModel {
   date = ''
 }
 
-defineModelAnnotations(ItemModel, {
+defineModelDefinition(ItemModel, {
   modelName: 'ItemModel',
   locale: 'en-US',
   tokenColorByType: {
@@ -179,7 +179,7 @@ defineModelAnnotations(ItemModel, {
   ],
 })
 
-const annotations = getModelAnnotations(ItemModel)
+const modelDefinition = getModelDefinition(ItemModel)
 
 const items: ItemModel[] = [
   {
@@ -193,9 +193,9 @@ const items: ItemModel[] = [
 
 ```vue
 <script setup lang="ts">
-import { TableSuggest, getModelAnnotations } from 'vue-table-suggest'
+import { TableSuggest, getModelDefinition } from 'vue-table-suggest'
 
-const annotations = getModelAnnotations(ItemModel)
+const modelDefinition = getModelDefinition(ItemModel)
 const items: ItemModel[] = [
   {
     id: 1,
@@ -207,7 +207,7 @@ const items: ItemModel[] = [
 </script>
 
 <template>
-  <TableSuggest :items="items" :annotations="annotations" />
+  <TableSuggest :items="items" :model-definition="modelDefinition" />
 </template>
 ```
 
@@ -269,4 +269,4 @@ Use these external resources only when you want to validate CDN-based integratio
 
 When you publish a new build and keep using `@main`, increase both `v=` values to force CodePen to fetch the new files.
 
-For a complete typed example, use `src/lib/demo-model.ts` + `src/lib/demo-data.ts` as the template.
+For a complete typed example, use `examples/consumer-app/src/demo-model.ts` + `examples/consumer-app/src/demo-data.ts` as the template.

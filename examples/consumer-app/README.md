@@ -21,5 +21,5 @@ npm --prefix examples/consumer-app run dev
 This verifies that another Vue app can consume:
 
 - `TableSuggest` component from `vue-table-suggest`
-- model annotation helpers from `vue-table-suggest`
+- model definition helpers from `vue-table-suggest`
 - package CSS via `vue-table-suggest/style.css`

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import TableSuggest from './components/table-suggest/TableSuggest.vue'
-import { demoModelDefinition } from './lib/demo-model'
-import { demoRows } from './lib/demo-data'
+import { demoModelDefinition, demoRows } from './testing/demo-fixtures'
 
 const modelDefinition = demoModelDefinition()
 const items = demoRows()
