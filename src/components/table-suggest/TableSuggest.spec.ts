@@ -425,6 +425,51 @@ describe('TableSuggest', () => {
     expect(wrapper.text()).not.toContain('In Column:')
   })
 
+  it('uses In SubColumn chip label for scope tokens targeting sub-columns even when key is missing', async () => {
+    const wrapper = mountTableSuggest()
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    select.vm.$emit('update:modelValue', [
+      {
+        uid: 'fulltext|235',
+        type: 'fulltext',
+        title: '235',
+      },
+      {
+        uid: 'scope|hangarCode',
+        type: 'scope',
+        title: 'Hangar Code',
+        category: 'Fulltext scope',
+      },
+    ])
+    await nextTick()
+
+    expect(wrapper.text()).toContain('In SubColumn:')
+  })
+
+  it('keeps In SubColumn when selecting Hangar Code scope suggestion from fulltext results', async () => {
+    const wrapper = mountTableSuggest()
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    select.vm.$emit('new-value', '235', () => undefined)
+    await nextTick()
+
+    select.vm.$emit('filter', '', (update: () => void) => update())
+    await nextTick()
+
+    const hangarCodeScopeSuggestion = wrapper
+      .findAll('.suggest-item')
+      .find((item) => item.text().includes('Hangar Code'))
+
+    expect(hangarCodeScopeSuggestion).toBeTruthy()
+
+    await hangarCodeScopeSuggestion!.trigger('click')
+    await nextTick()
+
+    expect(wrapper.text()).toContain('In SubColumn:')
+    expect(wrapper.text()).toContain('Hangar Code')
+  })
+
   it('keeps In Column chip label for non-sub-column scope tokens', async () => {
     const wrapper = mountTableSuggest()
     const select = wrapper.findComponent({ name: 'QSelect' })

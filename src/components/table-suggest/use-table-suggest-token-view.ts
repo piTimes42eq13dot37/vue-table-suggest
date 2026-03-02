@@ -20,9 +20,20 @@ export const useTableSuggestTokenView = <TItem extends object>(
   modelDefinition: SearchModelDefinition<TItem>,
   getColumnByKey: (key: string) => SearchColumnDefinition<TItem> | undefined,
 ) => {
-  const isSubColumnToken = (token: SearchToken): boolean => {
+  const resolveColumnForToken = (token: SearchToken): SearchColumnDefinition<TItem> | undefined => {
     const key = token.key ?? token.type
-    const column = getColumnByKey(key)
+    const byKey = getColumnByKey(key)
+    if (byKey) return byKey
+
+    if (token.type === 'scope' && token.title) {
+      return modelDefinition.columns.find((column) => column.label === token.title)
+    }
+
+    return undefined
+  }
+
+  const isSubColumnToken = (token: SearchToken): boolean => {
+    const column = resolveColumnForToken(token)
     return Boolean(column?.renderAsSublineOf)
   }
 
@@ -78,8 +89,7 @@ export const useTableSuggestTokenView = <TItem extends object>(
     if (mappedLabel) return mappedLabel
 
     if (isSubColumnToken(token)) {
-      const key = token.key ?? token.type
-      const column = getColumnByKey(key)
+      const column = resolveColumnForToken(token)
       const parentLabel = column?.renderAsSublineOf
         ? getColumnByKey(column.renderAsSublineOf)?.label
         : undefined
