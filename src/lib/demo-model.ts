@@ -1,5 +1,5 @@
-import { defineModelAnnotations, getModelAnnotations } from './annotations'
-import { getDateMouseoverLabel } from './date'
+import { defineModelDefinition, getModelDefinition } from './model-definition'
+import { dateDomainService } from './services/date-service'
 import type { SearchModelDefinition } from './models/external'
 
 export class DemoItem {
@@ -19,7 +19,7 @@ const locale =
     globalThis.navigator.languages.find((lang) => String(lang).toLowerCase().startsWith('en'))) ||
   'en-US'
 
-const annotations: SearchModelDefinition<DemoItem> = {
+const modelDefinition: SearchModelDefinition<DemoItem> = {
   modelName: 'DemoItem',
   locale,
   maxSuggestions: 7,
@@ -56,12 +56,12 @@ const annotations: SearchModelDefinition<DemoItem> = {
       icon: 'event',
       sortable: true,
       searchable: true,
-      tooltipHint: (item) => getDateMouseoverLabel(item.date, locale),
+      tooltipHint: (item) => dateDomainService.getDateMouseoverLabel(item.date, locale),
     },
     { key: 'status', label: 'Mission State', icon: 'task_alt', sortable: true, searchable: true },
   ],
 }
 
-defineModelAnnotations(DemoItem, annotations)
+defineModelDefinition(DemoItem, modelDefinition)
 
-export const demoAnnotations = (): SearchModelDefinition<DemoItem> => getModelAnnotations(DemoItem)
+export const demoModelDefinition = (): SearchModelDefinition<DemoItem> => getModelDefinition(DemoItem)

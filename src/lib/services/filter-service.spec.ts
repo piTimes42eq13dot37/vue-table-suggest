@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { formatDate, getAnchorWeekdayDate, parseDateInput } from '../date'
+import { dateDomainService } from './date-service'
 import { demoRows } from '../demo-data'
-import { demoAnnotations } from '../demo-model'
+import { demoModelDefinition } from '../demo-model'
 import { filterItems } from './filter-service'
 
 describe('filter-service', () => {
   it('filters by date_before token', () => {
     const rows = demoRows()
     const pivot = rows[3]!.date
-    const result = filterItems(rows, demoAnnotations(), [
+    const result = filterItems(rows, demoModelDefinition(), [
       {
         uid: `date_before|${pivot}`,
         type: 'date_before',
@@ -18,14 +18,16 @@ describe('filter-service', () => {
     ])
 
     expect(result.length).toBeGreaterThan(0)
-    const pivotTime = parseDateInput(pivot)!.getTime()
-    expect(result.every((row) => parseDateInput(row.date)!.getTime() < pivotTime)).toBe(true)
+    const pivotTime = dateDomainService.parseDateInput(pivot)!.getTime()
+    expect(result.every((row) => dateDomainService.parseDateInput(row.date)!.getTime() < pivotTime)).toBe(
+      true,
+    )
   })
 
   it('filters by date_after token', () => {
     const rows = demoRows()
     const pivot = rows[0]!.date
-    const result = filterItems(rows, demoAnnotations(), [
+    const result = filterItems(rows, demoModelDefinition(), [
       {
         uid: `date_after|${pivot}`,
         type: 'date_after',
@@ -35,15 +37,16 @@ describe('filter-service', () => {
     ])
 
     expect(result.length).toBeGreaterThan(0)
-    const pivotTime = parseDateInput(pivot)!.getTime()
-    expect(result.every((row) => parseDateInput(row.date)!.getTime() > pivotTime)).toBe(true)
+    const pivotTime = dateDomainService.parseDateInput(pivot)!.getTime()
+    expect(result.every((row) => dateDomainService.parseDateInput(row.date)!.getTime() > pivotTime)).toBe(
+      true,
+    )
   })
 
   it('filters by date_exact token', () => {
     const rows = demoRows()
     const exactDate = rows[0]!.date
-
-    const result = filterItems(rows, demoAnnotations(), [
+    const result = filterItems(rows, demoModelDefinition(), [
       {
         uid: `date_exact|${exactDate}`,
         type: 'date_exact',
@@ -58,7 +61,7 @@ describe('filter-service', () => {
 
   it('returns empty for invalid date token values', () => {
     const rows = demoRows()
-    const result = filterItems(rows, demoAnnotations(), [
+    const result = filterItems(rows, demoModelDefinition(), [
       {
         uid: 'date_before|invalid',
         type: 'date_before',
@@ -70,11 +73,11 @@ describe('filter-service', () => {
   })
 
   it('filters by date_relative token for after last thursday', () => {
-    const anchorDate = getAnchorWeekdayDate('last', 3)
-    const anchor = formatDate(anchorDate)
-    const dayBefore = new Date(anchorDate)
+    const referenceDate = dateDomainService.getReferenceWeekdayDate('last', 3)
+    const referenceDateText = dateDomainService.formatDate(referenceDate)
+    const dayBefore = new Date(referenceDate)
     dayBefore.setDate(dayBefore.getDate() - 1)
-    const dayAfter = new Date(anchorDate)
+    const dayAfter = new Date(referenceDate)
     dayAfter.setDate(dayAfter.getDate() + 1)
 
     const rows = [
@@ -84,7 +87,7 @@ describe('filter-service', () => {
         hangar: { type: 'Type', number: '1' },
         number: '1',
         owner: 'owner',
-        date: formatDate(dayBefore),
+        date: dateDomainService.formatDate(dayBefore),
         status: 'new',
       },
       {
@@ -93,7 +96,7 @@ describe('filter-service', () => {
         hangar: { type: 'Type', number: '2' },
         number: '2',
         owner: 'owner',
-        date: formatDate(anchorDate),
+        date: dateDomainService.formatDate(referenceDate),
         status: 'new',
       },
       {
@@ -102,32 +105,32 @@ describe('filter-service', () => {
         hangar: { type: 'Type', number: '3' },
         number: '3',
         owner: 'owner',
-        date: formatDate(dayAfter),
+        date: dateDomainService.formatDate(dayAfter),
         status: 'new',
       },
     ]
 
-    const result = filterItems(rows, demoAnnotations(), [
+    const result = filterItems(rows, demoModelDefinition(), [
       {
-        uid: `date_relative|after|last|3|${anchor}`,
+        uid: `date_relative|after|last|3|${referenceDateText}`,
         type: 'date_relative',
         title: 'after last Thursday',
-        rawTitle: anchor,
+        rawTitle: referenceDateText,
         direction: 'after',
-        anchor: 'last',
+        reference: 'last',
         category: 'date after',
       },
     ])
 
-    expect(result.map((row) => row.date)).toEqual([formatDate(dayAfter)])
+    expect(result.map((row) => row.date)).toEqual([dateDomainService.formatDate(dayAfter)])
   })
 
   it('filters by date_relative token for before next thursday', () => {
-    const anchorDate = getAnchorWeekdayDate('next', 3)
-    const anchor = formatDate(anchorDate)
-    const dayBefore = new Date(anchorDate)
+    const referenceDate = dateDomainService.getReferenceWeekdayDate('next', 3)
+    const referenceDateText = dateDomainService.formatDate(referenceDate)
+    const dayBefore = new Date(referenceDate)
     dayBefore.setDate(dayBefore.getDate() - 1)
-    const dayAfter = new Date(anchorDate)
+    const dayAfter = new Date(referenceDate)
     dayAfter.setDate(dayAfter.getDate() + 1)
 
     const rows = [
@@ -137,7 +140,7 @@ describe('filter-service', () => {
         hangar: { type: 'Type', number: '1' },
         number: '1',
         owner: 'owner',
-        date: formatDate(dayBefore),
+        date: dateDomainService.formatDate(dayBefore),
         status: 'new',
       },
       {
@@ -146,7 +149,7 @@ describe('filter-service', () => {
         hangar: { type: 'Type', number: '2' },
         number: '2',
         owner: 'owner',
-        date: formatDate(anchorDate),
+        date: dateDomainService.formatDate(referenceDate),
         status: 'new',
       },
       {
@@ -155,31 +158,31 @@ describe('filter-service', () => {
         hangar: { type: 'Type', number: '3' },
         number: '3',
         owner: 'owner',
-        date: formatDate(dayAfter),
+        date: dateDomainService.formatDate(dayAfter),
         status: 'new',
       },
     ]
 
-    const result = filterItems(rows, demoAnnotations(), [
+    const result = filterItems(rows, demoModelDefinition(), [
       {
-        uid: `date_relative|before|next|3|${anchor}`,
+        uid: `date_relative|before|next|3|${referenceDateText}`,
         type: 'date_relative',
         title: 'before next Thursday',
-        rawTitle: anchor,
+        rawTitle: referenceDateText,
         direction: 'before',
-        anchor: 'next',
+        reference: 'next',
         category: 'date before',
       },
     ])
 
-    expect(result.map((row) => row.date)).toEqual([formatDate(dayBefore)])
+    expect(result.map((row) => row.date)).toEqual([dateDomainService.formatDate(dayBefore)])
   })
 
   it('computes last tuesday date before applying after filter', () => {
-    const anchorDate = getAnchorWeekdayDate('last', 1)
-    const dayAfter = new Date(anchorDate)
+    const referenceDate = dateDomainService.getReferenceWeekdayDate('last', 1)
+    const dayAfter = new Date(referenceDate)
     dayAfter.setDate(dayAfter.getDate() + 1)
-    const twoDaysAfter = new Date(anchorDate)
+    const twoDaysAfter = new Date(referenceDate)
     twoDaysAfter.setDate(twoDaysAfter.getDate() + 2)
 
     const rows = [
@@ -189,7 +192,7 @@ describe('filter-service', () => {
         hangar: { type: 'Type', number: '1' },
         number: '1',
         owner: 'owner',
-        date: formatDate(anchorDate),
+        date: dateDomainService.formatDate(referenceDate),
         status: 'new',
       },
       {
@@ -198,7 +201,7 @@ describe('filter-service', () => {
         hangar: { type: 'Type', number: '2' },
         number: '2',
         owner: 'owner',
-        date: formatDate(dayAfter),
+        date: dateDomainService.formatDate(dayAfter),
         status: 'new',
       },
       {
@@ -207,23 +210,26 @@ describe('filter-service', () => {
         hangar: { type: 'Type', number: '3' },
         number: '3',
         owner: 'owner',
-        date: formatDate(twoDaysAfter),
+        date: dateDomainService.formatDate(twoDaysAfter),
         status: 'new',
       },
     ]
 
-    const result = filterItems(rows, demoAnnotations(), [
+    const result = filterItems(rows, demoModelDefinition(), [
       {
-        uid: `date_relative|after|last|1|${formatDate(anchorDate)}`,
+        uid: `date_relative|after|last|1|${dateDomainService.formatDate(referenceDate)}`,
         type: 'date_relative',
         title: 'after last tuesday',
-        rawTitle: formatDate(anchorDate),
+        rawTitle: dateDomainService.formatDate(referenceDate),
         direction: 'after',
-        anchor: 'last',
+        reference: 'last',
         category: 'date after',
       },
     ])
 
-    expect(result.map((row) => row.date)).toEqual([formatDate(dayAfter), formatDate(twoDaysAfter)])
+    expect(result.map((row) => row.date)).toEqual([
+      dateDomainService.formatDate(dayAfter),
+      dateDomainService.formatDate(twoDaysAfter),
+    ])
   })
 })

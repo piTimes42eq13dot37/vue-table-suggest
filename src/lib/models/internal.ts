@@ -1,12 +1,24 @@
-import type { SearchToken } from '../types'
+import type { SearchToken } from './search-token'
 
 export type {
   RelativeSearchInput,
-  SearchAnchor,
+} from './relative-search-input'
+
+export type {
+  DateReference,
+} from './search-date-reference'
+
+export type {
   SearchDirection,
+} from './search-direction'
+
+export type {
   SearchToken,
+} from './search-token'
+
+export type {
   SearchTokenType,
-} from '../types'
+} from './search-token-type'
 
 export interface ParsedSearchSelectionState {
   fullTextTokens: SearchToken[]

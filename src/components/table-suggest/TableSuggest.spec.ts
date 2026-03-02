@@ -4,7 +4,7 @@ import { nextTick } from 'vue'
 import { defineComponent, h } from 'vue'
 import TableSuggest from './TableSuggest.vue'
 import { demoRows } from '../../lib/demo-data'
-import { demoAnnotations } from '../../lib/demo-model'
+import { demoModelDefinition } from '../../lib/demo-model'
 
 const QSelectStub = defineComponent({
   name: 'QSelect',
@@ -149,7 +149,7 @@ const mountTableSuggest = () =>
   mount(TableSuggest, {
     props: {
       items: demoRows() as unknown as object[],
-      annotations: demoAnnotations() as unknown as {
+      modelDefinition: demoModelDefinition() as unknown as {
         modelName: string
         columns: Array<{ key: string; label: string }>
       },
@@ -228,14 +228,14 @@ describe('TableSuggest', () => {
   })
 
   it('shows initial sort icon on first sortable visible column when id is absent', () => {
-    const annotations = demoAnnotations()
-    const columnsWithoutId = annotations.columns.filter((column) => column.key !== 'id')
+    const modelDefinition = demoModelDefinition()
+    const columnsWithoutId = modelDefinition.columns.filter((column) => column.key !== 'id')
 
     const wrapper = mount(TableSuggest, {
       props: {
         items: demoRows() as unknown as object[],
-        annotations: {
-          ...annotations,
+        modelDefinition: {
+          ...modelDefinition,
           columns: columnsWithoutId,
         } as unknown as {
           modelName: string
@@ -270,7 +270,7 @@ describe('TableSuggest', () => {
     const wrapper = mount(TableSuggest, {
       props: {
         items: rows as unknown as object[],
-        annotations: {
+        modelDefinition: {
           modelName: 'SortModel',
           columns: [
             { key: 'id', label: 'id', sortable: true, searchable: true },
@@ -309,7 +309,7 @@ describe('TableSuggest', () => {
     const wrapper = mount(TableSuggest, {
       props: {
         items: rows as unknown as object[],
-        annotations: {
+        modelDefinition: {
           modelName: 'DateSortModel',
           columns: [
             { key: 'id', label: 'id', sortable: true, searchable: true },
@@ -499,12 +499,12 @@ describe('TableSuggest', () => {
     expect(wrapper.find('.chip[color="light-blue-9"]').exists()).toBe(true)
   })
 
-  it('supports overriding dynamic colors from annotation metadata', async () => {
+  it('supports overriding dynamic colors from model metadata', async () => {
     const wrapper = mount(TableSuggest, {
       props: {
         items: demoRows() as unknown as object[],
-        annotations: {
-          ...(demoAnnotations() as unknown as {
+        modelDefinition: {
+          ...(demoModelDefinition() as unknown as {
             modelName: string
             columns: Array<{ key: string; label: string }>
           }),

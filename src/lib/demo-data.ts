@@ -1,8 +1,8 @@
-import { formatDate, startOfDay } from './date'
+import { dateDomainService } from './services/date-service'
 import type { DemoItem } from './demo-model'
 
 const getCurrentWeekDatesMondayFirst = (): Date[] => {
-  const today = startOfDay(new Date())
+  const today = dateDomainService.startOfDay(new Date())
   const jsDay = today.getDay()
   const mondayOffset = (jsDay + 6) % 7
   const monday = new Date(today)
@@ -120,6 +120,8 @@ export const demoRows = (): DemoItem[] =>
     },
     number: entry.manifestNo,
     owner: entry.captainAlias,
-    date: formatDate(galacticWeekDates[index % galacticWeekDates.length] ?? galacticWeekDates[0] ?? new Date()),
+    date: dateDomainService.formatDate(
+      galacticWeekDates[index % galacticWeekDates.length] ?? galacticWeekDates[0] ?? new Date(),
+    ),
     status: entry.missionState,
   }))

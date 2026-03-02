@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { ModelAnnotations } from '../types'
+import type { SearchModelDefinition } from '../models/external'
 import {
   expandScopeKeys,
   formatGroupedNumber,
@@ -15,7 +15,7 @@ interface Item {
   hangar: { type: string; number: string }
 }
 
-const annotations: ModelAnnotations<Item> = {
+const modelDefinition: SearchModelDefinition<Item> = {
   modelName: 'Item',
   columns: [
     { key: 'id', label: 'id', searchable: true },
@@ -52,26 +52,26 @@ describe('value-service', () => {
   })
 
   it('reads values from accessors and keys', () => {
-    expect(readValue(sample, annotations.columns[0]!)).toBe('1')
-    expect(readValue(sample, annotations.columns[2]!)).toBe('Orbital Locker Classic')
+    expect(readValue(sample, modelDefinition.columns[0]!)).toBe('1')
+    expect(readValue(sample, modelDefinition.columns[2]!)).toBe('Orbital Locker Classic')
   })
 
   it('expands scope keys by scope group', () => {
-    const keys = expandScopeKeys(annotations, ['hangar'])
+    const keys = expandScopeKeys(modelDefinition, ['hangar'])
     expect(keys).toContain('hangar')
     expect(keys).toContain('hangarCode')
   })
 
   it('returns scope columns for empty and selected scopes', () => {
-    const allSearchable = getScopeColumns(annotations, [])
+    const allSearchable = getScopeColumns(modelDefinition, [])
     expect(allSearchable.length).toBe(4)
 
-    const scoped = getScopeColumns(annotations, ['hangar'])
+    const scoped = getScopeColumns(modelDefinition, ['hangar'])
     expect(scoped.map((column) => column.key)).toEqual(['hangar', 'hangarCode'])
   })
 
-  it('reads value by key with annotation lookup and fallback', () => {
-    expect(readValueByKey(sample, annotations, 'hangarCode')).toBe('10000021304')
-    expect(readValueByKey(sample, annotations, 'unknown')).toBe('')
+  it('reads value by key with model definition lookup and fallback', () => {
+    expect(readValueByKey(sample, modelDefinition, 'hangarCode')).toBe('10000021304')
+    expect(readValueByKey(sample, modelDefinition, 'unknown')).toBe('')
   })
 })

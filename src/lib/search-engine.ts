@@ -7,20 +7,69 @@ import {
 import { filterItems as filterItemsService } from './services/filter-service'
 import { buildSuggestions as buildSuggestionsService } from './services/suggestion-service'
 
-export const resolveEnglishLocale = (): string => resolveEnglishLocaleService()
+class SearchEngineApplicationService {
+  resolveEnglishLocale(): string {
+    return resolveEnglishLocaleService()
+  }
+
+  highlightText(value: unknown, terms: string[]): string {
+    return highlightTextService(value, terms)
+  }
+
+  filterItems<TItem>(
+    items: TItem[],
+    modelDefinition: SearchModelDefinition<TItem>,
+    selected: SearchToken[],
+  ): TItem[] {
+    return filterItemsService(items, modelDefinition, selected)
+  }
+
+  buildSuggestions<TItem>(
+    items: TItem[],
+    modelDefinition: SearchModelDefinition<TItem>,
+    selected: SearchToken[],
+    rawInput: string,
+  ): SearchToken[] {
+    return buildSuggestionsService(items, modelDefinition, selected, rawInput)
+  }
+}
+
+const searchEngineApplicationService = new SearchEngineApplicationService()
+
+export const searchEngine = {
+  resolveEnglishLocale: (): string => searchEngineApplicationService.resolveEnglishLocale(),
+  highlightText: (value: unknown, terms: string[]): string =>
+    searchEngineApplicationService.highlightText(value, terms),
+  filterItems: <TItem>(
+    items: TItem[],
+    modelDefinition: SearchModelDefinition<TItem>,
+    selected: SearchToken[],
+  ): TItem[] =>
+    searchEngineApplicationService.filterItems(items, modelDefinition, selected),
+  buildSuggestions: <TItem>(
+    items: TItem[],
+    modelDefinition: SearchModelDefinition<TItem>,
+    selected: SearchToken[],
+    rawInput: string,
+  ): SearchToken[] =>
+    searchEngineApplicationService.buildSuggestions(items, modelDefinition, selected, rawInput),
+}
+
+export const resolveEnglishLocale = (): string => searchEngine.resolveEnglishLocale()
 
 export const highlightText = (value: unknown, terms: string[]): string =>
-  highlightTextService(value, terms)
+  searchEngine.highlightText(value, terms)
 
 export const filterItems = <TItem>(
   items: TItem[],
-  annotations: SearchModelDefinition<TItem>,
+  modelDefinition: SearchModelDefinition<TItem>,
   selected: SearchToken[],
-): TItem[] => filterItemsService(items, annotations, selected)
+): TItem[] => searchEngineApplicationService.filterItems(items, modelDefinition, selected)
 
 export const buildSuggestions = <TItem>(
   items: TItem[],
-  annotations: SearchModelDefinition<TItem>,
+  modelDefinition: SearchModelDefinition<TItem>,
   selected: SearchToken[],
   rawInput: string,
-): SearchToken[] => buildSuggestionsService(items, annotations, selected, rawInput)
+): SearchToken[] =>
+  searchEngine.buildSuggestions(items, modelDefinition, selected, rawInput)

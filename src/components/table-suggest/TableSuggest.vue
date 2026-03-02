@@ -1,20 +1,24 @@
 <script setup lang="ts" generic="TItem extends object">
 import { computed, nextTick, ref, watch } from 'vue'
-import { getDateMouseoverLabel, parseDateInput } from '../../lib/date'
+import { dateDomainService } from '../../lib/services/date-service'
 import { buildSuggestions, filterItems, resolveEnglishLocale } from '../../lib/search-engine'
 import type { SearchModelDefinition } from '../../lib/models/external'
 import type { SearchToken } from '../../lib/models/internal'
 import { formatGroupedNumber } from '../../lib/services/value-service'
+import {
+  tableSuggestPresenterService,
+  type HighlightSegment,
+} from '../../lib/services/table-suggest-presenter-service'
 
 const props = defineProps<{
   items: TItem[]
-  annotations: SearchModelDefinition<TItem>
+  modelDefinition: SearchModelDefinition<TItem>
 }>()
 
 const query = ref('')
 const selected = ref<SearchToken[]>([])
 const resolveInitialSortKey = (): string =>
-  props.annotations.columns.find((column) => !column.renderAsSublineOf && column.sortable !== false)?.key ?? ''
+  props.modelDefinition.columns.find((column) => !column.renderAsSublineOf && column.sortable !== false)?.key ?? ''
 
 const sortState = ref<{ key: string; asc: boolean }>({ key: resolveInitialSortKey(), asc: true })
 const filterOptions = ref<SearchToken[]>([])
@@ -23,65 +27,33 @@ const qSelectRef = ref<{
   hidePopup?: () => void
 } | null>(null)
 
-const locale = computed(() => props.annotations.locale ?? resolveEnglishLocale())
+const locale = computed(() => props.modelDefinition.locale ?? resolveEnglishLocale())
 const textCollator = computed(
   () => new Intl.Collator(locale.value, { numeric: true, sensitivity: 'base' }),
 )
 
 const suggestions = computed(() =>
-  buildSuggestions(props.items, props.annotations, selected.value, query.value),
+  buildSuggestions(props.items, props.modelDefinition, selected.value, query.value),
 )
 
 const visibleColumns = computed(() =>
-  props.annotations.columns.filter((column) => !column.renderAsSublineOf),
+  props.modelDefinition.columns.filter((column) => !column.renderAsSublineOf),
 )
 
 const sublineColumnsByParent = computed(() => {
-  const grouped = new Map<string, typeof props.annotations.columns>()
-
-  props.annotations.columns.forEach((column) => {
-    const parentKey = column.renderAsSublineOf
-    if (!parentKey) return
-
-    const current = grouped.get(parentKey) ?? []
-    grouped.set(parentKey, [...current, column])
-  })
-
-  return grouped
+  return tableSuggestPresenterService.groupSublineColumnsByParent(props.modelDefinition.columns)
 })
 
-const filtered = computed(() => filterItems(props.items, props.annotations, selected.value))
+const filtered = computed(() => filterItems(props.items, props.modelDefinition, selected.value))
 
 const sortedRows = computed(() => {
-  const column = props.annotations.columns.find((value) => value.key === sortState.value.key)
-  const rows = filtered.value.slice()
-  if (!column || column.sortable === false) return rows
-
-  rows.sort((a, b) => {
-    const read = (item: TItem): string => {
-      if (column.accessor) return String(column.accessor(item) ?? '')
-      return String(item[column.key as keyof TItem] ?? '')
-    }
-
-    const aValue = read(a)
-    const bValue = read(b)
-
-    if (column.key === 'date') {
-      const aDate = parseDateInput(aValue)
-      const bDate = parseDateInput(bValue)
-      if (aDate && bDate) {
-        const aTime = aDate.getTime()
-        const bTime = bDate.getTime()
-        return sortState.value.asc ? aTime - bTime : bTime - aTime
-      }
-    }
-
-    return sortState.value.asc
-      ? textCollator.value.compare(aValue, bValue)
-      : textCollator.value.compare(bValue, aValue)
-  })
-
-  return rows
+  return tableSuggestPresenterService.sortRows(
+    filtered.value,
+    props.modelDefinition.columns,
+    sortState.value,
+    (a, b) => textCollator.value.compare(a, b),
+    (value) => dateDomainService.parseDateInput(value),
+  )
 })
 
 const fulltextTerms = computed(() =>
@@ -93,123 +65,17 @@ const scopedKeys = computed(() =>
 )
 
 const showHighlightForColumn = (key: string): boolean => {
-  if (!fulltextTerms.value.length) return false
-  if (!scopedKeys.value.length) return true
-
-  const selectedSet = new Set(scopedKeys.value)
-  const selectedColumns = props.annotations.columns.filter((column) => selectedSet.has(column.key))
-  const groups = new Set(selectedColumns.map((column) => column.scopeGroup).filter(Boolean))
-
-  if (selectedSet.has(key)) return true
-  const current = props.annotations.columns.find((column) => column.key === key)
-  if (!current?.scopeGroup) return false
-  return groups.has(current.scopeGroup)
+  return tableSuggestPresenterService.shouldHighlightColumn(
+    key,
+    fulltextTerms.value,
+    scopedKeys.value,
+    props.modelDefinition.columns,
+  )
 }
 
-const getColumnByKey = (key: string) => props.annotations.columns.find((column) => column.key === key)
+const getColumnByKey = (key: string) => props.modelDefinition.columns.find((column) => column.key === key)
 
 const getSublineColumns = (key: string) => sublineColumnsByParent.value.get(key) ?? []
-
-interface HighlightSegment {
-  text: string
-  highlighted: boolean
-}
-
-const escapeRegExp = (value: string): string =>
-  String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-
-const normalizeDigits = (value: string): string => String(value || '').replace(/[^0-9]/g, '')
-
-const buildTermPattern = (term: string): string => {
-  const normalized = normalizeDigits(term)
-  const isDigitsOnly = normalized.length > 0 && normalized === term
-
-  if (!isDigitsOnly) {
-    return escapeRegExp(term)
-  }
-
-  return normalized
-    .split('')
-    .map((digit) => escapeRegExp(digit))
-    .join('[^0-9]*')
-}
-
-const mergeRanges = (ranges: Array<{ start: number; end: number }>): Array<{ start: number; end: number }> => {
-  if (!ranges.length) return []
-
-  const sorted = ranges.slice().sort((a, b) => a.start - b.start)
-  const merged: Array<{ start: number; end: number }> = [sorted[0]!]
-
-  sorted.slice(1).forEach((current) => {
-    const last = merged[merged.length - 1]!
-
-    if (current.start <= last.end) {
-      last.end = Math.max(last.end, current.end)
-      return
-    }
-
-    merged.push({ ...current })
-  })
-
-  return merged
-}
-
-const buildHighlightSegments = (value: string, terms: string[]): HighlightSegment[] => {
-  const source = String(value ?? '')
-  const normalizedTerms = Array.from(
-    new Set(terms.map((term) => String(term || '').trim()).filter((term) => term.length > 0)),
-  )
-
-  if (!normalizedTerms.length) {
-    return [{ text: source, highlighted: false }]
-  }
-
-  const pattern = normalizedTerms
-    .slice()
-    .sort((a, b) => b.length - a.length)
-    .map((term) => buildTermPattern(term))
-    .join('|')
-
-  const regex = new RegExp(pattern, 'gi')
-  const ranges: Array<{ start: number; end: number }> = []
-
-  let match = regex.exec(source)
-  while (match) {
-    const matchedText = match[0] ?? ''
-    if (matchedText.length > 0) {
-      ranges.push({ start: match.index, end: match.index + matchedText.length })
-    }
-
-    if (matchedText.length === 0) {
-      regex.lastIndex += 1
-    }
-
-    match = regex.exec(source)
-  }
-
-  if (!ranges.length) {
-    return [{ text: source, highlighted: false }]
-  }
-
-  const merged = mergeRanges(ranges)
-  const segments: HighlightSegment[] = []
-  let cursor = 0
-
-  merged.forEach((range) => {
-    if (range.start > cursor) {
-      segments.push({ text: source.slice(cursor, range.start), highlighted: false })
-    }
-
-    segments.push({ text: source.slice(range.start, range.end), highlighted: true })
-    cursor = range.end
-  })
-
-  if (cursor < source.length) {
-    segments.push({ text: source.slice(cursor), highlighted: false })
-  }
-
-  return segments
-}
 
 const renderCellValue = (item: TItem, key: string): string => {
   const column = getColumnByKey(key)
@@ -270,7 +136,7 @@ const addQueryAsFulltext = (rawValue: string): void => {
   const normalizedValue = value.toLowerCase()
   const matchingSuggestion = buildSuggestions(
     props.items,
-    props.annotations,
+    props.modelDefinition,
     selected.value,
     value,
   ).find((token) => {
@@ -336,16 +202,16 @@ const resolveTokenColor = (
     colorByType?.[token.type] ??
     resolveDefaultTokenColor(token) ??
     fallback ??
-    props.annotations.tokenDefaultColor ??
+    props.modelDefinition.tokenDefaultColor ??
     'indigo-9'
   )
 }
 
 const chipColor = (token: SearchToken): string =>
-  resolveTokenColor(token, props.annotations.tokenColorByType)
+  resolveTokenColor(token, props.modelDefinition.tokenColorByType)
 
 const optionBadgeColor = (token: SearchToken): string =>
-  resolveTokenColor(token, props.annotations.optionBadgeColorByType, chipColor(token))
+  resolveTokenColor(token, props.modelDefinition.optionBadgeColorByType, chipColor(token))
 
 const createValue = (value: string, done: Function): void => {
   addQueryAsFulltext(value)
@@ -385,15 +251,15 @@ const sortIcon = (key: string): string | null => {
 const cellSegments = (item: TItem, key: string): HighlightSegment[] => {
   const value = renderCellValue(item, key)
   if (!showHighlightForColumn(key)) return [{ text: value, highlighted: false }]
-  return buildHighlightSegments(value, fulltextTerms.value)
+  return tableSuggestPresenterService.buildHighlightSegments(value, fulltextTerms.value)
 }
 
 const suggestionTitleSegments = (title: string): HighlightSegment[] =>
-  buildHighlightSegments(title, [query.value])
+  tableSuggestPresenterService.buildHighlightSegments(title, [query.value])
 
 const dateHint = (item: TItem): string => {
   const raw = renderCellValue(item, 'date')
-  return getDateMouseoverLabel(raw, locale.value)
+  return dateDomainService.getDateMouseoverLabel(raw, locale.value)
 }
 </script>
 
@@ -575,97 +441,3 @@ const dateHint = (item: TItem): string => {
   </div>
 </template>
 
-<style scoped>
-.table-suggest {
-  display: grid;
-  gap: 12px;
-}
-
-.search-wrap {
-  position: relative;
-}
-
-.search-field {
-  width: 100%;
-}
-
-:deep(.search-field .q-field__append) {
-  display: none;
-}
-
-.search-input {
-  font-size: 14px;
-}
-
-.chip-icon {
-  margin-right: 4px;
-}
-
-.suggest-item {
-  min-height: 48px;
-}
-
-.suggest-meta {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  color: #405166;
-}
-
-.suggest-icon {
-  opacity: 0.85;
-}
-
-.data-table {
-  width: max-content;
-  min-width: 100%;
-  border-collapse: collapse;
-  table-layout: auto;
-}
-
-.data-table th,
-.data-table td {
-  border: 1px solid #d9dfe8;
-  padding: 8px;
-  height: 40px;
-  text-align: left;
-  vertical-align: middle;
-  white-space: nowrap;
-}
-
-.data-table th {
-  cursor: pointer;
-  background: #f7f9fc;
-}
-
-.header-icon {
-  margin-right: 4px;
-  vertical-align: text-bottom;
-}
-
-.sort-icon {
-  vertical-align: text-bottom;
-}
-
-.sort-icon-slot {
-  display: inline-flex;
-  width: 14px;
-  margin-left: 4px;
-  justify-content: center;
-}
-
-.sort-icon--hidden {
-  visibility: hidden;
-}
-
-.subline-value {
-  display: inline-block;
-  margin-left: 6px;
-}
-
-:deep(mark) {
-  background: #ffb300;
-  color: #111827;
-}
-</style>

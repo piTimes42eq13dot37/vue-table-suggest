@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { TableSuggest, defineModelAnnotations, getModelAnnotations } from 'vue-table-suggest'
+import { TableSuggest, defineModelDefinition, getModelDefinition } from 'vue-table-suggest'
 
 class ShipmentItem {
   id = 0
@@ -8,7 +8,7 @@ class ShipmentItem {
   date = ''
 }
 
-defineModelAnnotations(ShipmentItem, {
+defineModelDefinition(ShipmentItem, {
   modelName: 'ShipmentItem',
   locale: 'en-US',
   columns: [
@@ -37,7 +37,7 @@ defineModelAnnotations(ShipmentItem, {
   ],
 })
 
-const annotations = getModelAnnotations(ShipmentItem)
+const modelDefinition = getModelDefinition(ShipmentItem)
 
 const items: ShipmentItem[] = [
   {
@@ -60,7 +60,7 @@ const items: ShipmentItem[] = [
     <h1>Consumer App Example</h1>
     <TableSuggest
       :items="items"
-      :annotations="annotations"
+      :model-definition="modelDefinition"
     />
   </main>
 </template>

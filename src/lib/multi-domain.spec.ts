@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { buildSuggestions, filterItems } from './search-engine'
-import type { ModelAnnotations, SuggestToken } from './types'
+import type { SearchModelDefinition } from './models/external'
+import type { SearchToken } from './models/internal'
 
 describe('search-engine across multiple domains', () => {
   it('filters nested customer data in commerce domain', () => {
@@ -29,7 +30,7 @@ describe('search-engine across multiple domains', () => {
       },
     ]
 
-    const annotations: ModelAnnotations<CommerceOrder> = {
+    const modelDefinition: SearchModelDefinition<CommerceOrder> = {
       modelName: 'CommerceOrder',
       columns: [
         { key: 'orderId', label: 'Order ID', searchable: true, sortable: true },
@@ -55,12 +56,12 @@ describe('search-engine across multiple domains', () => {
       ],
     }
 
-    const tokens: SuggestToken[] = [
+    const tokens: SearchToken[] = [
       { uid: 'fulltext|alice', type: 'fulltext', title: 'alice' },
       { uid: 'scope|customer', type: 'scope', key: 'customer', title: 'Customer' },
     ]
 
-    const result = filterItems(items, annotations, tokens)
+    const result = filterItems(items, modelDefinition, tokens)
     expect(result).toHaveLength(1)
     expect(result[0]?.customer.name).toBe('Alice Zephyr')
   })
@@ -91,7 +92,7 @@ describe('search-engine across multiple domains', () => {
       },
     ]
 
-    const annotations: ModelAnnotations<Appointment> = {
+    const modelDefinition: SearchModelDefinition<Appointment> = {
       modelName: 'Appointment',
       columns: [
         { key: 'id', label: 'ID', searchable: true, sortable: true },
@@ -108,7 +109,7 @@ describe('search-engine across multiple domains', () => {
       ],
     }
 
-    const suggestions = buildSuggestions(items, annotations, [], 'neu')
+    const suggestions = buildSuggestions(items, modelDefinition, [], 'neu')
     expect(suggestions.some((token) => token.type === 'specialty')).toBe(true)
     expect(suggestions.some((token) => token.title.toLowerCase().includes('neuro'))).toBe(true)
   })
@@ -136,7 +137,7 @@ describe('search-engine across multiple domains', () => {
       },
     ]
 
-    const annotations: ModelAnnotations<SupportTicket> = {
+    const modelDefinition: SearchModelDefinition<SupportTicket> = {
       modelName: 'SupportTicket',
       columns: [
         { key: 'ticket', label: 'Ticket', searchable: true, sortable: true },
@@ -159,7 +160,7 @@ describe('search-engine across multiple domains', () => {
       ],
     }
 
-    const result = filterItems(items, annotations, [
+    const result = filterItems(items, modelDefinition, [
       {
         uid: 'date_exact|06.03.2026',
         type: 'date_exact',

@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { buildSuggestions, filterItems, highlightText } from './search-engine'
-import { demoAnnotations, DemoItem } from './demo-model'
+import { buildSuggestions, filterItems, highlightText, searchEngine } from './search-engine'
+import { demoModelDefinition, DemoItem } from './demo-model'
 import { demoRows } from './demo-data'
-import type { SuggestToken } from './types'
+import type { SearchToken } from './models/internal'
 
 describe('search-engine', () => {
   it('filters by hangarCode exact through nested hangar object', () => {
     const rows = demoRows()
-    const annotations = demoAnnotations()
+    const modelDefinition = demoModelDefinition()
 
-    const result = filterItems(rows, annotations, [
+    const result = filterItems(rows, modelDefinition, [
       {
         uid: 'hangarCode|10000021304',
         type: 'hangarCode',
@@ -21,8 +21,8 @@ describe('search-engine', () => {
     expect((result[0] as DemoItem).hangar.number).toBe('10000021304')
   })
 
-  it('filters by relative date anchor for on next weekday token', () => {
-    const annotations = demoAnnotations()
+  it('filters by relative date reference for on next weekday token', () => {
+    const modelDefinition = demoModelDefinition()
     const items: DemoItem[] = [
       {
         id: 1,
@@ -44,7 +44,7 @@ describe('search-engine', () => {
       },
     ]
 
-    const tokens: SuggestToken[] = [
+    const tokens: SearchToken[] = [
       {
         uid: 'date_relative|on|next|1|03.03.2026',
         type: 'date_relative',
@@ -55,18 +55,18 @@ describe('search-engine', () => {
       },
     ]
 
-    const result = filterItems(items, annotations, tokens)
+    const result = filterItems(items, modelDefinition, tokens)
     expect(result).toHaveLength(1)
     expect(result[0]?.date).toBe('03.03.2026')
   })
 
   it('returns scope suggestions with match count when fulltext is active and query is empty', () => {
     const rows = demoRows()
-    const annotations = demoAnnotations()
+    const modelDefinition = demoModelDefinition()
 
     const suggestions = buildSuggestions(
       rows,
-      annotations,
+      modelDefinition,
       [
         {
           uid: 'fulltext|orbital',
@@ -84,18 +84,18 @@ describe('search-engine', () => {
 
   it('returns only date suggestions when query is a date and no fulltext token is active', () => {
     const rows = demoRows()
-    const annotations = demoAnnotations()
+    const modelDefinition = demoModelDefinition()
 
-    const suggestions = buildSuggestions(rows, annotations, [], '28.02.2026')
+    const suggestions = buildSuggestions(rows, modelDefinition, [], '28.02.2026')
     expect(suggestions.length).toBeGreaterThan(0)
     expect(suggestions.every((token) => String(token.type).startsWith('date_'))).toBe(true)
   })
 
   it('returns no suggestions for empty query without fulltext token', () => {
     const rows = demoRows()
-    const annotations = demoAnnotations()
+    const modelDefinition = demoModelDefinition()
 
-    const suggestions = buildSuggestions(rows, annotations, [], '')
+    const suggestions = buildSuggestions(rows, modelDefinition, [], '')
     expect(suggestions).toHaveLength(0)
   })
 
@@ -105,11 +105,21 @@ describe('search-engine', () => {
     expect(html).toContain('<mark>alpha</mark>')
   })
 
+  it('exposes equivalent behavior through searchEngine contract object', () => {
+    const rows = demoRows()
+    const modelDefinition = demoModelDefinition()
+
+    const viaContract = searchEngine.buildSuggestions(rows, modelDefinition, [], 'moon')
+    const viaFunction = buildSuggestions(rows, modelDefinition, [], 'moon')
+
+    expect(viaContract).toEqual(viaFunction)
+  })
+
   it('matches fulltext against nested sub-attribute values (hangar.number)', () => {
     const rows = demoRows()
-    const annotations = demoAnnotations()
+    const modelDefinition = demoModelDefinition()
 
-    const result = filterItems(rows, annotations, [
+    const result = filterItems(rows, modelDefinition, [
       {
         uid: 'fulltext|21304',
         type: 'fulltext',
@@ -123,9 +133,9 @@ describe('search-engine', () => {
 
   it('respects scope when matching nested sub-attributes', () => {
     const rows = demoRows()
-    const annotations = demoAnnotations()
+    const modelDefinition = demoModelDefinition()
 
-    const result = filterItems(rows, annotations, [
+    const result = filterItems(rows, modelDefinition, [
       {
         uid: 'fulltext|classic',
         type: 'fulltext',
@@ -145,20 +155,20 @@ describe('search-engine', () => {
 
   it('returns suggestions for nested sub-attribute values', () => {
     const rows = demoRows()
-    const annotations = demoAnnotations()
+    const modelDefinition = demoModelDefinition()
 
-    const suggestions = buildSuggestions(rows, annotations, [], '21304')
+    const suggestions = buildSuggestions(rows, modelDefinition, [], '21304')
     expect(suggestions.some((token) => token.type === 'hangarCode')).toBe(true)
   })
 
   it('returns only matching suggestions except for special suggestion types', () => {
     const rows = demoRows()
-    const annotations = demoAnnotations()
+    const modelDefinition = demoModelDefinition()
     const query = '02.03.2026'
 
     const suggestions = buildSuggestions(
       rows,
-      annotations,
+      modelDefinition,
       [
         {
           uid: 'fulltext|hangar',

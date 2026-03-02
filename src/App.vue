@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import TableSuggest from './components/table-suggest/TableSuggest.vue'
-import { demoAnnotations } from './lib/demo-model'
+import { demoModelDefinition } from './lib/demo-model'
 import { demoRows } from './lib/demo-data'
 
-const annotations = demoAnnotations()
+const modelDefinition = demoModelDefinition()
 const items = demoRows()
 
 const examples = [
@@ -37,7 +37,7 @@ const examples = [
 
     <TableSuggest
       :items="items"
-      :annotations="annotations"
+      :model-definition="modelDefinition"
     />
   </main>
 </template>
