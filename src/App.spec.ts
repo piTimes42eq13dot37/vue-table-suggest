@@ -86,8 +86,10 @@ describe('App', () => {
 
   it('renders demo guidance', () => {
     const wrapper = mountApp()
+    expect(wrapper.text()).toContain('Try: before monday')
     expect(wrapper.text()).toContain('Try: 2026-03-01')
     expect(wrapper.text()).toContain('Try: after monday')
+    expect(wrapper.text()).toContain('Try: last monday')
     expect(wrapper.text()).toContain('Try: donut')
   })
 

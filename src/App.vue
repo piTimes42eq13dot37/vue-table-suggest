@@ -10,8 +10,10 @@ const examples = [
   'donut',
   'pantry',
   'captain',
-  '2026-03-01',
+  'before monday',
   'after monday',
+  'last monday',
+  '2026-03-01',
 ]
 </script>
 

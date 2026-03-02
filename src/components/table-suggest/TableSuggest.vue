@@ -294,10 +294,10 @@ const addQueryAsFulltext = (rawValue: string): void => {
 
 const chipTypeLabel = (token: SearchToken): string => {
   const map: Record<string, string> = {
-    date_before: 'Stardate before',
-    date_after: 'Stardate after',
-    date_exact: 'Stardate exact',
-    date_relative: 'Stardate',
+    date_before: 'Date before',
+    date_after: 'Date after',
+    date_exact: 'Date exact',
+    date_relative: 'Date',
     fulltext: 'Full-Text',
     scope: 'In Column',
   }

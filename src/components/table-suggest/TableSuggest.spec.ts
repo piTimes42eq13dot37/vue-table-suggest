@@ -372,7 +372,7 @@ describe('TableSuggest', () => {
     await nextTick()
 
     const chips = wrapper.findAll('.chip').map((chip) => chip.text().toLowerCase())
-    expect(chips.some((text) => text.includes('stardate:') && text.includes('after last'))).toBe(true)
+    expect(chips.some((text) => text.includes('date:') && text.includes('after last'))).toBe(true)
     expect(chips.some((text) => text.includes('full-text:') && text.includes('after last'))).toBe(false)
   })
 
