@@ -1,6 +1,7 @@
 # vue-table-suggest
-see [live demo](https://pitimes42eq13dot37.github.io/vue-table-suggest/)
 `vue-table-suggest` is a Vue 3 + TypeScript table search module with suggestion chips and date-aware filtering.
+
+see [live demo](https://pitimes42eq13dot37.github.io/vue-table-suggest/)
 
 ## Use in another Vue project
 
