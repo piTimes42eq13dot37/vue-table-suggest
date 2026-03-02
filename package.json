@@ -23,9 +23,11 @@
   ],
   "scripts": {
     "clean": "rm -rf dist",
+    "build:demo": "npm run clean && vue-tsc -b && vite build",
     "build": "npm run clean && vue-tsc -b && vite build && vite build -c vite.lib.config.ts && vue-tsc -p tsconfig.lib.json && vite build -c vite.codepen.config.ts",
     "test": "npm run build && vue-tsc --noEmit -p tsconfig.app.json && eslint src tests --ext .ts,.vue && vitest run --coverage && playwright test",
-    "watch": "vite"
+    "watch": "vite",
+    "check:cdn": "sh -c 'git status --short dist/lib; local_js=$(shasum dist/lib/index.global.js | cut -d \" \" -f1); local_css=$(shasum dist/lib/vue-table-suggest.css | cut -d \" \" -f1); remote_js=$(curl -sL \"https://cdn.jsdelivr.net/gh/piTimes42eq13dot37/vue-table-suggest@main/dist/lib/index.global.js\" | shasum | cut -d \" \" -f1); remote_css=$(curl -sL \"https://cdn.jsdelivr.net/gh/piTimes42eq13dot37/vue-table-suggest@main/dist/lib/vue-table-suggest.css\" | shasum | cut -d \" \" -f1); echo \"index.global.js: $([ \"$local_js\" = \"$remote_js\" ] && echo IDENTICAL || echo DIFFERENT)\"; echo \"vue-table-suggest.css: $([ \"$local_css\" = \"$remote_css\" ] && echo IDENTICAL || echo DIFFERENT)\"; echo \"local  js: $local_js\"; echo \"remote js: $remote_js\"; echo \"local  css: $local_css\"; echo \"remote css: $remote_css\"'"
   },
   "peerDependencies": {
     "quasar": "^2.18.5",

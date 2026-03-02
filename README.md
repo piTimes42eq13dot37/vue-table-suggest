@@ -40,6 +40,12 @@ The app in `src/App.vue` is a complete working demo of the module.
 There is also an external-consumer sample in `examples/consumer-app` that imports this package via
 `file:../..` to validate real host-app integration.
 
+CodePen is supported for quick external integration checks, but it is not the canonical demo for this project.
+
+GitHub demo URL (after Pages is enabled):
+
+- `https://<your-github-user>.github.io/<your-repo>/`
+
 When you run the app, you can try these demo searches in the input:
 
 - `donut`
@@ -69,9 +75,17 @@ Then open the local Vite URL shown in the terminal.
 ## Scripts
 
 - `npm run clean` - remove `dist`
+- `npm run build:demo` - clean, type-check, and build only the app demo (GitHub Pages artifact)
 - `npm run build` - clean, compile, and build app + library + codepen bundles
 - `npm run test` - run `build`, typecheck, lint (`src` + `tests`), Vitest with coverage, then Playwright E2E
 - `npm run watch` - start Vite dev server with local URL output
+
+## Publish demo on GitHub Pages
+
+1. Push to `main`.
+2. In GitHub repo settings, open `Pages` and set `Source` to `GitHub Actions`.
+3. The workflow deploys the app demo automatically using `npm run build:demo`.
+4. Open `https://<your-github-user>.github.io/<your-repo>/`.
 
 ## Test coverage notes
 
@@ -189,5 +203,35 @@ import '@quasar/extras/material-icons/material-icons.css'
 
   - Ensure `QIcon` is registered in your Quasar `components` list.
   - For CodePen, add the same Material Icons CSS as an external stylesheet resource.
+
+- CodePen still shows old JS/CSS after a new build:
+  - Keep using the same `@main` URL, but bump query params on each update (for both files), e.g. `?v=20260303-2`.
+  - Optional purge endpoints, then reload CodePen Debug View:
+    - `https://purge.jsdelivr.net/gh/piTimes42eq13dot37/vue-table-suggest@main/dist/lib/index.global.js`
+    - `https://purge.jsdelivr.net/gh/piTimes42eq13dot37/vue-table-suggest@main/dist/lib/vue-table-suggest.css`
+  - Verify local build equals CDN content using:
+
+```bash
+npm run check:cdn
+```
+
+  - `index.global.js: IDENTICAL` and `vue-table-suggest.css: IDENTICAL` means CDN is up to date.
+  - `DIFFERENT` means your local build and CDN `@main` still differ.
+
+## CodePen integration (optional)
+
+Use these external resources only when you want to validate CDN-based integration in CodePen.
+
+- CSS (top to bottom):
+  - `https://cdn.jsdelivr.net/npm/quasar@2.18.5/dist/quasar.prod.css`
+  - `https://cdn.jsdelivr.net/npm/@quasar/extras@1.17.0/material-icons/material-icons.css`
+  - `https://cdn.jsdelivr.net/gh/piTimes42eq13dot37/vue-table-suggest@main/dist/lib/vue-table-suggest.css?v=20260303`
+
+- JS (top to bottom):
+  - `https://unpkg.com/vue@3/dist/vue.global.prod.js`
+  - `https://cdn.jsdelivr.net/npm/quasar@2.18.5/dist/quasar.umd.prod.js`
+  - `https://cdn.jsdelivr.net/gh/piTimes42eq13dot37/vue-table-suggest@main/dist/lib/index.global.js?v=20260303`
+
+When you publish a new build and keep using `@main`, increase both `v=` values to force CodePen to fetch the new files.
 
 For a complete typed example, use `src/lib/demo-model.ts` + `src/lib/demo-data.ts` as the template.

@@ -1,8 +1,18 @@
 import { defineConfig } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
 
+const resolveBase = (): string => {
+  if (process.env.GITHUB_ACTIONS !== 'true') {
+    return '/'
+  }
+
+  const repoName = process.env.GITHUB_REPOSITORY?.split('/')[1]
+  return repoName ? `/${repoName}/` : '/'
+}
+
 // https://vite.dev/config/
 export default defineConfig({
+  base: resolveBase(),
   plugins: [vue()],
   build: {
     rollupOptions: {
