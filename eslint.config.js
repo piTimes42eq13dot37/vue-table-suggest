@@ -48,4 +48,37 @@ export default [
       'vue/one-component-per-file': 'off',
     },
   },
+  {
+    files: ['src/components/**/*.ts', 'src/components/**/*.vue'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: ['**/lib/models/internal'],
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/lib/models/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: ['**/services/*', '**/components/*'],
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/lib/services/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: ['**/components/*'],
+        },
+      ],
+    },
+  },
 ]

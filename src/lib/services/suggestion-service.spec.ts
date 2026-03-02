@@ -180,4 +180,73 @@ describe('suggestion-service', () => {
     expect(hangarScope?.matchCount).toBe(4)
     expect(hangarCodeScope).toBeUndefined()
   })
+
+  it('keeps deterministic suggestion ordering for moon query (golden master)', () => {
+    const suggestions = buildSuggestions(demoRows(), demoModelDefinition(), [], 'moon')
+
+    expect(
+      suggestions.map((token) => ({
+        uid: token.uid,
+        type: token.type,
+        title: token.title,
+      })),
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "title": "Moon Pantry Hyper",
+          "type": "hangar",
+          "uid": "hangar|Moon Pantry Hyper",
+        },
+        {
+          "title": "Moon Pantry Ultra",
+          "type": "hangar",
+          "uid": "hangar|Moon Pantry Ultra",
+        },
+        {
+          "title": "Moon Pantry Classic",
+          "type": "hangar",
+          "uid": "hangar|Moon Pantry Classic",
+        },
+        {
+          "title": "Moon Sprinkles Epsilon",
+          "type": "product",
+          "uid": "product|Moon Sprinkles Epsilon",
+        },
+      ]
+    `)
+  })
+
+  it('keeps deterministic date token creation for exact date query (golden master)', () => {
+    const suggestions = buildSuggestions(demoRows(), demoModelDefinition(), [], '02.03.2026')
+
+    expect(
+      suggestions.map((token) => ({
+        uid: token.uid,
+        type: token.type,
+        title: token.title,
+        category: token.category,
+      })),
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "category": "date before",
+          "title": "02.03.2026",
+          "type": "date_before",
+          "uid": "date_before|02.03.2026",
+        },
+        {
+          "category": "date after",
+          "title": "02.03.2026",
+          "type": "date_after",
+          "uid": "date_after|02.03.2026",
+        },
+        {
+          "category": "date exact",
+          "title": "02.03.2026",
+          "type": "date_exact",
+          "uid": "date_exact|02.03.2026",
+        },
+      ]
+    `)
+  })
 })

@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { buildSuggestions, filterItems, highlightText, searchEngine } from './search-engine'
+import {
+  buildSuggestions,
+  createSearchEngine,
+  filterItems,
+  highlightText,
+  searchEngine,
+} from './search-engine'
 import { demoModelDefinition, DemoItem } from './demo-model'
 import { demoRows } from './demo-data'
 import type { SearchToken } from './models/internal'
@@ -113,6 +119,16 @@ describe('search-engine', () => {
     const viaFunction = buildSuggestions(rows, modelDefinition, [], 'moon')
 
     expect(viaContract).toEqual(viaFunction)
+  })
+
+  it('supports dependency overrides through createSearchEngine', () => {
+    const engine = createSearchEngine({
+      resolveEnglishLocale: () => 'de-DE',
+      highlightText: () => 'highlighted',
+    })
+
+    expect(engine.resolveEnglishLocale()).toBe('de-DE')
+    expect(engine.highlightText('value', ['v'])).toBe('highlighted')
   })
 
   it('matches fulltext against nested sub-attribute values (hangar.number)', () => {

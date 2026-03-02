@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { defineModelDefinition, getModelDefinition } from './model-definition'
+import {
+  createTypedModelDefinition,
+  defineModelDefinition,
+  defineTypedModelDefinition,
+  getModelDefinition,
+} from './model-definition'
 
 class ModelDefinitionTestModel {
   id = 0
@@ -56,5 +61,39 @@ describe('model-definition', () => {
     ).toThrow(
       'Invalid model definition for ModelDefinitionTestModel: renderAsSublineOf references unknown key "missingParent"',
     )
+  })
+
+  it('supports typed model definition helper for key-safe columns', () => {
+    const typedDefinition = createTypedModelDefinition<ModelDefinitionTestModel>()({
+      modelName: 'TypedModelDefinitionTestModel',
+      columns: [{ key: 'id', label: 'ID', searchable: true, sortable: true }],
+    })
+
+    defineTypedModelDefinition(ModelDefinitionTestModel, typedDefinition)
+
+    const modelDefinition = getModelDefinition(ModelDefinitionTestModel)
+    expect(modelDefinition.modelName).toBe('TypedModelDefinitionTestModel')
+    expect(modelDefinition.columns[0]?.key).toBe('id')
+  })
+
+  it('allows explicit accessor columns with keys outside the model shape', () => {
+    const typedDefinition = createTypedModelDefinition<ModelDefinitionTestModel>()({
+      modelName: 'TypedAccessorModelDefinitionTestModel',
+      columns: [
+        {
+          key: 'customAccessor',
+          label: 'Custom Accessor',
+          searchable: true,
+          sortable: true,
+          accessor: (item) => item.id,
+        },
+      ],
+    })
+
+    defineTypedModelDefinition(ModelDefinitionTestModel, typedDefinition)
+
+    const modelDefinition = getModelDefinition(ModelDefinitionTestModel)
+    expect(modelDefinition.modelName).toBe('TypedAccessorModelDefinitionTestModel')
+    expect(modelDefinition.columns[0]?.key).toBe('customAccessor')
   })
 })

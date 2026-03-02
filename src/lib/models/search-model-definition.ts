@@ -5,6 +5,8 @@ export interface SearchModelDefinition<TItem> {
   locale?: string
   maxSuggestions?: number
   maxWeekdaySuggestions?: number
+  tokenTypeLabelByType?: Record<string, string>
+  suggestionCategoryLabelByType?: Record<string, string>
   tokenColorByType?: Record<string, string>
   optionBadgeColorByType?: Record<string, string>
   tokenDefaultColor?: string

@@ -1,6 +1,25 @@
 import type { SearchModelDefinition } from './models/external'
+import type { SearchColumnDefinition } from './models/search-column-definition'
 
 type Constructor<T> = abstract new (...args: never[]) => T
+type ModelKey<TItem> = Extract<keyof TItem, string>
+
+type TypedColumnWithKnownKey<TItem> = Omit<SearchColumnDefinition<TItem>, 'key'> & {
+  key: ModelKey<TItem>
+}
+
+type TypedColumnWithAccessor<TItem> = Omit<SearchColumnDefinition<TItem>, 'accessor'> & {
+  key: string
+  accessor: (item: TItem) => unknown
+}
+
+export type TypedSearchColumnDefinition<TItem> =
+  | TypedColumnWithKnownKey<TItem>
+  | TypedColumnWithAccessor<TItem>
+
+export type TypedSearchModelDefinition<TItem> = Omit<SearchModelDefinition<TItem>, 'columns'> & {
+  columns: TypedSearchColumnDefinition<TItem>[]
+}
 
 const assertModelDefinitionValid = <TItem>(
   ctor: Constructor<TItem>,
@@ -65,6 +84,17 @@ export const defineModelDefinition = <TItem>(
 ): void => {
   modelDefinitionRegistry.define(ctor, modelDefinition)
 }
+
+export const defineTypedModelDefinition = <TItem>(
+  ctor: Constructor<TItem>,
+  modelDefinition: TypedSearchModelDefinition<TItem>,
+): void => {
+  defineModelDefinition(ctor, modelDefinition as SearchModelDefinition<TItem>)
+}
+
+export const createTypedModelDefinition = <TItem>() =>
+  (modelDefinition: TypedSearchModelDefinition<TItem>): TypedSearchModelDefinition<TItem> =>
+    modelDefinition
 
 export const getModelDefinition = <TItem>(
   ctor: Constructor<TItem>,

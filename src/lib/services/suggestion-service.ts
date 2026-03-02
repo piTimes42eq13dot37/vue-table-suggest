@@ -8,10 +8,8 @@ import {
 } from '../models/search-selection'
 import { SearchTokenFactory } from '../models/search-token-factory'
 import {
-  dateOperationSuggestionPolicy,
-  relativeDateSuggestionPolicy,
-  textSuggestionScoringPolicy,
-  uniqueSuggestionMergeService,
+  createSuggestionPolicies,
+  type SuggestionPolicies,
 } from './suggestion-policy'
 import { filterItems } from './filter-service'
 import {
@@ -23,6 +21,11 @@ import {
 
 const MIN_QUERY_LENGTH = 1
 const TOP_SCORE_FIRST_COUNT = 3
+
+interface SuggestionServiceDependencies {
+  policies: SuggestionPolicies
+  filterItems: typeof filterItems
+}
 
 interface SuggestionContext<TItem> {
   items: TItem[]
@@ -43,19 +46,22 @@ const escapeRegExp = (value: string): string =>
   String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 class SuggestionService {
+  constructor(private readonly dependencies: SuggestionServiceDependencies) {
+  }
+
   private getRelativeCandidates<TItem>(
     modelDefinition: SearchModelDefinition<TItem>,
     selected: SearchToken[],
     rawInput: string,
   ): SearchToken[] {
-    return relativeDateSuggestionPolicy.suggest(modelDefinition, selected, rawInput)
+    return this.dependencies.policies.relativeDateSuggestionPolicy.suggest(modelDefinition, selected, rawInput)
   }
 
   private getDateOperationCandidates(
     selected: SearchToken[],
     rawInput: string,
   ): SearchToken[] {
-    return dateOperationSuggestionPolicy.suggest(selected, rawInput)
+    return this.dependencies.policies.dateOperationSuggestionPolicy.suggest(selected, rawInput)
   }
 
   private countTermOccurrencesInValue(value: string, term: string): number {
@@ -117,7 +123,7 @@ class SuggestionService {
 
     const candidates: RankedSearchToken[] = []
     const seen = new Set<string>()
-    const baseRows = filterItems(items, modelDefinition, selected)
+    const baseRows = this.dependencies.filterItems(items, modelDefinition, selected)
 
     modelDefinition.columns
       .filter((column) => column.suggestionEnabled !== false)
@@ -134,7 +140,7 @@ class SuggestionService {
 
           const displayTitle = isNumberLikeColumn(column) ? formatGroupedNumber(rawTitle) : rawTitle
           const scoreTitle = isNumberLikeColumn(column) ? rawTitle : displayTitle
-          const score = textSuggestionScoringPolicy.score(scoreTitle, column.label, needle)
+          const score = this.dependencies.policies.textSuggestionScoringPolicy.score(scoreTitle, column.label, needle)
           if (score < 0 && needle.length > 0) return
 
           candidates.push({
@@ -215,7 +221,7 @@ class SuggestionService {
       .filter((term) => term.length > 0)
 
     const exactOnly = selected.filter((token) => SearchSelection.isExactFilterToken(token))
-    const baseRows = filterItems(items, modelDefinition, exactOnly)
+    const baseRows = this.dependencies.filterItems(items, modelDefinition, exactOnly)
 
     const selectedScope = new Set(
       selected
@@ -228,7 +234,9 @@ class SuggestionService {
       .filter((column) => !selectedScope.has(column.key))
       .map((column) => {
         const matchCount = this.countColumnMatchesForTerms(baseRows, modelDefinition, column.key, fulltextTerms)
-        const score = needle.length === 0 ? 1 : textSuggestionScoringPolicy.score(column.label, 'Fulltext scope', needle)
+        const score = needle.length === 0
+          ? 1
+          : this.dependencies.policies.textSuggestionScoringPolicy.score(column.label, 'Fulltext scope', needle)
 
         return {
           ...SearchTokenFactory.createScope({
@@ -263,7 +271,7 @@ class SuggestionService {
     builders: CandidateBuilder<TItem>[],
   ): SearchToken[] {
     const candidateLists = builders.map((builder) => builder(context))
-    return uniqueSuggestionMergeService.merge(...candidateLists)
+    return this.dependencies.policies.uniqueSuggestionMergeService.merge(...candidateLists)
   }
 
   buildSuggestions<TItem>(
@@ -333,7 +341,21 @@ class SuggestionService {
   }
 }
 
-const suggestionService = new SuggestionService()
+const createSuggestionServiceDependencies = (
+  overrides?: Partial<SuggestionServiceDependencies>,
+): SuggestionServiceDependencies => ({
+  policies: overrides?.policies ?? createSuggestionPolicies(),
+  filterItems: overrides?.filterItems ?? filterItems,
+})
+
+export const createSuggestionService = (
+  overrides?: Partial<SuggestionServiceDependencies>,
+): Pick<SuggestionService, 'buildSuggestions'> => {
+  const dependencies = createSuggestionServiceDependencies(overrides)
+  return new SuggestionService(dependencies)
+}
+
+const suggestionService = createSuggestionService()
 
 export const buildSuggestions = <TItem>(
   items: TItem[],

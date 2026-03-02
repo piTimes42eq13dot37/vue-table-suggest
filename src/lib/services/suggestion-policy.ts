@@ -15,24 +15,61 @@ import {
 import { SearchTokenTypeValueObject } from '../models/search-token-type'
 import { resolveEnglishLocale } from './highlight-service'
 
-const SCORE_START = 300
-const SCORE_MIDDLE = 200
-const SCORE_END = 100
-const WORD_SCORE_BASE = 10_000
-const WORD_INDEX_WEIGHT = 1_000
-const SCORE_CATEGORY_MATCH = 40
-const SCORE_EXACT_MATCH = 50
-const MAX_LENGTH_PENALTY = 30
-const LENGTH_PENALTY_DIVISOR = 6
+export interface RelativeDateSuggestionPolicyConfig {
+  minQueryLength: number
+  defaultMaxWeekdaySuggestions: number
+}
+
+export interface TextSuggestionScoringPolicyConfig {
+  scoreStart: number
+  scoreMiddle: number
+  scoreEnd: number
+  wordScoreBase: number
+  wordIndexWeight: number
+  scoreCategoryMatch: number
+  scoreExactMatch: number
+  maxLengthPenalty: number
+  lengthPenaltyDivisor: number
+}
+
+export interface SuggestionPolicyConfig {
+  relativeDate: RelativeDateSuggestionPolicyConfig
+  textScoring: TextSuggestionScoringPolicyConfig
+}
+
+export const defaultSuggestionPolicyConfig: SuggestionPolicyConfig = {
+  relativeDate: {
+    minQueryLength: 4,
+    defaultMaxWeekdaySuggestions: 4,
+  },
+  textScoring: {
+    scoreStart: 300,
+    scoreMiddle: 200,
+    scoreEnd: 100,
+    wordScoreBase: 10_000,
+    wordIndexWeight: 1_000,
+    scoreCategoryMatch: 40,
+    scoreExactMatch: 50,
+    maxLengthPenalty: 30,
+    lengthPenaltyDivisor: 6,
+  },
+}
+
+const mergeSuggestionPolicyConfig = (
+  overrides?: Partial<SuggestionPolicyConfig>,
+): SuggestionPolicyConfig => ({
+  relativeDate: {
+    ...defaultSuggestionPolicyConfig.relativeDate,
+    ...(overrides?.relativeDate ?? {}),
+  },
+  textScoring: {
+    ...defaultSuggestionPolicyConfig.textScoring,
+    ...(overrides?.textScoring ?? {}),
+  },
+})
 
 class RelativeDateSuggestionPolicy {
-  private readonly minQueryLength: number
-
-  private readonly defaultMaxWeekdaySuggestions: number
-
-  constructor(minQueryLength = 4, defaultMaxWeekdaySuggestions = 4) {
-    this.minQueryLength = minQueryLength
-    this.defaultMaxWeekdaySuggestions = defaultMaxWeekdaySuggestions
+  constructor(private readonly config: RelativeDateSuggestionPolicyConfig) {
   }
 
   private buildRelativeTitlePrefix(direction: SearchDirection, reference: DateReference): string {
@@ -83,7 +120,7 @@ class RelativeDateSuggestionPolicy {
     rawInput: string,
   ): SearchToken[] {
     if (
-      String(rawInput || '').trim().length < this.minQueryLength ||
+      String(rawInput || '').trim().length < this.config.minQueryLength ||
       selected.some((token) => SearchSelection.isRelativeDateToken(token))
     ) {
       return []
@@ -133,7 +170,7 @@ class RelativeDateSuggestionPolicy {
 
     return results
       .sort((a, b) => this.getPriority(b.title, parsed.needle) - this.getPriority(a.title, parsed.needle))
-      .slice(0, modelDefinition.maxWeekdaySuggestions ?? this.defaultMaxWeekdaySuggestions)
+      .slice(0, modelDefinition.maxWeekdaySuggestions ?? this.config.defaultMaxWeekdaySuggestions)
   }
 }
 
@@ -160,6 +197,9 @@ class DateOperationSuggestionPolicy {
 }
 
 class TextSuggestionScoringPolicy {
+  constructor(private readonly config: TextSuggestionScoringPolicyConfig) {
+  }
+
   private getPositionWeight(text: string, needle: string): number {
     if (!needle) {
       return 0
@@ -171,14 +211,14 @@ class TextSuggestionScoringPolicy {
     }
 
     if (index === 0) {
-      return SCORE_START
+      return this.config.scoreStart
     }
 
     if (index + needle.length === text.length) {
-      return SCORE_END
+      return this.config.scoreEnd
     }
 
-    return SCORE_MIDDLE
+    return this.config.scoreMiddle
   }
 
   private getBestWordMatchScore(text: string, needle: string): number {
@@ -197,7 +237,7 @@ class TextSuggestionScoringPolicy {
         return
       }
 
-      const score = WORD_SCORE_BASE - wordIndex * WORD_INDEX_WEIGHT + locationScore
+      const score = this.config.wordScoreBase - wordIndex * this.config.wordIndexWeight + locationScore
       if (score > best) {
         best = score
       }
@@ -219,11 +259,11 @@ class TextSuggestionScoringPolicy {
     }
 
     const normalizedCategory = String(category || '').toLowerCase()
-    const categoryScore = normalizedCategory.includes(needle) ? SCORE_CATEGORY_MATCH : 0
-    const exactBonus = normalizedTitle === needle ? SCORE_EXACT_MATCH : 0
+    const categoryScore = normalizedCategory.includes(needle) ? this.config.scoreCategoryMatch : 0
+    const exactBonus = normalizedTitle === needle ? this.config.scoreExactMatch : 0
     const lengthPenalty = Math.min(
-      MAX_LENGTH_PENALTY,
-      Math.floor(normalizedTitle.length / LENGTH_PENALTY_DIVISOR),
+      this.config.maxLengthPenalty,
+      Math.floor(normalizedTitle.length / this.config.lengthPenaltyDivisor),
     )
 
     return wordMatchScore + categoryScore + exactBonus - lengthPenalty
@@ -248,10 +288,32 @@ class UniqueSuggestionMergeService {
   }
 }
 
-export const relativeDateSuggestionPolicy = new RelativeDateSuggestionPolicy()
+export interface SuggestionPolicies {
+  relativeDateSuggestionPolicy: RelativeDateSuggestionPolicy
+  dateOperationSuggestionPolicy: DateOperationSuggestionPolicy
+  textSuggestionScoringPolicy: TextSuggestionScoringPolicy
+  uniqueSuggestionMergeService: UniqueSuggestionMergeService
+}
 
-export const dateOperationSuggestionPolicy = new DateOperationSuggestionPolicy()
+export const createSuggestionPolicies = (
+  overrides?: Partial<SuggestionPolicyConfig>,
+): SuggestionPolicies => {
+  const config = mergeSuggestionPolicyConfig(overrides)
 
-export const textSuggestionScoringPolicy = new TextSuggestionScoringPolicy()
+  return {
+    relativeDateSuggestionPolicy: new RelativeDateSuggestionPolicy(config.relativeDate),
+    dateOperationSuggestionPolicy: new DateOperationSuggestionPolicy(),
+    textSuggestionScoringPolicy: new TextSuggestionScoringPolicy(config.textScoring),
+    uniqueSuggestionMergeService: new UniqueSuggestionMergeService(),
+  }
+}
 
-export const uniqueSuggestionMergeService = new UniqueSuggestionMergeService()
+const defaultSuggestionPolicies = createSuggestionPolicies()
+
+export const relativeDateSuggestionPolicy = defaultSuggestionPolicies.relativeDateSuggestionPolicy
+
+export const dateOperationSuggestionPolicy = defaultSuggestionPolicies.dateOperationSuggestionPolicy
+
+export const textSuggestionScoringPolicy = defaultSuggestionPolicies.textSuggestionScoringPolicy
+
+export const uniqueSuggestionMergeService = defaultSuggestionPolicies.uniqueSuggestionMergeService

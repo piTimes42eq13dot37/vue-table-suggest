@@ -364,6 +364,85 @@ describe('TableSuggest', () => {
     expect(wrapper.text()).toContain('alpha')
   })
 
+  it('uses configurable token type labels from model definition metadata', async () => {
+    const modelDefinition = demoModelDefinition()
+
+    const wrapper = mount(TableSuggest, {
+      props: {
+        items: demoRows() as unknown as object[],
+        modelDefinition: {
+          ...modelDefinition,
+          tokenTypeLabelByType: {
+            fulltext: 'Anywhere',
+          },
+        } as unknown as {
+          modelName: string
+          columns: Array<{ key: string; label: string }>
+        },
+      },
+      global: {
+        stubs: {
+          QSelect: QSelectStub,
+          QChip: QChipStub,
+          QItem: QItemStub,
+          QItemSection: QItemSectionStub,
+          QItemLabel: QItemLabelStub,
+          QIcon: QIconStub,
+          QAvatar: QAvatarStub,
+        },
+      },
+    })
+
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    select.vm.$emit('new-value', 'alpha', () => undefined)
+    await nextTick()
+
+    expect(wrapper.text()).toContain('Anywhere:')
+    expect(wrapper.text()).not.toContain('Full-Text:')
+  })
+
+  it('uses configurable suggestion category labels from model definition metadata', async () => {
+    const modelDefinition = demoModelDefinition()
+
+    const wrapper = mount(TableSuggest, {
+      props: {
+        items: demoRows() as unknown as object[],
+        modelDefinition: {
+          ...modelDefinition,
+          suggestionCategoryLabelByType: {
+            scope: 'Search Scope',
+          },
+        } as unknown as {
+          modelName: string
+          columns: Array<{ key: string; label: string }>
+        },
+      },
+      global: {
+        stubs: {
+          QSelect: QSelectStub,
+          QChip: QChipStub,
+          QItem: QItemStub,
+          QItemSection: QItemSectionStub,
+          QItemLabel: QItemLabelStub,
+          QIcon: QIconStub,
+          QAvatar: QAvatarStub,
+        },
+      },
+    })
+
+    const select = wrapper.findComponent({ name: 'QSelect' })
+
+    select.vm.$emit('new-value', 'moon', () => undefined)
+    await nextTick()
+
+    select.vm.$emit('filter', '', (update: () => void) => update())
+    await nextTick()
+
+    const suggestionMeta = wrapper.findAll('.suggest-meta').map((node) => node.text())
+    expect(suggestionMeta.some((text) => text.includes('Search Scope'))).toBe(true)
+  })
+
   it('adds date-relative chip for after last tuesday when submitted by enter', async () => {
     const wrapper = mountTableSuggest()
     const select = wrapper.findComponent({ name: 'QSelect' })

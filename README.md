@@ -81,6 +81,30 @@ Then open the local Vite URL shown in the terminal.
 - `npm run test` - run `build`, typecheck, lint (`src` + `tests`), Vitest with coverage, then Playwright E2E
 - `npm run watch` - start Vite dev server with local URL output
 
+## Architecture decisions
+
+- **DDD boundaries**
+  - `src/lib/models` contains value objects and domain parsing logic only.
+  - `src/lib/services` contains application services and policy orchestration.
+  - `src/components` stays presentational and delegates behavior to controller/presenter services.
+
+- **Search engine contract + DI**
+  - `createSearchEngine(...)` creates a fully wired search engine with overridable dependencies.
+  - `searchEngine` is the default production instance; function exports are compatibility aliases.
+
+- **Typed model definition API**
+  - `createTypedModelDefinition<T>()` and `defineTypedModelDefinition(...)` add compile-time safety for column keys.
+  - Custom keys are still supported when an explicit `accessor` is provided.
+
+- **Policy configuration**
+  - Suggestion scoring and relative-date thresholds are centralized via `defaultSuggestionPolicyConfig`.
+  - `createSuggestionPolicies(...)` enables controlled tuning without touching service internals.
+
+- **Import boundaries enforced by lint**
+  - Models cannot import services/components.
+  - Services cannot import components.
+  - Components cannot import internal model-only modules.
+
 ## Publish demo on GitHub Pages
 
 1. Push to `main`.
@@ -115,6 +139,16 @@ defineModelAnnotations(ItemModel, {
     fulltext: 'teal-9',
     scope: 'green-8',
     hangarCode: 'light-blue-9',
+  },
+  tokenTypeLabelByType: {
+    fulltext: 'Anywhere',
+    scope: 'In Column',
+    date_relative: 'Date',
+  },
+  suggestionCategoryLabelByType: {
+    scope: 'Search Scope',
+    date_before: 'Before Date',
+    date_after: 'After Date',
   },
   optionBadgeColorByType: {
     fulltext: 'teal-9',
