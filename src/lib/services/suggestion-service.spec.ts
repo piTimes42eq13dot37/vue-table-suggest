@@ -3,7 +3,6 @@ import { demoModelDefinition, demoRows } from '../../testing/demo-fixtures'
 import { DateReference } from '../models/date-reference'
 import { DateRelation } from '../models/date-relation'
 import type { SearchModelDefinition } from '../models/external'
-import type { SearchToken as SearchTokenData } from '../models/internal'
 import { SearchTokenModel, resolveTokenCategory } from '../models/search-token'
 import { buildSuggestions } from './suggestion-service'
 
@@ -177,10 +176,7 @@ describe('suggestion-service', () => {
     )
 
     const fulltextScopeSuggestions = suggestions
-      .filter(
-        (token): token is SearchTokenData & { key: string; matchCount?: number } =>
-          SearchTokenModel.isScope(token) && 'key' in token,
-      )
+      .filter(SearchTokenModel.isScope)
     const hangarFulltextScope = fulltextScopeSuggestions.find((token) => token.key === 'hangar')
     const hangarCodeFulltextScope = fulltextScopeSuggestions.find((token) => token.key === 'hangarCode')
 

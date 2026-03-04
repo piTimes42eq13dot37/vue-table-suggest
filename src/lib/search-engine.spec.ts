@@ -86,10 +86,7 @@ describe('search-engine', () => {
     )
 
     const fulltextScopeSuggestions = suggestions
-      .filter(
-        (token): token is SearchTokenData & { key: string; matchCount?: number } =>
-          SearchTokenModel.isScope(token) && 'key' in token,
-      )
+      .filter(SearchTokenModel.isScope)
     expect(fulltextScopeSuggestions.length).toBeGreaterThan(0)
     expect(fulltextScopeSuggestions.some((token) => (token.matchCount ?? 0) > 0)).toBe(true)
   })

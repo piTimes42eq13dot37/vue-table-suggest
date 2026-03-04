@@ -48,10 +48,7 @@ export const useTableSuggestSearchState = <TItem extends object>(
 
   const scopedKeys = computed(() =>
     selected.value
-      .filter(
-        (token): token is SearchToken & { key: string } =>
-          SearchTokenModel.isScope(token) && 'key' in token,
-      )
+      .filter(SearchTokenModel.isScope)
       .map((token) => token.key),
   )
 

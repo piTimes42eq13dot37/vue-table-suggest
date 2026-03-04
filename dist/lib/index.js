@@ -50,8 +50,8 @@ class et {
   highlightText(e, n) {
     const s = this.escapeHtml(e), r = n.map((o) => String(o || "").trim()).filter((o) => o.length > 0);
     return r.length ? r.reduce((o, u) => {
-      const d = j(u), m = d.length > 0 && d === String(u) ? d.split("").map((f) => this.escapeRegExp(f)).join("[^0-9]*") : this.escapeRegExp(this.escapeHtml(u)), i = new RegExp(m, "gi");
-      return o.replace(i, (f) => `<mark>${f}</mark>`);
+      const d = j(u), m = d.length > 0 && d === String(u) ? d.split("").map((f) => this.escapeRegExp(f)).join("[^0-9]*") : this.escapeRegExp(this.escapeHtml(u)), a = new RegExp(m, "gi");
+      return o.replace(a, (f) => `<mark>${f}</mark>`);
     }, s) : s;
   }
 }
@@ -216,29 +216,29 @@ class ht {
   filterItems(e, n, s) {
     const r = he.from(s), { fulltextTokens: o, exactTokens: u, scopedColumnKeys: d } = r.toParsedState(), g = Xe(n, d);
     return e.filter((m) => {
-      for (const i of u) {
-        const f = T.resolveTermKey(i), l = n.columns.find((h) => h.key === f), a = l ? oe(m, l) : "";
-        if (T.isDate(i)) {
-          const h = F.parseDateInput(a), c = F.parseDateInput(i.rawTitle || i.title);
+      for (const a of u) {
+        const f = T.resolveTermKey(a), l = n.columns.find((h) => h.key === f), i = l ? oe(m, l) : "";
+        if (T.isDate(a)) {
+          const h = F.parseDateInput(i), c = F.parseDateInput(a.rawTitle || a.title);
           if (!h || !c) return !1;
           const b = h.getTime(), C = c.getTime();
-          if (T.isBeforeDirection(i) && !(b < C) || T.isAfterDirection(i) && !(b > C) || T.isOnDirection(i) && b !== C)
+          if (T.isBeforeDirection(a) && !(b < C) || T.isAfterDirection(a) && !(b > C) || T.isOnDirection(a) && b !== C)
             return !1;
           continue;
         }
         if (l?.valueType === "number-like") {
-          if (j(a) !== j(i.title))
+          if (j(i) !== j(a.title))
             return !1;
           continue;
         }
-        if (String(a).toLowerCase() !== String(i.title || "").toLowerCase())
+        if (String(i).toLowerCase() !== String(a.title || "").toLowerCase())
           return !1;
       }
-      for (const i of o) {
-        const f = String(i.title || "").toLowerCase();
+      for (const a of o) {
+        const f = String(a.title || "").toLowerCase();
         if (!f) continue;
         if (!g.some(
-          (a) => String(oe(m, a)).toLowerCase().includes(f)
+          (i) => String(oe(m, i)).toLowerCase().includes(f)
         )) return !1;
       }
       return !0;
@@ -287,7 +287,7 @@ class vt {
       const m = String(r[1]).toLowerCase();
       if (!rt(m))
         return null;
-      const i = String(r[2] || "").toLowerCase(), f = i && me(i) ? i : null, l = String(r[3] || "").trim().toLowerCase();
+      const a = String(r[2] || "").toLowerCase(), f = a && me(a) ? a : null, l = String(r[3] || "").trim().toLowerCase();
       return l ? { dateRelation: m, reference: f, weekdayPart: l, needle: s } : null;
     }
     const o = s.match(/^(last|next)\s+(.+)$/i);
@@ -341,30 +341,30 @@ class Tt {
     return s === n ? 3 : s.startsWith(n) ? 2 : s.includes(n) ? 1 : 0;
   }
   suggest(e, n, s) {
-    if (String(s || "").trim().length < this.config.minQueryLength || n.some((i) => T.isDateRelative(i)))
+    if (String(s || "").trim().length < this.config.minQueryLength || n.some((a) => T.isDateRelative(a)))
       return [];
     const r = xt.parse(s);
     if (!r)
       return [];
-    const o = e.locale ?? nt(), u = F.getLocalizedWeekdaysMondayFirst(o).map((i, f) => ({
-      weekday: i,
+    const o = e.locale ?? nt(), u = F.getLocalizedWeekdaysMondayFirst(o).map((a, f) => ({
+      weekday: a,
       weekdayIndexMonday: f,
-      weekdayLower: i.toLowerCase()
-    })).filter((i) => i.weekdayLower.startsWith(r.weekdayPart)), d = r.reference ? [r.reference] : [ie.Last, ie.Next], g = [], m = /* @__PURE__ */ new Set();
-    return u.forEach((i) => {
+      weekdayLower: a.toLowerCase()
+    })).filter((a) => a.weekdayLower.startsWith(r.weekdayPart)), d = r.reference ? [r.reference] : [ie.Last, ie.Next], g = [], m = /* @__PURE__ */ new Set();
+    return u.forEach((a) => {
       d.forEach((f) => {
-        const l = F.getReferenceWeekdayDate(f, i.weekdayIndexMonday), a = F.formatDate(l), c = `${this.buildRelativeTitlePrefix(r.dateRelation, f)} ${i.weekday}`;
+        const l = F.getReferenceWeekdayDate(f, a.weekdayIndexMonday), i = F.formatDate(l), c = `${this.buildRelativeTitlePrefix(r.dateRelation, f)} ${a.weekday}`;
         m.has(c) || (m.add(c), g.push(
           pe.createDateRelative({
             dateRelation: r.dateRelation,
             reference: f,
-            weekdayIndexMonday: i.weekdayIndexMonday,
-            dateText: a,
+            weekdayIndexMonday: a.weekdayIndexMonday,
+            dateText: i,
             title: c
           })
         ));
       });
-    }), g.sort((i, f) => this.getPriority(f.title, r.needle) - this.getPriority(i.title, r.needle)).slice(0, e.maxWeekdaySuggestions ?? this.config.defaultMaxWeekdaySuggestions);
+    }), g.sort((a, f) => this.getPriority(f.title, r.needle) - this.getPriority(a.title, r.needle)).slice(0, e.maxWeekdaySuggestions ?? this.config.defaultMaxWeekdaySuggestions);
   }
 }
 class wt {
@@ -456,8 +456,8 @@ class Lt {
       return 0;
     const o = [s];
     return e.reduce((u, d) => {
-      const g = r.reduce((m, i) => {
-        const f = o.reduce((l, a) => l + this.countTermOccurrencesInValue(Ze(d, n, a), i), 0);
+      const g = r.reduce((m, a) => {
+        const f = o.reduce((l, i) => l + this.countTermOccurrencesInValue(Ze(d, n, i), a), 0);
         return m + f;
       }, 0);
       return u + g;
@@ -486,13 +486,13 @@ class Lt {
         });
       });
     });
-    const m = (c, b) => b._score !== c._score ? b._score - c._score : c.title.localeCompare(b.title), i = u.slice().sort(m), f = [], l = /* @__PURE__ */ new Set(), a = /* @__PURE__ */ new Set();
-    i.slice(0, ve).forEach((c) => {
-      l.has(c.uid) || (l.add(c.uid), a.add(c._columnType), f.push(c));
+    const m = (c, b) => b._score !== c._score ? b._score - c._score : c.title.localeCompare(b.title), a = u.slice().sort(m), f = [], l = /* @__PURE__ */ new Set(), i = /* @__PURE__ */ new Set();
+    a.slice(0, ve).forEach((c) => {
+      l.has(c.uid) || (l.add(c.uid), i.add(c._columnType), f.push(c));
     });
-    const h = i.slice(ve);
+    const h = a.slice(ve);
     return h.forEach((c) => {
-      l.has(c.uid) || a.has(c._columnType) || (l.add(c.uid), a.add(c._columnType), f.push(c));
+      l.has(c.uid) || i.has(c._columnType) || (l.add(c.uid), i.add(c._columnType), f.push(c));
     }), h.forEach((c) => {
       l.has(c.uid) || (l.add(c.uid), f.push(c));
     }), f.map((c) => {
@@ -501,27 +501,25 @@ class Lt {
     });
   }
   buildScopeCandidates(e, n, s, r) {
-    const o = s.filter((i) => T.isFulltext(i)).map((i) => String(i.title || "").toLowerCase()).filter((i) => i.length > 0), u = s.filter((i) => T.isExactCellValue(i)), d = this.dependencies.filterItems(e, n, u), g = new Set(
-      s.filter(
-        (i) => T.isScope(i) && "key" in i
-      ).map((i) => i.key)
+    const o = s.filter((a) => T.isFulltext(a)).map((a) => String(a.title || "").toLowerCase()).filter((a) => a.length > 0), u = s.filter((a) => T.isExactCellValue(a)), d = this.dependencies.filterItems(e, n, u), g = new Set(
+      s.filter(T.isScope).map((a) => a.key)
     );
-    return n.columns.filter((i) => i.searchable !== !1).filter((i) => !g.has(i.key)).map((i) => {
-      const f = this.countColumnMatchesForTerms(d, n, i.key, o), l = r.length === 0 ? 1 : this.dependencies.policies.textSuggestionScoringPolicy.score(i.label, "Fulltext scope", r);
+    return n.columns.filter((a) => a.searchable !== !1).filter((a) => !g.has(a.key)).map((a) => {
+      const f = this.countColumnMatchesForTerms(d, n, a.key, o), l = r.length === 0 ? 1 : this.dependencies.policies.textSuggestionScoringPolicy.score(a.label, "Fulltext scope", r);
       return {
         ...pe.createScope({
-          key: i.key,
-          title: i.label,
-          icon: i.icon
+          key: a.key,
+          title: a.label,
+          icon: a.icon
         }),
         matchCount: f,
         _score: l
       };
-    }).filter((i) => (i.matchCount ?? 0) > 0).filter((i) => r.length === 0 || i._score >= 0).sort((i, f) => {
-      const l = i.matchCount ?? 0, a = f.matchCount ?? 0;
-      return a !== l ? a - l : f._score !== i._score ? f._score - i._score : i.title.localeCompare(f.title);
-    }).map((i) => {
-      const f = { ...i };
+    }).filter((a) => (a.matchCount ?? 0) > 0).filter((a) => r.length === 0 || a._score >= 0).sort((a, f) => {
+      const l = a.matchCount ?? 0, i = f.matchCount ?? 0;
+      return i !== l ? i - l : f._score !== a._score ? f._score - a._score : a.title.localeCompare(f.title);
+    }).map((a) => {
+      const f = { ...a };
       return delete f._score, f;
     });
   }
@@ -536,7 +534,7 @@ class Lt {
       selected: s,
       rawInput: r,
       needle: o
-    }, g = (h) => this.getDateOperationCandidates(h.selected, h.rawInput), m = (h) => this.getRelativeCandidates(h.modelDefinition, h.selected, h.rawInput), i = (h) => this.buildScopeCandidates(
+    }, g = (h) => this.getDateOperationCandidates(h.selected, h.rawInput), m = (h) => this.getRelativeCandidates(h.modelDefinition, h.selected, h.rawInput), a = (h) => this.buildScopeCandidates(
       h.items,
       h.modelDefinition,
       h.selected,
@@ -553,7 +551,7 @@ class Lt {
     return s.some((h) => T.isFulltext(h)) ? this.collectCandidates(d, [
       g,
       m,
-      i,
+      a,
       f
     ]).slice(0, u) : l.length > 0 ? l.slice(0, u) : o.length < Dt ? [] : f(d).slice(0, u);
   }
@@ -604,22 +602,20 @@ const Mt = {
   ), u = O(
     () => n.value.filter((l) => l.type === "fulltext").map((l) => l.title)
   ), d = O(
-    () => n.value.filter(
-      (l) => T.isScope(l) && "key" in l
-    ).map((l) => l.key)
+    () => n.value.filter(T.isScope).map((l) => l.key)
   ), g = (l) => {
-    if (n.value.some((a) => a.uid === l.uid)) {
+    if (n.value.some((i) => i.uid === l.uid)) {
       e.value = "", s.value = [];
       return;
     }
     n.value = [...n.value, l], e.value = "", s.value = [];
   };
   He(n, (l) => {
-    const a = l.filter(
+    const i = l.filter(
       (c, b, C) => C.findIndex((M) => M.uid === c.uid) === b
     );
-    if (a.length !== l.length) {
-      n.value = a;
+    if (i.length !== l.length) {
+      n.value = i;
       return;
     }
     if (!l.some((c) => c.type === "fulltext") && l.some((c) => c.type === "scope")) {
@@ -631,22 +627,22 @@ const Mt = {
     });
   });
   const m = (l) => {
-    const a = String(l || "").trim();
-    if (!a) return;
-    const h = a.toLowerCase(), c = Te(
+    const i = String(l || "").trim();
+    if (!i) return;
+    const h = i.toLowerCase(), c = Te(
       t.items,
       t.modelDefinition,
       n.value,
-      a
+      i
     ).find((b) => String(b.type).startsWith("date_") ? String(b.title || "").trim().toLowerCase() === h : !1);
     if (c) {
       g(c);
       return;
     }
     g({
-      uid: `fulltext|${a}`,
+      uid: `fulltext|${i}`,
       type: "fulltext",
-      title: a
+      title: i
     });
   };
   return {
@@ -656,11 +652,11 @@ const Mt = {
     qSelectRef: r,
     fulltextTerms: u,
     scopedKeys: d,
-    createValue: (l, a) => {
-      m(l), a(null);
+    createValue: (l, i) => {
+      m(l), i(null);
     },
-    filterFn: (l, a) => {
-      a(() => {
+    filterFn: (l, i) => {
+      i(() => {
         e.value = l, s.value = o.value.filter((h) => h.type !== "fulltext");
       });
     }
@@ -703,11 +699,11 @@ class Vt {
   sortRows(e, n, s, r, o) {
     const u = n.find((g) => g.key === s.key), d = e.slice();
     return !u || u.sortable === !1 || d.sort((g, m) => {
-      const i = (a) => u.accessor ? String(u.accessor(a) ?? "") : String(a[u.key] ?? ""), f = i(g), l = i(m);
+      const a = (i) => u.accessor ? String(u.accessor(i) ?? "") : String(i[u.key] ?? ""), f = a(g), l = a(m);
       if (u.key === "date") {
-        const a = o(f), h = o(l);
-        if (a && h) {
-          const c = a.getTime(), b = h.getTime();
+        const i = o(f), h = o(l);
+        if (i && h) {
+          const c = i.getTime(), b = h.getTime();
           return s.asc ? c - b : b - c;
         }
       }
@@ -731,7 +727,7 @@ class Vt {
     );
     if (!r.length)
       return [{ text: s, highlighted: !1 }];
-    const o = r.slice().sort((l, a) => a.length - l.length).map((l) => this.buildTermPattern(l)).join("|"), u = new RegExp(o, "gi"), d = [];
+    const o = r.slice().sort((l, i) => i.length - l.length).map((l) => this.buildTermPattern(l)).join("|"), u = new RegExp(o, "gi"), d = [];
     let g = u.exec(s);
     for (; g; ) {
       const l = g[0] ?? "";
@@ -739,11 +735,11 @@ class Vt {
     }
     if (!d.length)
       return [{ text: s, highlighted: !1 }];
-    const m = this.mergeRanges(d), i = [];
+    const m = this.mergeRanges(d), a = [];
     let f = 0;
     return m.forEach((l) => {
-      l.start > f && i.push({ text: s.slice(f, l.start), highlighted: !1 }), i.push({ text: s.slice(l.start, l.end), highlighted: !0 }), f = l.end;
-    }), f < s.length && i.push({ text: s.slice(f), highlighted: !1 }), i;
+      l.start > f && a.push({ text: s.slice(f, l.start), highlighted: !1 }), a.push({ text: s.slice(l.start, l.end), highlighted: !0 }), f = l.end;
+    }), f < s.length && a.push({ text: s.slice(f), highlighted: !1 }), a;
   }
 }
 const K = new Vt(), Nt = (t) => {
@@ -762,21 +758,21 @@ const K = new Vt(), Nt = (t) => {
     t.fulltextTerms.value,
     t.scopedKeys.value,
     t.modelDefinition.columns
-  ), i = (p) => t.modelDefinition.columns.find((D) => D.key === p), f = (p) => u.value.get(p) ?? [], l = (p, D) => {
-    const _ = i(D), ee = (G) => _?.valueType === "number-like" ? we(G) : String(G ?? "");
+  ), a = (p) => t.modelDefinition.columns.find((D) => D.key === p), f = (p) => u.value.get(p) ?? [], l = (p, D) => {
+    const _ = a(D), ee = (G) => _?.valueType === "number-like" ? we(G) : String(G ?? "");
     return _?.accessor ? ee(_.accessor(p)) : ee(p[D]);
   };
   return {
     visibleColumns: o,
     sortedRows: g,
-    getColumnByKey: i,
+    getColumnByKey: a,
     getSublineColumns: f,
     getTooltip: (p, D) => {
-      const _ = i(D);
+      const _ = a(D);
       return _?.tooltipHint ? typeof _.tooltipHint == "function" ? _.tooltipHint(p) : _.tooltipHint : "";
     },
     toggleSort: (p) => {
-      if (i(p)?.sortable !== !1) {
+      if (a(p)?.sortable !== !1) {
         if (n.value.key !== p) {
           n.value = { key: p, asc: !0 };
           return;
@@ -807,48 +803,48 @@ const K = new Vt(), Nt = (t) => {
   fulltext: "Full-Text",
   scope: "In Column"
 }, Wt = (t, e) => {
-  const n = (a) => (a.type === "scope" || !T.isBuiltIn(a)) && "key" in a ? a.key : void 0, s = (a) => {
-    const h = n(a) ?? a.type, c = e(h);
+  const n = (i) => (i.type === "scope" || !T.isBuiltIn(i)) && "key" in i ? i.key : void 0, s = (i) => {
+    const h = n(i) ?? i.type, c = e(h);
     if (c) return c;
-    if (a.type === "scope" && a.title)
-      return t.columns.find((b) => b.label === a.title);
-  }, r = (a) => !!s(a)?.renderAsSublineOf, o = (a) => {
-    if (a.type === "scope" && r(a))
+    if (i.type === "scope" && i.title)
+      return t.columns.find((b) => b.label === i.title);
+  }, r = (i) => !!s(i)?.renderAsSublineOf, o = (i) => {
+    if (i.type === "scope" && r(i))
       return "In SubColumn";
-    const h = t.tokenTypeLabelByType?.[a.type] ?? qt[a.type];
+    const h = t.tokenTypeLabelByType?.[i.type] ?? qt[i.type];
     if (h) return h;
-    const c = n(a) ?? a.type;
-    return e(c)?.label ?? se(a, {
+    const c = n(i) ?? i.type;
+    return e(c)?.label ?? se(i, {
       getColumnByKey: (C) => e(C),
       suggestionCategoryLabelByType: t.suggestionCategoryLabelByType
     });
-  }, u = (a) => {
-    if (re[a.type]) return re[a.type];
-    const h = n(a) ?? a.type;
+  }, u = (i) => {
+    if (re[i.type]) return re[i.type];
+    const h = n(i) ?? i.type;
     if (e(h)?.renderAsSublineOf)
       return re.subcolumn;
-  }, d = (a, h, c) => h?.[a.type] ?? u(a) ?? c ?? t.tokenDefaultColor ?? "indigo-9", g = (a) => d(a, t.tokenColorByType);
+  }, d = (i, h, c) => h?.[i.type] ?? u(i) ?? c ?? t.tokenDefaultColor ?? "indigo-9", g = (i) => d(i, t.tokenColorByType);
   return {
     chipTypeLabel: o,
     chipColor: g,
-    optionBadgeColor: (a) => d(a, t.optionBadgeColorByType, g(a)),
-    suggestionCategoryLabel: (a) => {
-      const h = t.suggestionCategoryLabelByType?.[a.type];
+    optionBadgeColor: (i) => d(i, t.optionBadgeColorByType, g(i)),
+    suggestionCategoryLabel: (i) => {
+      const h = t.suggestionCategoryLabelByType?.[i.type];
       if (h) return h;
-      if (r(a)) {
-        const c = s(a);
-        return `${(c?.renderAsSublineOf ? e(c.renderAsSublineOf)?.label : void 0) ?? c?.label ?? se(a, {
+      if (r(i)) {
+        const c = s(i);
+        return `${(c?.renderAsSublineOf ? e(c.renderAsSublineOf)?.label : void 0) ?? c?.label ?? se(i, {
           getColumnByKey: (C) => e(C),
           suggestionCategoryLabelByType: t.suggestionCategoryLabelByType
         })}-SubColumn`;
       }
-      return se(a, {
+      return se(i, {
         getColumnByKey: (c) => e(c),
         suggestionCategoryLabelByType: t.suggestionCategoryLabelByType
       });
     },
-    tokenIcon: (a) => ft(a),
-    tokenMatchCount: (a) => "matchCount" in a ? a.matchCount ?? 0 : 0
+    tokenIcon: (i) => ft(i),
+    tokenMatchCount: (i) => "matchCount" in i ? i.matchCount ?? 0 : 0
   };
 }, Kt = (t) => {
   const e = At({
@@ -900,10 +896,10 @@ const K = new Vt(), Nt = (t) => {
       getSublineColumns: d,
       createValue: g,
       filterFn: m,
-      chipColor: i,
+      chipColor: a,
       chipTypeLabel: f,
       tokenIcon: l,
-      tokenMatchCount: a,
+      tokenMatchCount: i,
       optionBadgeColor: h,
       suggestionCategoryLabel: c,
       suggestionTitleSegments: b,
@@ -940,7 +936,7 @@ const K = new Vt(), Nt = (t) => {
                 removable: "",
                 dense: "",
                 class: "chip",
-                color: x(i)(y.opt),
+                color: x(a)(y.opt),
                 "text-color": "white",
                 onRemove: (E) => y.removeAtIndex(y.index)
               }, {
@@ -948,7 +944,7 @@ const K = new Vt(), Nt = (t) => {
                   x(l)(y.opt) ? (S(), U(G, {
                     key: 0,
                     color: "white",
-                    "text-color": x(i)(y.opt),
+                    "text-color": x(a)(y.opt),
                     icon: x(l)(y.opt)
                   }, null, 8, ["text-color", "icon"])) : W("", !0),
                   $("span", null, R(x(f)(y.opt)) + ":", 1),
@@ -987,7 +983,7 @@ const K = new Vt(), Nt = (t) => {
                             class: "suggest-icon"
                           }, null, 8, ["name", "color"])) : W("", !0),
                           q(" " + R(x(c)(y.opt)), 1),
-                          x(a)(y.opt) > 0 ? (S(), v("span", Ut, " - " + R(x(a)(y.opt)) + " x", 1)) : W("", !0)
+                          x(i)(y.opt) > 0 ? (S(), v("span", Ut, " - " + R(x(i)(y.opt)) + " x", 1)) : W("", !0)
                         ]),
                         _: 2
                       }, 1024)

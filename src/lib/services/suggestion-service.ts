@@ -221,10 +221,7 @@ class SuggestionService {
 
     const selectedScope = new Set(
       selected
-        .filter(
-          (token): token is SearchTokenData & { key: string } =>
-            SearchTokenModel.isScope(token) && 'key' in token,
-        )
+        .filter(SearchTokenModel.isScope)
         .map((token) => token.key),
     )
 
