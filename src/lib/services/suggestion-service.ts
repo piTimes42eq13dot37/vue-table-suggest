@@ -43,6 +43,54 @@ const isNumberLikeColumn = (column: { valueType?: string }): boolean =>
 const escapeRegExp = (value: string): string =>
   String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
+const sortByScoreThenTitle = (a: RankedSearchToken, b: RankedSearchToken): number => {
+  if (b._score !== a._score) {
+    return b._score - a._score
+  }
+
+  return a.title.localeCompare(b.title)
+}
+
+const selectRankedCandidates = (candidates: RankedSearchToken[]): RankedSearchToken[] => {
+  const sorted = candidates.slice().sort(sortByScoreThenTitle)
+  const result: RankedSearchToken[] = []
+  const usedUids = new Set<string>()
+  const usedTypes = new Set<string>()
+
+  sorted.slice(0, TOP_SCORE_FIRST_COUNT).forEach((candidate) => {
+    if (usedUids.has(candidate.uid)) {
+      return
+    }
+
+    usedUids.add(candidate.uid)
+    usedTypes.add(candidate._columnType)
+    result.push(candidate)
+  })
+
+  const tail = sorted.slice(TOP_SCORE_FIRST_COUNT)
+
+  tail.forEach((candidate) => {
+    if (usedUids.has(candidate.uid) || usedTypes.has(candidate._columnType)) {
+      return
+    }
+
+    usedUids.add(candidate.uid)
+    usedTypes.add(candidate._columnType)
+    result.push(candidate)
+  })
+
+  tail.forEach((candidate) => {
+    if (usedUids.has(candidate.uid)) {
+      return
+    }
+
+    usedUids.add(candidate.uid)
+    result.push(candidate)
+  })
+
+  return result
+}
+
 class SuggestionService {
   constructor(private readonly dependencies: SuggestionServiceDependencies) {
   }
@@ -153,49 +201,7 @@ class SuggestionService {
         })
       })
 
-    const sortByScoreThenTitle = (a: RankedSearchToken, b: RankedSearchToken): number => {
-      if (b._score !== a._score) {
-        return b._score - a._score
-      }
-
-      return a.title.localeCompare(b.title)
-    }
-
-    const sorted = candidates.slice().sort(sortByScoreThenTitle)
-    const result: RankedSearchToken[] = []
-    const usedUids = new Set<string>()
-    const usedTypes = new Set<string>()
-
-    sorted.slice(0, TOP_SCORE_FIRST_COUNT).forEach((candidate) => {
-      if (usedUids.has(candidate.uid)) {
-        return
-      }
-
-      usedUids.add(candidate.uid)
-      usedTypes.add(candidate._columnType)
-      result.push(candidate)
-    })
-
-    const tail = sorted.slice(TOP_SCORE_FIRST_COUNT)
-
-    tail.forEach((candidate) => {
-      if (usedUids.has(candidate.uid) || usedTypes.has(candidate._columnType)) {
-        return
-      }
-
-      usedUids.add(candidate.uid)
-      usedTypes.add(candidate._columnType)
-      result.push(candidate)
-    })
-
-    tail.forEach((candidate) => {
-      if (usedUids.has(candidate.uid)) {
-        return
-      }
-
-      usedUids.add(candidate.uid)
-      result.push(candidate)
-    })
+    const result = selectRankedCandidates(candidates)
 
     return result.map((candidate) => {
       const token = { ...candidate }
@@ -357,16 +363,9 @@ export const createSuggestionService = (
 
 const suggestionService = createSuggestionService()
 
-export const buildSuggestionsService = <TItem>(
-  items: TItem[],
-  modelDefinition: SearchModelDefinition<TItem>,
-  selected: SearchTokenData[],
-  rawInput: string,
-): SearchTokenData[] => suggestionService.buildSuggestions(items, modelDefinition, selected, rawInput)
-
 export const buildSuggestions = <TItem>(
   items: TItem[],
   modelDefinition: SearchModelDefinition<TItem>,
   selected: SearchTokenData[],
   rawInput: string,
-): SearchTokenData[] => buildSuggestionsService(items, modelDefinition, selected, rawInput)
+): SearchTokenData[] => suggestionService.buildSuggestions(items, modelDefinition, selected, rawInput)

@@ -1,11 +1,11 @@
 import type { SearchModelDefinition } from './models/external'
 import type { SearchToken } from './models/internal'
 import {
-  highlightTextService,
-  resolveEnglishLocaleService,
+  highlightText as highlightTextDomainService,
+  resolveEnglishLocale as resolveEnglishLocaleDomainService,
 } from './services/highlight-service'
-import { filterItemsService } from './services/filter-service'
-import { buildSuggestionsService } from './services/suggestion-service'
+import { filterItems as filterItemsDomainService } from './services/filter-service'
+import { buildSuggestions as buildSuggestionsDomainService } from './services/suggestion-service'
 
 type HighlightableValue = string | number | boolean | Date | null | undefined
 
@@ -25,41 +25,11 @@ export interface SearchEngineDependencies {
   ) => SearchToken[]
 }
 
-class SearchEngineApplicationService {
-  constructor(private readonly dependencies: SearchEngineDependencies) {
-  }
-
-  resolveEnglishLocale(): string {
-    return this.dependencies.resolveEnglishLocale()
-  }
-
-  highlightText(value: HighlightableValue, terms: string[]): string {
-    return this.dependencies.highlightText(value, terms)
-  }
-
-  filterItems<TItem>(
-    items: TItem[],
-    modelDefinition: SearchModelDefinition<TItem>,
-    selected: SearchToken[],
-  ): TItem[] {
-    return this.dependencies.filterItems(items, modelDefinition, selected)
-  }
-
-  buildSuggestions<TItem>(
-    items: TItem[],
-    modelDefinition: SearchModelDefinition<TItem>,
-    selected: SearchToken[],
-    rawInput: string,
-  ): SearchToken[] {
-    return this.dependencies.buildSuggestions(items, modelDefinition, selected, rawInput)
-  }
-}
-
 const defaultSearchEngineDependencies: SearchEngineDependencies = {
-  resolveEnglishLocale: resolveEnglishLocaleService,
-  highlightText: highlightTextService,
-  filterItems: filterItemsService,
-  buildSuggestions: buildSuggestionsService,
+  resolveEnglishLocale: resolveEnglishLocaleDomainService,
+  highlightText: highlightTextDomainService,
+  filterItems: filterItemsDomainService,
+  buildSuggestions: buildSuggestionsDomainService,
 }
 
 export const createSearchEngine = (
@@ -69,25 +39,24 @@ export const createSearchEngine = (
     ...defaultSearchEngineDependencies,
     ...overrides,
   }
-  const searchEngineApplicationService = new SearchEngineApplicationService(dependencies)
 
   return {
-    resolveEnglishLocale: (): string => searchEngineApplicationService.resolveEnglishLocale(),
+    resolveEnglishLocale: (): string => dependencies.resolveEnglishLocale(),
     highlightText: (value: HighlightableValue, terms: string[]): string =>
-      searchEngineApplicationService.highlightText(value, terms),
+      dependencies.highlightText(value, terms),
     filterItems: <TItem>(
       items: TItem[],
       modelDefinition: SearchModelDefinition<TItem>,
       selected: SearchToken[],
     ): TItem[] =>
-      searchEngineApplicationService.filterItems(items, modelDefinition, selected),
+      dependencies.filterItems(items, modelDefinition, selected),
     buildSuggestions: <TItem>(
       items: TItem[],
       modelDefinition: SearchModelDefinition<TItem>,
       selected: SearchToken[],
       rawInput: string,
     ): SearchToken[] =>
-      searchEngineApplicationService.buildSuggestions(items, modelDefinition, selected, rawInput),
+      dependencies.buildSuggestions(items, modelDefinition, selected, rawInput),
   }
 }
 

@@ -58,12 +58,7 @@ class HighlightService {
 
 const highlightService = new HighlightService()
 
-export const resolveEnglishLocaleService = (): string => highlightService.resolveEnglishLocale()
-
-export const highlightTextService = (value: HighlightableValue, terms: string[]): string =>
-  highlightService.highlightText(value, terms)
-
-export const resolveEnglishLocale = (): string => resolveEnglishLocaleService()
+export const resolveEnglishLocale = (): string => highlightService.resolveEnglishLocale()
 
 export const highlightText = (value: HighlightableValue, terms: string[]): string =>
-  highlightTextService(value, terms)
+  highlightService.highlightText(value, terms)

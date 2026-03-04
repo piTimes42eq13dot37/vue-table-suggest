@@ -3,7 +3,8 @@ import { demoModelDefinition, demoRows } from '../../testing/demo-fixtures'
 import { DateReference } from '../models/date-reference'
 import { DateRelation } from '../models/date-relation'
 import type { SearchModelDefinition } from '../models/external'
-import { SearchTokenModel, resolveTokenCategory } from '../models/search-token'
+import { SearchTokenModel } from '../models/search-token'
+import { resolveTokenCategory } from './token-view-service'
 import { buildSuggestions } from './suggestion-service'
 
 describe('suggestion-service', () => {

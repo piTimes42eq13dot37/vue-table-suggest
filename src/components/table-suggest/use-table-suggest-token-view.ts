@@ -1,10 +1,9 @@
 import type { SearchColumnDefinition, SearchModelDefinition } from '../../lib/models/external'
 import {
   SearchTokenModel,
-  resolveTokenCategory,
-  resolveTokenIcon,
   type SearchToken,
 } from '../../lib/models/search-token'
+import { resolveTokenCategory, resolveTokenIcon } from '../../lib/services/token-view-service'
 
 const defaultTokenColorByType: Record<string, string> = {
   fulltext: 'teal-9',

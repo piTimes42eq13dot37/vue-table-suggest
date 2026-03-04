@@ -19,6 +19,5 @@ declare class SuggestionService {
     buildSuggestions<TItem>(items: TItem[], modelDefinition: SearchModelDefinition<TItem>, selected: SearchTokenData[], rawInput: string): SearchTokenData[];
 }
 export declare const createSuggestionService: (overrides?: Partial<SuggestionServiceDependencies>) => Pick<SuggestionService, "buildSuggestions">;
-export declare const buildSuggestionsService: <TItem>(items: TItem[], modelDefinition: SearchModelDefinition<TItem>, selected: SearchTokenData[], rawInput: string) => SearchTokenData[];
 export declare const buildSuggestions: <TItem>(items: TItem[], modelDefinition: SearchModelDefinition<TItem>, selected: SearchTokenData[], rawInput: string) => SearchTokenData[];
 export {};

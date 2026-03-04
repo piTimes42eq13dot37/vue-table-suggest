@@ -3,6 +3,7 @@ export { default as TableSuggestPlugin, TableSuggestPlugin as plugin } from './p
 export { default } from './plugin';
 export * from './lib/model-definition';
 export * from './lib/services/date-service';
+export * from './lib/services/token-view-service';
 export * from './lib/search-engine';
 export * from './lib/models/date-relation';
 export * from './lib/models/date-reference';
