@@ -1,43 +1,43 @@
-import { ref as G, computed as P, watch as _e, nextTick as Ee, defineComponent as Le, resolveComponent as O, openBlock as p, createElementBlock as v, createElementVNode as I, createVNode as q, unref as w, isRef as $e, withCtx as N, createBlock as Y, mergeProps as Re, Fragment as k, renderList as F, toDisplayString as E, createTextVNode as W, createCommentVNode as z, normalizeStyle as Ie, normalizeClass as Fe } from "vue";
-class Me {
+import { ref as H, computed as O, watch as He, nextTick as ze, defineComponent as Ge, resolveComponent as A, openBlock as S, createElementBlock as v, createElementVNode as $, createVNode as N, unref as x, isRef as Ue, withCtx as V, createBlock as U, mergeProps as je, Fragment as w, renderList as B, toDisplayString as R, createTextVNode as q, createCommentVNode as W, normalizeStyle as Qe, normalizeClass as Ye } from "vue";
+class Je {
   normalizeNumberLike(e) {
     return String(e ?? "").replace(/[^0-9]/g, "");
   }
   formatGroupedNumber(e) {
-    const t = this.normalizeNumberLike(e);
-    return t ? t.replace(/\B(?=(\d{3})+(?!\d))/g, ".") : String(e ?? "");
+    const n = this.normalizeNumberLike(e);
+    return n ? n.replace(/\B(?=(\d{3})+(?!\d))/g, ".") : String(e ?? "");
   }
-  readValue(e, t) {
-    if (t.accessor)
-      return String(t.accessor(e) ?? "");
-    const s = t.key;
+  readValue(e, n) {
+    if (n.accessor)
+      return String(n.accessor(e) ?? "");
+    const s = n.key;
     return String(e[s] ?? "");
   }
-  getScopeColumns(e, t) {
-    if (!t.length)
-      return e.columns.filter((i) => i.searchable !== !1);
-    const s = new Set(t), o = /* @__PURE__ */ new Set();
-    return e.columns.forEach((i) => {
-      s.has(i.key) && i.scopeGroup && o.add(i.scopeGroup);
-    }), e.columns.filter((i) => !s.has(i.key) && !o.has(i.scopeGroup ?? "") ? !1 : i.searchable !== !1);
+  getScopeColumns(e, n) {
+    if (!n.length)
+      return e.columns.filter((o) => o.searchable !== !1);
+    const s = new Set(n), r = /* @__PURE__ */ new Set();
+    return e.columns.forEach((o) => {
+      s.has(o.key) && o.scopeGroup && r.add(o.scopeGroup);
+    }), e.columns.filter((o) => !s.has(o.key) && !r.has(o.scopeGroup ?? "") ? !1 : o.searchable !== !1);
   }
-  expandScopeKeys(e, t) {
-    const s = new Set(t), o = /* @__PURE__ */ new Set();
-    return e.columns.forEach((i) => {
-      s.has(i.key) && i.scopeGroup && o.add(i.scopeGroup);
+  expandScopeKeys(e, n) {
+    const s = new Set(n), r = /* @__PURE__ */ new Set();
+    return e.columns.forEach((o) => {
+      s.has(o.key) && o.scopeGroup && r.add(o.scopeGroup);
     }), Array.from(
       new Set(
-        e.columns.filter((i) => s.has(i.key) || o.has(i.scopeGroup ?? "")).map((i) => i.key)
+        e.columns.filter((o) => s.has(o.key) || r.has(o.scopeGroup ?? "")).map((o) => o.key)
       )
     );
   }
-  readValueByKey(e, t, s) {
-    const o = t.columns.find((i) => i.key === s);
-    return o ? this.readValue(e, o) : String(e[s] ?? "");
+  readValueByKey(e, n, s) {
+    const r = n.columns.find((o) => o.key === s);
+    return r ? this.readValue(e, r) : String(e[s] ?? "");
   }
 }
-const U = new Me(), J = (n) => U.normalizeNumberLike(n), ge = (n) => U.formatGroupedNumber(n), te = (n, e) => U.readValue(n, e), Pe = (n, e) => U.getScopeColumns(n, e), Be = (n, e, t) => U.readValueByKey(n, e, t);
-class Ae {
+const z = new Je(), j = (t) => z.normalizeNumberLike(t), we = (t) => z.formatGroupedNumber(t), oe = (t, e) => z.readValue(t, e), Xe = (t, e) => z.getScopeColumns(t, e), Ze = (t, e, n) => z.readValueByKey(t, e, n);
+class et {
   escapeRegExp(e) {
     return String(e).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
@@ -47,144 +47,155 @@ class Ae {
   resolveEnglishLocale() {
     return typeof globalThis > "u" || typeof globalThis.navigator > "u" || !Array.isArray(globalThis.navigator.languages) ? "en-US" : globalThis.navigator.languages.find((e) => String(e).toLowerCase().startsWith("en")) ?? "en-US";
   }
-  highlightText(e, t) {
-    const s = this.escapeHtml(e), o = t.map((i) => String(i || "").trim()).filter((i) => i.length > 0);
-    return o.length ? o.reduce((i, l) => {
-      const g = J(l), y = g.length > 0 && g === String(l) ? g.split("").map((c) => this.escapeRegExp(c)).join("[^0-9]*") : this.escapeRegExp(this.escapeHtml(l)), r = new RegExp(y, "gi");
-      return i.replace(r, (c) => `<mark>${c}</mark>`);
+  highlightText(e, n) {
+    const s = this.escapeHtml(e), r = n.map((o) => String(o || "").trim()).filter((o) => o.length > 0);
+    return r.length ? r.reduce((o, u) => {
+      const d = j(u), m = d.length > 0 && d === String(u) ? d.split("").map((f) => this.escapeRegExp(f)).join("[^0-9]*") : this.escapeRegExp(this.escapeHtml(u)), i = new RegExp(m, "gi");
+      return o.replace(i, (f) => `<mark>${f}</mark>`);
     }, s) : s;
   }
 }
-const de = new Ae(), fe = () => de.resolveEnglishLocale(), Oe = (n, e) => de.highlightText(n, e);
-class Ne {
+const ke = new et(), Ce = () => ke.resolveEnglishLocale(), tt = (t, e) => ke.highlightText(t, e), nt = () => Ce();
+class st {
   startOfDay(e) {
-    const t = new Date(e);
-    return t.setHours(0, 0, 0, 0), t;
+    const n = new Date(e);
+    return n.setHours(0, 0, 0, 0), n;
   }
   parseDateInput(e) {
-    const t = String(e ?? "").trim(), s = t.match(/^(\d{2})\.(\d{2})\.(\d{4})$/), o = t.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (!s && !o) return null;
-    const i = Number(s ? s[3] : o[1]), l = Number(s ? s[2] : o[2]), g = Number(s ? s[1] : o[3]), d = new Date(i, l - 1, g);
-    return d.setHours(0, 0, 0, 0), d.getFullYear() !== i || d.getMonth() !== l - 1 || d.getDate() !== g ? null : d;
+    const n = String(e ?? "").trim(), s = n.match(/^(\d{2})\.(\d{2})\.(\d{4})$/), r = n.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!s && !r) return null;
+    const o = Number(s ? s[3] : r[1]), u = Number(s ? s[2] : r[2]), d = Number(s ? s[1] : r[3]), g = new Date(o, u - 1, d);
+    return g.setHours(0, 0, 0, 0), g.getFullYear() !== o || g.getMonth() !== u - 1 || g.getDate() !== d ? null : g;
   }
   formatDate(e) {
-    const t = this.startOfDay(e), s = String(t.getDate()).padStart(2, "0"), o = String(t.getMonth() + 1).padStart(2, "0"), i = t.getFullYear();
-    return `${s}.${o}.${i}`;
+    const n = this.startOfDay(e), s = String(n.getDate()).padStart(2, "0"), r = String(n.getMonth() + 1).padStart(2, "0"), o = n.getFullYear();
+    return `${s}.${r}.${o}`;
   }
   getMondayIndexFromDate(e) {
     return (this.startOfDay(e).getDay() + 6) % 7;
   }
   getLocalizedWeekdaysMondayFirst(e = "en-US") {
-    const t = new Intl.DateTimeFormat(e, { weekday: "long" }), s = new Date(2024, 0, 1);
-    return Array.from({ length: 7 }, (o, i) => {
-      const l = new Date(s);
-      return l.setDate(s.getDate() + i), t.format(l);
+    const n = new Intl.DateTimeFormat(e, { weekday: "long" }), s = new Date(2024, 0, 1);
+    return Array.from({ length: 7 }, (r, o) => {
+      const u = new Date(s);
+      return u.setDate(s.getDate() + o), n.format(u);
     });
   }
-  getReferenceWeekdayDate(e, t, s = /* @__PURE__ */ new Date()) {
-    const o = this.startOfDay(s), i = this.getMondayIndexFromDate(o), l = new Date(o);
+  getReferenceWeekdayDate(e, n, s = /* @__PURE__ */ new Date()) {
+    const r = this.startOfDay(s), o = this.getMondayIndexFromDate(r), u = new Date(r);
     if (e === "last") {
-      const d = (i - t + 7) % 7 || 7;
-      return l.setDate(o.getDate() - d), l;
+      const g = (o - n + 7) % 7 || 7;
+      return u.setDate(r.getDate() - g), u;
     }
-    const g = (t - i + 7) % 7 || 7;
-    return l.setDate(o.getDate() + g), l;
+    const d = (n - o + 7) % 7 || 7;
+    return u.setDate(r.getDate() + d), u;
   }
   getIsoWeekInfo(e) {
-    const t = this.startOfDay(e), s = (t.getDay() + 6) % 7, o = new Date(t);
-    o.setDate(t.getDate() - s + 3);
-    const i = o.getFullYear(), l = new Date(i, 0, 4), g = (l.getDay() + 6) % 7;
-    return l.setDate(l.getDate() - g + 3), { weekNo: 1 + Math.round((o.getTime() - l.getTime()) / 6048e5), weekYear: i };
+    const n = this.startOfDay(e), s = (n.getDay() + 6) % 7, r = new Date(n);
+    r.setDate(n.getDate() - s + 3);
+    const o = r.getFullYear(), u = new Date(o, 0, 4), d = (u.getDay() + 6) % 7;
+    return u.setDate(u.getDate() - d + 3), { weekNo: 1 + Math.round((r.getTime() - u.getTime()) / 6048e5), weekYear: o };
   }
-  getDateMouseoverLabel(e, t = "en-US") {
+  getDateMouseoverLabel(e, n = "en-US") {
     const s = this.parseDateInput(e);
     if (!s) return "";
-    const o = new Intl.DateTimeFormat(t, {
+    const r = new Intl.DateTimeFormat(n, {
       weekday: "long"
-    }).format(s), { weekNo: i, weekYear: l } = this.getIsoWeekInfo(s);
-    return `KW ${String(i).padStart(2, "0")}/${l} - ${o}`;
+    }).format(s), { weekNo: o, weekYear: u } = this.getIsoWeekInfo(s);
+    return `KW ${String(o).padStart(2, "0")}/${u} - ${r}`;
   }
 }
-const B = new Ne();
-var he = /* @__PURE__ */ ((n) => (n.Before = "before", n.After = "after", n.On = "on", n))(he || {});
-const pe = (n) => n === "before", ye = (n) => n === "after", me = (n) => n === "on", qe = (n) => pe(n) || ye(n) || me(n), re = pe, ne = ye, We = me, Pt = qe;
-class x {
-  static fulltext = "fulltext";
-  static scope = "scope";
-  static dateBefore = "date_before";
-  static dateAfter = "date_after";
-  static dateExact = "date_exact";
-  static dateRelative = "date_relative";
-  static isFulltext(e) {
-    return e === x.fulltext;
+const F = new st();
+var De = /* @__PURE__ */ ((t) => (t.Before = "before", t.After = "after", t.On = "on", t))(De || {});
+const ae = (t) => t === "before", le = (t) => t === "after", _e = (t) => t === "on", rt = (t) => ae(t) || le(t) || _e(t), k = {
+  fulltext: "fulltext",
+  scope: "scope",
+  dateBefore: "date_before",
+  dateAfter: "date_after",
+  dateExact: "date_exact",
+  dateRelative: "date_relative"
+}, ot = [
+  k.dateBefore,
+  k.dateAfter,
+  k.dateExact
+], it = {
+  [k.fulltext]: "search",
+  [k.scope]: "tune",
+  [k.dateBefore]: "event_busy",
+  [k.dateAfter]: "event_available",
+  [k.dateExact]: "event",
+  [k.dateRelative]: "event_repeat"
+}, Q = (t) => t === k.fulltext, Y = (t) => t === k.scope, ce = (t) => t === k.dateBefore, ue = (t) => t === k.dateAfter, de = (t) => t === k.dateExact, ge = (t) => t === k.dateRelative, fe = (t) => ce(t) || ue(t) || de(t) || ge(t), Le = (t) => Q(t) || Y(t) || fe(t), Re = (t) => !Q(t) && !Y(t), at = (t) => Q(t.type), Ie = (t) => Y(t.type), Ee = (t) => ce(t.type), $e = (t) => ue(t.type), Be = (t) => de(t.type), J = (t) => ge(t.type), Me = (t) => fe(t.type), lt = (t) => Le(t.type), Pe = (t) => Re(t.type), ct = (t) => Ee(t) || J(t) && ae(t.dateRelation), ut = (t) => $e(t) || J(t) && le(t.dateRelation), dt = (t) => Be(t) || J(t) && _e(t.dateRelation), gt = (t) => Me(t) ? "date" : Ie(t) || Pe(t) && t.key ? t.key : t.type, T = {
+  fulltext: k.fulltext,
+  scope: k.scope,
+  dateBefore: k.dateBefore,
+  dateAfter: k.dateAfter,
+  dateExact: k.dateExact,
+  dateRelative: k.dateRelative,
+  dateOperationTypes: ot,
+  isFulltextType: Q,
+  isScopeType: Y,
+  isDateBeforeType: ce,
+  isDateAfterType: ue,
+  isDateExactType: de,
+  isDateRelativeType: ge,
+  isDateType: fe,
+  isBuiltInType: Le,
+  isExactCellValueType: Re,
+  isFulltext: at,
+  isScope: Ie,
+  isDateBefore: Ee,
+  isDateAfter: $e,
+  isDateExact: Be,
+  isDateRelative: J,
+  isDate: Me,
+  isBuiltIn: lt,
+  isExactCellValue: Pe,
+  isBeforeDirection: ct,
+  isAfterDirection: ut,
+  isOnDirection: dt,
+  resolveTermKey: gt
+}, ft = (t) => {
+  if ("icon" in t && t.icon)
+    return t.icon;
+  if (T.isBuiltIn(t))
+    return it[t.type];
+}, se = (t, e) => {
+  const n = e?.suggestionCategoryLabelByType?.[t.type];
+  if (n)
+    return n;
+  if (T.isDateBefore(t))
+    return "date before";
+  if (T.isDateAfter(t))
+    return "date after";
+  if (T.isDateExact(t))
+    return "date exact";
+  if (T.isDateRelative(t))
+    return t.dateRelation === "before" ? "date before" : t.dateRelation === "after" ? "date after" : "date exact";
+  if (T.isFulltext(t))
+    return "Fulltext";
+  if (T.isScope(t))
+    return "Fulltext scope";
+  const s = "key" in t ? t.key : void 0;
+  if (s) {
+    const r = e?.getColumnByKey?.(s);
+    if (r?.label)
+      return r.label;
   }
-  static isScope(e) {
-    return e === x.scope;
-  }
-  static isDateBefore(e) {
-    return e === x.dateBefore;
-  }
-  static isDateAfter(e) {
-    return e === x.dateAfter;
-  }
-  static isDateExact(e) {
-    return e === x.dateExact;
-  }
-  static isDateRelative(e) {
-    return e === x.dateRelative;
-  }
-  static isDate(e) {
-    return x.isDateBefore(e) || x.isDateAfter(e) || x.isDateExact(e) || x.isDateRelative(e);
-  }
-  static isBuiltIn(e) {
-    return x.isFulltext(e) || x.isScope(e) || x.isDate(e);
-  }
-  static isExactFilterType(e) {
-    return !x.isFulltext(e) && !x.isScope(e);
-  }
-}
-class L {
+  return t.type;
+};
+class he {
   selected;
   fulltext;
   exact;
   scopedKeys;
   constructor(e) {
-    this.selected = e, this.fulltext = this.selected.filter((t) => x.isFulltext(t.type)), this.exact = this.selected.filter((t) => x.isExactFilterType(t.type)), this.scopedKeys = this.selected.filter((t) => x.isScope(t.type) && t.key).map((t) => t.key);
+    this.selected = e, this.fulltext = this.selected.filter((n) => T.isFulltext(n)), this.exact = this.selected.filter((n) => T.isExactCellValue(n)), this.scopedKeys = this.selected.filter((n) => T.isScope(n)).map((n) => n.key);
   }
   static from(e) {
-    return new L(e);
+    return new he(e);
   }
-  static isExactTokenType(e) {
-    return x.isExactFilterType(e);
-  }
-  static isDateToken(e) {
-    return x.isDate(e.type);
-  }
-  static isFulltextToken(e) {
-    return x.isFulltext(e.type);
-  }
-  static isScopeToken(e) {
-    return x.isScope(e.type);
-  }
-  static isRelativeDateToken(e) {
-    return x.isDateRelative(e.type);
-  }
-  static isExactFilterToken(e) {
-    return L.isExactTokenType(e.type);
-  }
-  static resolveTermKey(e) {
-    return e.key ?? (x.isDate(e.type) ? "date" : e.type);
-  }
-  static isBeforeDirection(e) {
-    return x.isDateBefore(e.type) || re(e.direction);
-  }
-  static isAfterDirection(e) {
-    return x.isDateAfter(e.type) || ne(e.direction);
-  }
-  static isOnDirection(e) {
-    return x.isDateExact(e.type) || We(e.direction);
-  }
-  get fullTextTokens() {
+  get fulltextTokens() {
     return this.fulltext;
   }
   get exactTokens() {
@@ -195,116 +206,106 @@ class L {
   }
   toParsedState() {
     return {
-      fullTextTokens: this.fullTextTokens,
+      fulltextTokens: this.fulltextTokens,
       exactTokens: this.exactTokens,
       scopedColumnKeys: this.scopedColumnKeys
     };
   }
-  isDateToken(e) {
-    return L.isDateToken(e);
-  }
-  resolveTermKey(e) {
-    return L.resolveTermKey(e);
-  }
 }
-class Ke {
-  filterItems(e, t, s) {
-    const o = L.from(s), { fullTextTokens: i, exactTokens: l, scopedColumnKeys: g } = o.toParsedState(), d = Pe(t, g);
-    return e.filter((y) => {
-      for (const r of l) {
-        const c = o.resolveTermKey(r), a = t.columns.find((m) => m.key === c), f = a ? te(y, a) : "";
-        if (o.isDateToken(r)) {
-          const m = B.parseDateInput(f), u = B.parseDateInput(r.rawTitle || r.title);
-          if (!m || !u) return !1;
-          const D = m.getTime(), b = u.getTime();
-          if (L.isBeforeDirection(r) && !(D < b) || L.isAfterDirection(r) && !(D > b) || L.isOnDirection(r) && D !== b)
+class ht {
+  filterItems(e, n, s) {
+    const r = he.from(s), { fulltextTokens: o, exactTokens: u, scopedColumnKeys: d } = r.toParsedState(), g = Xe(n, d);
+    return e.filter((m) => {
+      for (const i of u) {
+        const f = T.resolveTermKey(i), l = n.columns.find((h) => h.key === f), a = l ? oe(m, l) : "";
+        if (T.isDate(i)) {
+          const h = F.parseDateInput(a), c = F.parseDateInput(i.rawTitle || i.title);
+          if (!h || !c) return !1;
+          const b = h.getTime(), C = c.getTime();
+          if (T.isBeforeDirection(i) && !(b < C) || T.isAfterDirection(i) && !(b > C) || T.isOnDirection(i) && b !== C)
             return !1;
           continue;
         }
-        if (a?.valueType === "number-like") {
-          if (J(f) !== J(r.title))
+        if (l?.valueType === "number-like") {
+          if (j(a) !== j(i.title))
             return !1;
           continue;
         }
-        if (String(f).toLowerCase() !== String(r.title || "").toLowerCase())
+        if (String(a).toLowerCase() !== String(i.title || "").toLowerCase())
           return !1;
       }
-      for (const r of i) {
-        const c = String(r.title || "").toLowerCase();
-        if (!c) continue;
-        if (!d.some(
-          (f) => String(te(y, f)).toLowerCase().includes(c)
+      for (const i of o) {
+        const f = String(i.title || "").toLowerCase();
+        if (!f) continue;
+        if (!g.some(
+          (a) => String(oe(m, a)).toLowerCase().includes(f)
         )) return !1;
       }
       return !0;
     });
   }
 }
-const He = new Ke(), Se = (n, e, t) => He.filterItems(n, e, t);
-class K {
-  static getDateCategoryFromDirection(e) {
-    return re(e) ? "date before" : ne(e) ? "date after" : "date exact";
-  }
-  static getDateOperationMetadata(e) {
-    return x.isDateBefore(e) ? { category: "date before", icon: "event_busy" } : x.isDateAfter(e) ? { category: "date after", icon: "event_available" } : { category: "date exact", icon: "event" };
-  }
+const pt = new ht(), Oe = (t, e, n) => pt.filterItems(t, e, n), yt = (t, e, n) => Oe(t, e, n);
+class pe {
   static createDateRelative(e) {
     return {
-      uid: `${x.dateRelative}|${e.direction}|${e.reference}|${e.weekdayIndexMonday}|${e.dateText}`,
-      type: x.dateRelative,
+      uid: `${T.dateRelative}|${e.dateRelation}|${e.reference}|${e.weekdayIndexMonday}|${e.dateText}`,
+      type: "date_relative",
       title: e.title,
       rawTitle: e.dateText,
-      category: K.getDateCategoryFromDirection(e.direction),
-      icon: "event_repeat",
-      direction: e.direction,
+      dateRelation: e.dateRelation,
       reference: e.reference
     };
   }
-  static createDateOperation(e, t) {
-    const s = K.getDateOperationMetadata(e);
+  static createDateOperation(e, n) {
     return {
-      uid: `${e}|${t}`,
+      uid: `${e}|${n}`,
       type: e,
-      title: t,
-      rawTitle: t,
-      category: s.category,
-      icon: s.icon
+      title: n,
+      rawTitle: n
     };
   }
   static createScope(e) {
     return {
-      uid: `${x.scope}|${e.key}`,
-      type: x.scope,
+      uid: `${T.scope}|${e.key}`,
+      type: "scope",
       key: e.key,
       title: e.title,
-      category: "Fulltext scope",
       icon: e.icon
     };
   }
 }
-class ze {
+var ie = /* @__PURE__ */ ((t) => (t.Last = "last", t.Next = "next", t))(ie || {});
+const mt = (t) => t === "last", St = (t) => t === "next", me = (t) => mt(t) || St(t);
+class vt {
   parse(e) {
-    const t = e.trim().toLowerCase();
-    if (!t)
+    const n = e.trim().toLowerCase();
+    if (!n)
       return null;
-    const s = t.startsWith("date ") ? t.slice(5).trim() : t, o = s.match(/^(before|after|on)(?:\s+(last|next))?\s+(.+)$/i);
-    if (o) {
-      const d = String(o[1]).toLowerCase(), y = String(o[2] || "").toLowerCase() || null, r = String(o[3] || "").trim().toLowerCase();
-      return r ? { direction: d, reference: y, weekdayPart: r, needle: s } : null;
+    const s = n.startsWith("date ") ? n.slice(5).trim() : n, r = s.match(/^(before|after|on)(?:\s+(last|next))?\s+(.+)$/i);
+    if (r) {
+      const m = String(r[1]).toLowerCase();
+      if (!rt(m))
+        return null;
+      const i = String(r[2] || "").toLowerCase(), f = i && me(i) ? i : null, l = String(r[3] || "").trim().toLowerCase();
+      return l ? { dateRelation: m, reference: f, weekdayPart: l, needle: s } : null;
     }
-    const i = s.match(/^(last|next)\s+(.+)$/i);
-    if (!i)
+    const o = s.match(/^(last|next)\s+(.+)$/i);
+    if (!o)
       return null;
-    const l = String(i[1]).toLowerCase(), g = String(i[2] || "").trim().toLowerCase();
+    const u = String(o[1]).toLowerCase();
+    if (!me(u))
+      return null;
+    const d = u, g = String(o[2] || "").trim().toLowerCase();
     return g ? {
-      direction: he.On,
-      reference: l,
+      dateRelation: De.On,
+      reference: d,
       weekdayPart: g,
       needle: s
     } : null;
   }
 }
-const Ve = new ze(), ie = {
+const xt = new vt(), Se = {
   relativeDate: {
     minQueryLength: 4,
     defaultMaxWeekdaySuggestions: 4
@@ -320,356 +321,352 @@ const Ve = new ze(), ie = {
     maxLengthPenalty: 30,
     lengthPenaltyDivisor: 6
   }
-}, Ge = (n) => ({
+}, bt = (t) => ({
   relativeDate: {
-    ...ie.relativeDate
+    ...Se.relativeDate
   },
   textScoring: {
-    ...ie.textScoring
+    ...Se.textScoring
   }
 });
-class Ue {
+class Tt {
   constructor(e) {
     this.config = e;
   }
-  buildRelativeTitlePrefix(e, t) {
-    return re(e) ? t === "last" ? "before last" : "before next" : ne(e) ? t === "last" ? "after last" : "after next" : t === "last" ? "on last" : "on next";
+  buildRelativeTitlePrefix(e, n) {
+    return ae(e) ? n === "last" ? "before last" : "before next" : le(e) ? n === "last" ? "after last" : "after next" : n === "last" ? "on last" : "on next";
   }
-  getPriority(e, t) {
+  getPriority(e, n) {
     const s = e.toLowerCase();
-    return s === t ? 3 : s.startsWith(t) ? 2 : s.includes(t) ? 1 : 0;
+    return s === n ? 3 : s.startsWith(n) ? 2 : s.includes(n) ? 1 : 0;
   }
-  suggest(e, t, s) {
-    if (String(s || "").trim().length < this.config.minQueryLength || t.some((r) => L.isRelativeDateToken(r)))
+  suggest(e, n, s) {
+    if (String(s || "").trim().length < this.config.minQueryLength || n.some((i) => T.isDateRelative(i)))
       return [];
-    const o = Ve.parse(s);
-    if (!o)
+    const r = xt.parse(s);
+    if (!r)
       return [];
-    const i = e.locale ?? fe(), l = B.getLocalizedWeekdaysMondayFirst(i).map((r, c) => ({
-      weekday: r,
-      weekdayIndexMonday: c,
-      weekdayLower: r.toLowerCase()
-    })).filter((r) => r.weekdayLower.startsWith(o.weekdayPart)), g = o.reference ? [o.reference] : ["last", "next"], d = [], y = /* @__PURE__ */ new Set();
-    return l.forEach((r) => {
-      g.forEach((c) => {
-        const a = B.getReferenceWeekdayDate(c, r.weekdayIndexMonday), f = B.formatDate(a), u = `${this.buildRelativeTitlePrefix(o.direction, c)} ${r.weekday}`;
-        y.has(u) || (y.add(u), d.push(
-          K.createDateRelative({
-            direction: o.direction,
-            reference: c,
-            weekdayIndexMonday: r.weekdayIndexMonday,
-            dateText: f,
-            title: u
+    const o = e.locale ?? nt(), u = F.getLocalizedWeekdaysMondayFirst(o).map((i, f) => ({
+      weekday: i,
+      weekdayIndexMonday: f,
+      weekdayLower: i.toLowerCase()
+    })).filter((i) => i.weekdayLower.startsWith(r.weekdayPart)), d = r.reference ? [r.reference] : [ie.Last, ie.Next], g = [], m = /* @__PURE__ */ new Set();
+    return u.forEach((i) => {
+      d.forEach((f) => {
+        const l = F.getReferenceWeekdayDate(f, i.weekdayIndexMonday), a = F.formatDate(l), c = `${this.buildRelativeTitlePrefix(r.dateRelation, f)} ${i.weekday}`;
+        m.has(c) || (m.add(c), g.push(
+          pe.createDateRelative({
+            dateRelation: r.dateRelation,
+            reference: f,
+            weekdayIndexMonday: i.weekdayIndexMonday,
+            dateText: a,
+            title: c
           })
         ));
       });
-    }), d.sort((r, c) => this.getPriority(c.title, o.needle) - this.getPriority(r.title, o.needle)).slice(0, e.maxWeekdaySuggestions ?? this.config.defaultMaxWeekdaySuggestions);
+    }), g.sort((i, f) => this.getPriority(f.title, r.needle) - this.getPriority(i.title, r.needle)).slice(0, e.maxWeekdaySuggestions ?? this.config.defaultMaxWeekdaySuggestions);
   }
 }
-class Qe {
-  suggest(e, t) {
-    const s = B.parseDateInput(t);
+class wt {
+  suggest(e, n) {
+    const s = F.parseDateInput(n);
     if (!s)
       return [];
-    const o = new Set(e.map((g) => g.type)), i = B.formatDate(s);
-    return [
-      x.dateBefore,
-      x.dateAfter,
-      x.dateExact
-    ].filter((g) => !o.has(g)).map((g) => K.createDateOperation(g, i));
+    const r = new Set(e.map((d) => d.type)), o = F.formatDate(s);
+    return T.dateOperationTypes.filter((d) => !r.has(d)).map((d) => pe.createDateOperation(d, o));
   }
 }
-class Ye {
+class kt {
   constructor(e) {
     this.config = e;
   }
-  getPositionWeight(e, t) {
-    if (!t)
+  getPositionWeight(e, n) {
+    if (!n)
       return 0;
-    const s = e.indexOf(t);
-    return s < 0 ? -1 : s === 0 ? this.config.scoreStart : s + t.length === e.length ? this.config.scoreEnd : this.config.scoreMiddle;
+    const s = e.indexOf(n);
+    return s < 0 ? -1 : s === 0 ? this.config.scoreStart : s + n.length === e.length ? this.config.scoreEnd : this.config.scoreMiddle;
   }
-  getBestWordMatchScore(e, t) {
-    if (!t)
+  getBestWordMatchScore(e, n) {
+    if (!n)
       return 0;
-    const s = String(e || "").split(/\s+/).filter((i) => i.length > 0);
-    let o = -1;
-    return s.forEach((i, l) => {
-      const g = this.getPositionWeight(i, t);
-      if (g < 0)
+    const s = String(e || "").split(/\s+/).filter((o) => o.length > 0);
+    let r = -1;
+    return s.forEach((o, u) => {
+      const d = this.getPositionWeight(o, n);
+      if (d < 0)
         return;
-      const d = this.config.wordScoreBase - l * this.config.wordIndexWeight + g;
-      d > o && (o = d);
-    }), o;
+      const g = this.config.wordScoreBase - u * this.config.wordIndexWeight + d;
+      g > r && (r = g);
+    }), r;
   }
-  score(e, t, s) {
+  score(e, n, s) {
     if (!s)
       return 1;
-    const o = String(e || "").toLowerCase(), i = this.getBestWordMatchScore(o, s);
-    if (i < 0)
+    const r = String(e || "").toLowerCase(), o = this.getBestWordMatchScore(r, s);
+    if (o < 0)
       return -1;
-    const g = String(t || "").toLowerCase().includes(s) ? this.config.scoreCategoryMatch : 0, d = o === s ? this.config.scoreExactMatch : 0, y = Math.min(
+    const d = String(n || "").toLowerCase().includes(s) ? this.config.scoreCategoryMatch : 0, g = r === s ? this.config.scoreExactMatch : 0, m = Math.min(
       this.config.maxLengthPenalty,
-      Math.floor(o.length / this.config.lengthPenaltyDivisor)
+      Math.floor(r.length / this.config.lengthPenaltyDivisor)
     );
-    return i + g + d - y;
+    return o + d + g - m;
   }
 }
-class Je {
+class Ct {
   merge(...e) {
-    const t = [], s = /* @__PURE__ */ new Set();
-    return e.flat().forEach((o) => {
-      s.has(o.uid) || (s.add(o.uid), t.push(o));
-    }), t;
+    const n = [], s = /* @__PURE__ */ new Set();
+    return e.flat().forEach((r) => {
+      s.has(r.uid) || (s.add(r.uid), n.push(r));
+    }), n;
   }
 }
-const xe = (n) => {
-  const e = Ge();
+const Fe = (t) => {
+  const e = bt();
   return {
-    relativeDateSuggestionPolicy: new Ue(e.relativeDate),
-    dateOperationSuggestionPolicy: new Qe(),
-    textSuggestionScoringPolicy: new Ye(e.textScoring),
-    uniqueSuggestionMergeService: new Je()
+    relativeDateSuggestionPolicy: new Tt(e.relativeDate),
+    dateOperationSuggestionPolicy: new wt(),
+    textSuggestionScoringPolicy: new kt(e.textScoring),
+    uniqueSuggestionMergeService: new Ct()
   };
-}, X = xe();
+}, X = Fe();
 X.relativeDateSuggestionPolicy;
 X.dateOperationSuggestionPolicy;
 X.textSuggestionScoringPolicy;
 X.uniqueSuggestionMergeService;
-const Xe = 1, ae = 3, Ze = (n, e) => `${n}|${e}`, le = (n) => n.valueType === "number-like", ce = (n) => String(n).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-class je {
+const Dt = 1, ve = 3, _t = (t, e) => `${t}|${e}`, xe = (t) => t.valueType === "number-like", be = (t) => String(t).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+class Lt {
   constructor(e) {
     this.dependencies = e;
   }
-  getRelativeCandidates(e, t, s) {
-    return this.dependencies.policies.relativeDateSuggestionPolicy.suggest(e, t, s);
+  getRelativeCandidates(e, n, s) {
+    return this.dependencies.policies.relativeDateSuggestionPolicy.suggest(e, n, s);
   }
-  getDateOperationCandidates(e, t) {
-    return this.dependencies.policies.dateOperationSuggestionPolicy.suggest(e, t);
+  getDateOperationCandidates(e, n) {
+    return this.dependencies.policies.dateOperationSuggestionPolicy.suggest(e, n);
   }
-  countTermOccurrencesInValue(e, t) {
+  countTermOccurrencesInValue(e, n) {
     const s = String(e ?? "").toLowerCase();
-    if (!s || !t)
+    if (!s || !n)
       return 0;
-    const o = J(t), l = o.length > 0 && o === String(t) ? o.split("").map((y) => ce(y)).join("[^0-9]*") : ce(String(t)), g = new RegExp(l, "gi"), d = s.match(g);
-    return d ? d.length : 0;
+    const r = j(n), u = r.length > 0 && r === String(n) ? r.split("").map((m) => be(m)).join("[^0-9]*") : be(String(n)), d = new RegExp(u, "gi"), g = s.match(d);
+    return g ? g.length : 0;
   }
-  countColumnMatchesForTerms(e, t, s, o) {
-    if (!o.length)
+  countColumnMatchesForTerms(e, n, s, r) {
+    if (!r.length)
       return 0;
-    const i = [s];
-    return e.reduce((l, g) => {
-      const d = o.reduce((y, r) => {
-        const c = i.reduce((a, f) => a + this.countTermOccurrencesInValue(Be(g, t, f), r), 0);
-        return y + c;
+    const o = [s];
+    return e.reduce((u, d) => {
+      const g = r.reduce((m, i) => {
+        const f = o.reduce((l, a) => l + this.countTermOccurrencesInValue(Ze(d, n, a), i), 0);
+        return m + f;
       }, 0);
-      return l + d;
+      return u + g;
     }, 0);
   }
-  buildNormalCandidates(e, t, s, o) {
-    const i = new Set(
-      s.map((u) => u.type).filter((u) => u && L.isExactTokenType(u))
-    ), l = [], g = /* @__PURE__ */ new Set(), d = this.dependencies.filterItems(e, t, s);
-    t.columns.filter((u) => u.suggestionEnabled !== !1).forEach((u) => {
-      i.has(u.key) || new Set(d.map((D) => te(D, u))).forEach((D) => {
-        const b = String(D ?? "");
-        if (!b) return;
-        const A = Ze(u.key, b);
-        if (g.has(A)) return;
-        g.add(A);
-        const S = le(u) ? ge(b) : b, T = le(u) ? b : S, C = this.dependencies.policies.textSuggestionScoringPolicy.score(T, u.label, o);
-        C < 0 && o.length > 0 || l.push({
-          uid: A,
-          type: u.key,
-          key: u.key,
-          title: S,
-          rawTitle: b,
-          category: u.label,
-          icon: u.icon,
-          _score: C,
-          _columnType: u.key
+  buildNormalCandidates(e, n, s, r) {
+    const o = new Set(
+      s.map((c) => c.type).filter((c) => c && T.isExactCellValueType(c))
+    ), u = [], d = /* @__PURE__ */ new Set(), g = this.dependencies.filterItems(e, n, s);
+    n.columns.filter((c) => c.suggestionEnabled !== !1).forEach((c) => {
+      o.has(c.key) || new Set(g.map((b) => oe(b, c))).forEach((b) => {
+        const C = String(b ?? "");
+        if (!C) return;
+        const M = _t(c.key, C);
+        if (d.has(M)) return;
+        d.add(M);
+        const p = xe(c) ? we(C) : C, D = xe(c) ? C : p, _ = this.dependencies.policies.textSuggestionScoringPolicy.score(D, c.label, r);
+        _ < 0 && r.length > 0 || u.push({
+          uid: M,
+          type: c.key,
+          key: c.key,
+          title: p,
+          icon: c.icon,
+          _score: _,
+          _columnType: c.key
         });
       });
     });
-    const y = (u, D) => D._score !== u._score ? D._score - u._score : u.title.localeCompare(D.title), r = l.slice().sort(y), c = [], a = /* @__PURE__ */ new Set(), f = /* @__PURE__ */ new Set();
-    r.slice(0, ae).forEach((u) => {
-      a.has(u.uid) || (a.add(u.uid), f.add(u._columnType), c.push(u));
+    const m = (c, b) => b._score !== c._score ? b._score - c._score : c.title.localeCompare(b.title), i = u.slice().sort(m), f = [], l = /* @__PURE__ */ new Set(), a = /* @__PURE__ */ new Set();
+    i.slice(0, ve).forEach((c) => {
+      l.has(c.uid) || (l.add(c.uid), a.add(c._columnType), f.push(c));
     });
-    const m = r.slice(ae);
-    return m.forEach((u) => {
-      a.has(u.uid) || f.has(u._columnType) || (a.add(u.uid), f.add(u._columnType), c.push(u));
-    }), m.forEach((u) => {
-      a.has(u.uid) || (a.add(u.uid), c.push(u));
-    }), c.map((u) => {
-      const D = { ...u };
-      return delete D._score, delete D._columnType, D;
+    const h = i.slice(ve);
+    return h.forEach((c) => {
+      l.has(c.uid) || a.has(c._columnType) || (l.add(c.uid), a.add(c._columnType), f.push(c));
+    }), h.forEach((c) => {
+      l.has(c.uid) || (l.add(c.uid), f.push(c));
+    }), f.map((c) => {
+      const b = { ...c };
+      return delete b._score, delete b._columnType, b;
     });
   }
-  buildScopeCandidates(e, t, s, o) {
-    const i = s.filter((r) => L.isFulltextToken(r)).map((r) => String(r.title || "").toLowerCase()).filter((r) => r.length > 0), l = s.filter((r) => L.isExactFilterToken(r)), g = this.dependencies.filterItems(e, t, l), d = new Set(
-      s.filter((r) => L.isScopeToken(r) && r.key).map((r) => r.key)
+  buildScopeCandidates(e, n, s, r) {
+    const o = s.filter((i) => T.isFulltext(i)).map((i) => String(i.title || "").toLowerCase()).filter((i) => i.length > 0), u = s.filter((i) => T.isExactCellValue(i)), d = this.dependencies.filterItems(e, n, u), g = new Set(
+      s.filter(
+        (i) => T.isScope(i) && "key" in i
+      ).map((i) => i.key)
     );
-    return t.columns.filter((r) => r.searchable !== !1).filter((r) => !d.has(r.key)).map((r) => {
-      const c = this.countColumnMatchesForTerms(g, t, r.key, i), a = o.length === 0 ? 1 : this.dependencies.policies.textSuggestionScoringPolicy.score(r.label, "Fulltext scope", o);
+    return n.columns.filter((i) => i.searchable !== !1).filter((i) => !g.has(i.key)).map((i) => {
+      const f = this.countColumnMatchesForTerms(d, n, i.key, o), l = r.length === 0 ? 1 : this.dependencies.policies.textSuggestionScoringPolicy.score(i.label, "Fulltext scope", r);
       return {
-        ...K.createScope({
-          key: r.key,
-          title: r.label,
-          icon: r.icon
+        ...pe.createScope({
+          key: i.key,
+          title: i.label,
+          icon: i.icon
         }),
-        matchCount: c,
-        _score: a
+        matchCount: f,
+        _score: l
       };
-    }).filter((r) => (r.matchCount ?? 0) > 0).filter((r) => o.length === 0 || r._score >= 0).sort((r, c) => {
-      const a = r.matchCount ?? 0, f = c.matchCount ?? 0;
-      return f !== a ? f - a : c._score !== r._score ? c._score - r._score : r.title.localeCompare(c.title);
-    }).map((r) => {
-      const c = { ...r };
-      return delete c._score, c;
+    }).filter((i) => (i.matchCount ?? 0) > 0).filter((i) => r.length === 0 || i._score >= 0).sort((i, f) => {
+      const l = i.matchCount ?? 0, a = f.matchCount ?? 0;
+      return a !== l ? a - l : f._score !== i._score ? f._score - i._score : i.title.localeCompare(f.title);
+    }).map((i) => {
+      const f = { ...i };
+      return delete f._score, f;
     });
   }
-  collectCandidates(e, t) {
-    const s = t.map((o) => o(e));
+  collectCandidates(e, n) {
+    const s = n.map((r) => r(e));
     return this.dependencies.policies.uniqueSuggestionMergeService.merge(...s);
   }
-  buildSuggestions(e, t, s, o) {
-    const i = String(o || "").trim().toLowerCase(), l = t.maxSuggestions ?? 7, g = {
+  buildSuggestions(e, n, s, r) {
+    const o = String(r || "").trim().toLowerCase(), u = n.maxSuggestions ?? 7, d = {
       items: e,
-      modelDefinition: t,
+      modelDefinition: n,
       selected: s,
-      rawInput: o,
-      needle: i
-    }, d = (m) => this.getDateOperationCandidates(m.selected, m.rawInput), y = (m) => this.getRelativeCandidates(m.modelDefinition, m.selected, m.rawInput), r = (m) => this.buildScopeCandidates(
-      m.items,
-      m.modelDefinition,
-      m.selected,
-      m.needle
-    ), c = (m) => this.buildNormalCandidates(
-      m.items,
-      m.modelDefinition,
-      m.selected,
-      m.needle
-    ), a = this.collectCandidates(g, [
-      d,
-      y
+      rawInput: r,
+      needle: o
+    }, g = (h) => this.getDateOperationCandidates(h.selected, h.rawInput), m = (h) => this.getRelativeCandidates(h.modelDefinition, h.selected, h.rawInput), i = (h) => this.buildScopeCandidates(
+      h.items,
+      h.modelDefinition,
+      h.selected,
+      h.needle
+    ), f = (h) => this.buildNormalCandidates(
+      h.items,
+      h.modelDefinition,
+      h.selected,
+      h.needle
+    ), l = this.collectCandidates(d, [
+      g,
+      m
     ]);
-    return s.some((m) => L.isFulltextToken(m)) ? this.collectCandidates(g, [
-      d,
-      y,
-      r,
-      c
-    ]).slice(0, l) : a.length > 0 ? a.slice(0, l) : i.length < Xe ? [] : c(g).slice(0, l);
+    return s.some((h) => T.isFulltext(h)) ? this.collectCandidates(d, [
+      g,
+      m,
+      i,
+      f
+    ]).slice(0, u) : l.length > 0 ? l.slice(0, u) : o.length < Dt ? [] : f(d).slice(0, u);
   }
 }
-const et = (n) => ({
-  policies: xe(),
-  filterItems: Se
-}), tt = (n) => {
-  const e = et();
-  return new je(e);
-}, st = tt(), rt = (n, e, t, s) => st.buildSuggestions(n, e, t, s);
-class nt {
+const Rt = (t) => ({
+  policies: Fe(),
+  filterItems: yt
+}), It = (t) => {
+  const e = Rt();
+  return new Lt(e);
+}, Et = It(), $t = (t, e, n, s) => Et.buildSuggestions(t, e, n, s);
+class Bt {
   constructor(e) {
     this.dependencies = e;
   }
   resolveEnglishLocale() {
     return this.dependencies.resolveEnglishLocale();
   }
-  highlightText(e, t) {
-    return this.dependencies.highlightText(e, t);
+  highlightText(e, n) {
+    return this.dependencies.highlightText(e, n);
   }
-  filterItems(e, t, s) {
-    return this.dependencies.filterItems(e, t, s);
+  filterItems(e, n, s) {
+    return this.dependencies.filterItems(e, n, s);
   }
-  buildSuggestions(e, t, s, o) {
-    return this.dependencies.buildSuggestions(e, t, s, o);
+  buildSuggestions(e, n, s, r) {
+    return this.dependencies.buildSuggestions(e, n, s, r);
   }
 }
-const ot = {
-  resolveEnglishLocale: fe,
-  highlightText: Oe,
-  filterItems: Se,
-  buildSuggestions: rt
-}, it = (n = {}) => {
+const Mt = {
+  resolveEnglishLocale: Ce,
+  highlightText: tt,
+  filterItems: Oe,
+  buildSuggestions: $t
+}, Pt = (t = {}) => {
   const e = {
-    ...ot,
-    ...n
-  }, t = new nt(e);
+    ...Mt,
+    ...t
+  }, n = new Bt(e);
   return {
-    resolveEnglishLocale: () => t.resolveEnglishLocale(),
-    highlightText: (s, o) => t.highlightText(s, o),
-    filterItems: (s, o, i) => t.filterItems(s, o, i),
-    buildSuggestions: (s, o, i, l) => t.buildSuggestions(s, o, i, l)
+    resolveEnglishLocale: () => n.resolveEnglishLocale(),
+    highlightText: (s, r) => n.highlightText(s, r),
+    filterItems: (s, r, o) => n.filterItems(s, r, o),
+    buildSuggestions: (s, r, o, u) => n.buildSuggestions(s, r, o, u)
   };
-}, Z = it(), at = () => Z.resolveEnglishLocale(), Bt = (n, e) => Z.highlightText(n, e), lt = (n, e, t) => Z.filterItems(n, e, t), ue = (n, e, t, s) => Z.buildSuggestions(n, e, t, s), ct = (n) => {
-  const e = G(""), t = G([]), s = G([]), o = G(null), i = P(
-    () => ue(n.items, n.modelDefinition, t.value, e.value)
-  ), l = P(
-    () => t.value.filter((a) => a.type === "fulltext").map((a) => a.title)
-  ), g = P(
-    () => t.value.filter((a) => a.type === "scope" && a.key).map((a) => a.key)
-  ), d = (a) => {
-    if (t.value.some((f) => f.uid === a.uid)) {
+}, Z = Pt(), Ot = () => Z.resolveEnglishLocale(), un = (t, e) => Z.highlightText(t, e), Ft = (t, e, n) => Z.filterItems(t, e, n), Te = (t, e, n, s) => Z.buildSuggestions(t, e, n, s), At = (t) => {
+  const e = H(""), n = H([]), s = H([]), r = H(null), o = O(
+    () => Te(t.items, t.modelDefinition, n.value, e.value)
+  ), u = O(
+    () => n.value.filter((l) => l.type === "fulltext").map((l) => l.title)
+  ), d = O(
+    () => n.value.filter(
+      (l) => T.isScope(l) && "key" in l
+    ).map((l) => l.key)
+  ), g = (l) => {
+    if (n.value.some((a) => a.uid === l.uid)) {
       e.value = "", s.value = [];
       return;
     }
-    t.value = [...t.value, a], e.value = "", s.value = [];
+    n.value = [...n.value, l], e.value = "", s.value = [];
   };
-  _e(t, (a) => {
-    const f = a.filter(
-      (u, D, b) => b.findIndex((A) => A.uid === u.uid) === D
+  He(n, (l) => {
+    const a = l.filter(
+      (c, b, C) => C.findIndex((M) => M.uid === c.uid) === b
     );
-    if (f.length !== a.length) {
-      t.value = f;
+    if (a.length !== l.length) {
+      n.value = a;
       return;
     }
-    if (!a.some((u) => u.type === "fulltext") && a.some((u) => u.type === "scope")) {
-      t.value = a.filter((u) => u.type !== "scope");
+    if (!l.some((c) => c.type === "fulltext") && l.some((c) => c.type === "scope")) {
+      n.value = l.filter((c) => c.type !== "scope");
       return;
     }
-    e.value = "", s.value = [], Ee(() => {
-      o.value?.updateInputValue?.("", !0, !0), o.value?.hidePopup?.();
+    e.value = "", s.value = [], ze(() => {
+      r.value?.updateInputValue?.("", !0, !0), r.value?.hidePopup?.();
     });
   });
-  const y = (a) => {
-    const f = String(a || "").trim();
-    if (!f) return;
-    const m = f.toLowerCase(), u = ue(
-      n.items,
-      n.modelDefinition,
-      t.value,
-      f
-    ).find((D) => String(D.type).startsWith("date_") ? String(D.title || "").trim().toLowerCase() === m : !1);
-    if (u) {
-      d(u);
+  const m = (l) => {
+    const a = String(l || "").trim();
+    if (!a) return;
+    const h = a.toLowerCase(), c = Te(
+      t.items,
+      t.modelDefinition,
+      n.value,
+      a
+    ).find((b) => String(b.type).startsWith("date_") ? String(b.title || "").trim().toLowerCase() === h : !1);
+    if (c) {
+      g(c);
       return;
     }
-    d({
-      uid: `fulltext|${f}`,
+    g({
+      uid: `fulltext|${a}`,
       type: "fulltext",
-      title: f,
-      category: "Fulltext",
-      icon: "search"
+      title: a
     });
   };
   return {
     query: e,
-    selected: t,
+    selected: n,
     filterOptions: s,
-    qSelectRef: o,
-    fulltextTerms: l,
-    scopedKeys: g,
-    createValue: (a, f) => {
-      y(a), f(null);
+    qSelectRef: r,
+    fulltextTerms: u,
+    scopedKeys: d,
+    createValue: (l, a) => {
+      m(l), a(null);
     },
-    filterFn: (a, f) => {
-      f(() => {
-        e.value = a, s.value = i.value.filter((m) => m.type !== "fulltext");
+    filterFn: (l, a) => {
+      a(() => {
+        e.value = l, s.value = o.value.filter((h) => h.type !== "fulltext");
       });
     }
   };
 };
-class ut {
+class Vt {
   escapeRegExp(e) {
     return String(e).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
@@ -677,239 +674,254 @@ class ut {
     return String(e || "").replace(/[^0-9]/g, "");
   }
   buildTermPattern(e) {
-    const t = this.normalizeDigits(e);
-    return t.length > 0 && t === e ? t.split("").map((o) => this.escapeRegExp(o)).join("[^0-9]*") : this.escapeRegExp(e);
+    const n = this.normalizeDigits(e);
+    return n.length > 0 && n === e ? n.split("").map((r) => this.escapeRegExp(r)).join("[^0-9]*") : this.escapeRegExp(e);
   }
   mergeRanges(e) {
     if (!e.length)
       return [];
-    const t = e.slice().sort((o, i) => o.start - i.start), s = [t[0]];
-    return t.slice(1).forEach((o) => {
-      const i = s[s.length - 1];
-      if (o.start <= i.end) {
-        i.end = Math.max(i.end, o.end);
+    const n = e.slice().sort((r, o) => r.start - o.start), s = [n[0]];
+    return n.slice(1).forEach((r) => {
+      const o = s[s.length - 1];
+      if (r.start <= o.end) {
+        o.end = Math.max(o.end, r.end);
         return;
       }
-      s.push({ ...o });
+      s.push({ ...r });
     }), s;
   }
   groupSublineColumnsByParent(e) {
-    const t = /* @__PURE__ */ new Map();
+    const n = /* @__PURE__ */ new Map();
     return e.forEach((s) => {
-      const o = s.renderAsSublineOf;
-      if (!o)
+      const r = s.renderAsSublineOf;
+      if (!r)
         return;
-      const i = t.get(o) ?? [];
-      t.set(o, [...i, s]);
-    }), t;
+      const o = n.get(r) ?? [];
+      n.set(r, [...o, s]);
+    }), n;
   }
-  sortRows(e, t, s, o, i) {
-    const l = t.find((d) => d.key === s.key), g = e.slice();
-    return !l || l.sortable === !1 || g.sort((d, y) => {
-      const r = (f) => l.accessor ? String(l.accessor(f) ?? "") : String(f[l.key] ?? ""), c = r(d), a = r(y);
-      if (l.key === "date") {
-        const f = i(c), m = i(a);
-        if (f && m) {
-          const u = f.getTime(), D = m.getTime();
-          return s.asc ? u - D : D - u;
+  sortRows(e, n, s, r, o) {
+    const u = n.find((g) => g.key === s.key), d = e.slice();
+    return !u || u.sortable === !1 || d.sort((g, m) => {
+      const i = (a) => u.accessor ? String(u.accessor(a) ?? "") : String(a[u.key] ?? ""), f = i(g), l = i(m);
+      if (u.key === "date") {
+        const a = o(f), h = o(l);
+        if (a && h) {
+          const c = a.getTime(), b = h.getTime();
+          return s.asc ? c - b : b - c;
         }
       }
-      return s.asc ? o(c, a) : o(a, c);
-    }), g;
+      return s.asc ? r(f, l) : r(l, f);
+    }), d;
   }
-  shouldHighlightColumn(e, t, s, o) {
-    if (!t.length)
+  shouldHighlightColumn(e, n, s, r) {
+    if (!n.length)
       return !1;
     if (!s.length)
       return !0;
-    const i = new Set(s), l = o.filter((y) => i.has(y.key)), g = new Set(l.map((y) => y.scopeGroup).filter(Boolean));
-    if (i.has(e))
+    const o = new Set(s), u = r.filter((m) => o.has(m.key)), d = new Set(u.map((m) => m.scopeGroup).filter(Boolean));
+    if (o.has(e))
       return !0;
-    const d = o.find((y) => y.key === e);
-    return d?.scopeGroup ? g.has(d.scopeGroup) : !1;
+    const g = r.find((m) => m.key === e);
+    return g?.scopeGroup ? d.has(g.scopeGroup) : !1;
   }
-  buildHighlightSegments(e, t) {
-    const s = String(e ?? ""), o = Array.from(
-      new Set(t.map((a) => String(a || "").trim()).filter((a) => a.length > 0))
+  buildHighlightSegments(e, n) {
+    const s = String(e ?? ""), r = Array.from(
+      new Set(n.map((l) => String(l || "").trim()).filter((l) => l.length > 0))
     );
-    if (!o.length)
+    if (!r.length)
       return [{ text: s, highlighted: !1 }];
-    const i = o.slice().sort((a, f) => f.length - a.length).map((a) => this.buildTermPattern(a)).join("|"), l = new RegExp(i, "gi"), g = [];
-    let d = l.exec(s);
-    for (; d; ) {
-      const a = d[0] ?? "";
-      a.length > 0 && g.push({ start: d.index, end: d.index + a.length }), a.length === 0 && (l.lastIndex += 1), d = l.exec(s);
+    const o = r.slice().sort((l, a) => a.length - l.length).map((l) => this.buildTermPattern(l)).join("|"), u = new RegExp(o, "gi"), d = [];
+    let g = u.exec(s);
+    for (; g; ) {
+      const l = g[0] ?? "";
+      l.length > 0 && d.push({ start: g.index, end: g.index + l.length }), l.length === 0 && (u.lastIndex += 1), g = u.exec(s);
     }
-    if (!g.length)
+    if (!d.length)
       return [{ text: s, highlighted: !1 }];
-    const y = this.mergeRanges(g), r = [];
-    let c = 0;
-    return y.forEach((a) => {
-      a.start > c && r.push({ text: s.slice(c, a.start), highlighted: !1 }), r.push({ text: s.slice(a.start, a.end), highlighted: !0 }), c = a.end;
-    }), c < s.length && r.push({ text: s.slice(c), highlighted: !1 }), r;
+    const m = this.mergeRanges(d), i = [];
+    let f = 0;
+    return m.forEach((l) => {
+      l.start > f && i.push({ text: s.slice(f, l.start), highlighted: !1 }), i.push({ text: s.slice(l.start, l.end), highlighted: !0 }), f = l.end;
+    }), f < s.length && i.push({ text: s.slice(f), highlighted: !1 }), i;
   }
 }
-const V = new ut(), gt = (n) => {
-  const t = G({ key: n.modelDefinition.columns.find((S) => !S.renderAsSublineOf && S.sortable !== !1)?.key ?? "", asc: !0 }), s = P(() => n.modelDefinition.locale ?? at()), o = P(
+const K = new Vt(), Nt = (t) => {
+  const n = H({ key: t.modelDefinition.columns.find((p) => !p.renderAsSublineOf && p.sortable !== !1)?.key ?? "", asc: !0 }), s = O(() => t.modelDefinition.locale ?? Ot()), r = O(
     () => new Intl.Collator(s.value, { numeric: !0, sensitivity: "base" })
-  ), i = P(
-    () => n.modelDefinition.columns.filter((S) => !S.renderAsSublineOf)
-  ), l = P(() => V.groupSublineColumnsByParent(n.modelDefinition.columns)), g = P(() => lt(n.items, n.modelDefinition, n.selected.value)), d = P(() => V.sortRows(
-    g.value,
-    n.modelDefinition.columns,
-    t.value,
-    (S, T) => o.value.compare(S, T),
-    (S) => B.parseDateInput(S)
-  )), y = (S) => V.shouldHighlightColumn(
-    S,
-    n.fulltextTerms.value,
-    n.scopedKeys.value,
-    n.modelDefinition.columns
-  ), r = (S) => n.modelDefinition.columns.find((T) => T.key === S), c = (S) => l.value.get(S) ?? [], a = (S, T) => {
-    const C = r(T), Q = (H) => C?.valueType === "number-like" ? ge(H) : String(H ?? "");
-    return C?.accessor ? Q(C.accessor(S)) : Q(S[T]);
+  ), o = O(
+    () => t.modelDefinition.columns.filter((p) => !p.renderAsSublineOf)
+  ), u = O(() => K.groupSublineColumnsByParent(t.modelDefinition.columns)), d = O(() => Ft(t.items, t.modelDefinition, t.selected.value)), g = O(() => K.sortRows(
+    d.value,
+    t.modelDefinition.columns,
+    n.value,
+    (p, D) => r.value.compare(p, D),
+    (p) => F.parseDateInput(p)
+  )), m = (p) => K.shouldHighlightColumn(
+    p,
+    t.fulltextTerms.value,
+    t.scopedKeys.value,
+    t.modelDefinition.columns
+  ), i = (p) => t.modelDefinition.columns.find((D) => D.key === p), f = (p) => u.value.get(p) ?? [], l = (p, D) => {
+    const _ = i(D), ee = (G) => _?.valueType === "number-like" ? we(G) : String(G ?? "");
+    return _?.accessor ? ee(_.accessor(p)) : ee(p[D]);
   };
   return {
-    visibleColumns: i,
-    sortedRows: d,
-    getColumnByKey: r,
-    getSublineColumns: c,
-    getTooltip: (S, T) => {
-      const C = r(T);
-      return C?.tooltipHint ? typeof C.tooltipHint == "function" ? C.tooltipHint(S) : C.tooltipHint : "";
+    visibleColumns: o,
+    sortedRows: g,
+    getColumnByKey: i,
+    getSublineColumns: f,
+    getTooltip: (p, D) => {
+      const _ = i(D);
+      return _?.tooltipHint ? typeof _.tooltipHint == "function" ? _.tooltipHint(p) : _.tooltipHint : "";
     },
-    toggleSort: (S) => {
-      if (r(S)?.sortable !== !1) {
-        if (t.value.key !== S) {
-          t.value = { key: S, asc: !0 };
+    toggleSort: (p) => {
+      if (i(p)?.sortable !== !1) {
+        if (n.value.key !== p) {
+          n.value = { key: p, asc: !0 };
           return;
         }
-        t.value = { key: S, asc: !t.value.asc };
+        n.value = { key: p, asc: !n.value.asc };
       }
     },
-    sortIcon: (S) => t.value.key !== S ? null : t.value.asc ? "arrow_upward" : "arrow_downward",
-    cellSegments: (S, T) => {
-      const C = a(S, T);
-      return y(T) ? V.buildHighlightSegments(C, n.fulltextTerms.value) : [{ text: C, highlighted: !1 }];
+    sortIcon: (p) => n.value.key !== p ? null : n.value.asc ? "arrow_upward" : "arrow_downward",
+    cellSegments: (p, D) => {
+      const _ = l(p, D);
+      return m(D) ? K.buildHighlightSegments(_, t.fulltextTerms.value) : [{ text: _, highlighted: !1 }];
     },
-    suggestionTitleSegments: (S) => V.buildHighlightSegments(S, [n.query.value]),
-    dateHint: (S) => {
-      const T = a(S, "date");
-      return B.getDateMouseoverLabel(T, s.value);
+    suggestionTitleSegments: (p) => K.buildHighlightSegments(p, [t.query.value]),
+    dateHint: (p) => {
+      const D = l(p, "date");
+      return F.getDateMouseoverLabel(D, s.value);
     }
   };
-}, ee = {
+}, re = {
   fulltext: "teal-9",
   scope: "green-8",
   subcolumn: "light-blue-9"
-}, dt = {
+}, qt = {
   date_before: "Date before",
   date_after: "Date after",
   date_exact: "Date exact",
   date_relative: "Date",
   fulltext: "Full-Text",
   scope: "In Column"
-}, ft = (n, e) => {
-  const t = (r) => {
-    const c = r.key ?? r.type, a = e(c);
-    if (a) return a;
-    if (r.type === "scope" && r.title)
-      return n.columns.find((f) => f.label === r.title);
-  }, s = (r) => !!t(r)?.renderAsSublineOf, o = (r) => {
-    if (r.type === "scope" && s(r))
-      return "In SubColumn";
-    const c = n.tokenTypeLabelByType?.[r.type] ?? dt[r.type];
+}, Wt = (t, e) => {
+  const n = (a) => (a.type === "scope" || !T.isBuiltIn(a)) && "key" in a ? a.key : void 0, s = (a) => {
+    const h = n(a) ?? a.type, c = e(h);
     if (c) return c;
-    const a = r.key ?? r.type;
-    return e(a)?.label ?? r.category ?? r.type;
-  }, i = (r) => {
-    if (ee[r.type]) return ee[r.type];
-    const c = r.key ?? r.type;
-    if (e(c)?.renderAsSublineOf)
-      return ee.subcolumn;
-  }, l = (r, c, a) => c?.[r.type] ?? i(r) ?? a ?? n.tokenDefaultColor ?? "indigo-9", g = (r) => l(r, n.tokenColorByType);
+    if (a.type === "scope" && a.title)
+      return t.columns.find((b) => b.label === a.title);
+  }, r = (a) => !!s(a)?.renderAsSublineOf, o = (a) => {
+    if (a.type === "scope" && r(a))
+      return "In SubColumn";
+    const h = t.tokenTypeLabelByType?.[a.type] ?? qt[a.type];
+    if (h) return h;
+    const c = n(a) ?? a.type;
+    return e(c)?.label ?? se(a, {
+      getColumnByKey: (C) => e(C),
+      suggestionCategoryLabelByType: t.suggestionCategoryLabelByType
+    });
+  }, u = (a) => {
+    if (re[a.type]) return re[a.type];
+    const h = n(a) ?? a.type;
+    if (e(h)?.renderAsSublineOf)
+      return re.subcolumn;
+  }, d = (a, h, c) => h?.[a.type] ?? u(a) ?? c ?? t.tokenDefaultColor ?? "indigo-9", g = (a) => d(a, t.tokenColorByType);
   return {
     chipTypeLabel: o,
     chipColor: g,
-    optionBadgeColor: (r) => l(r, n.optionBadgeColorByType, g(r)),
-    suggestionCategoryLabel: (r) => {
-      const c = n.suggestionCategoryLabelByType?.[r.type];
-      if (c) return c;
-      if (s(r)) {
-        const a = t(r);
-        return `${(a?.renderAsSublineOf ? e(a.renderAsSublineOf)?.label : void 0) ?? a?.label ?? r.category ?? r.type}-SubColumn`;
+    optionBadgeColor: (a) => d(a, t.optionBadgeColorByType, g(a)),
+    suggestionCategoryLabel: (a) => {
+      const h = t.suggestionCategoryLabelByType?.[a.type];
+      if (h) return h;
+      if (r(a)) {
+        const c = s(a);
+        return `${(c?.renderAsSublineOf ? e(c.renderAsSublineOf)?.label : void 0) ?? c?.label ?? se(a, {
+          getColumnByKey: (C) => e(C),
+          suggestionCategoryLabelByType: t.suggestionCategoryLabelByType
+        })}-SubColumn`;
       }
-      return r.category ?? r.type;
-    }
+      return se(a, {
+        getColumnByKey: (c) => e(c),
+        suggestionCategoryLabelByType: t.suggestionCategoryLabelByType
+      });
+    },
+    tokenIcon: (a) => ft(a),
+    tokenMatchCount: (a) => "matchCount" in a ? a.matchCount ?? 0 : 0
   };
-}, ht = (n) => {
-  const e = ct({
-    items: n.items,
-    modelDefinition: n.modelDefinition
-  }), t = gt({
-    items: n.items,
-    modelDefinition: n.modelDefinition,
+}, Kt = (t) => {
+  const e = At({
+    items: t.items,
+    modelDefinition: t.modelDefinition
+  }), n = Nt({
+    items: t.items,
+    modelDefinition: t.modelDefinition,
     selected: e.selected,
     fulltextTerms: e.fulltextTerms,
     scopedKeys: e.scopedKeys,
     query: e.query
-  }), s = ft(n.modelDefinition, t.getColumnByKey);
+  }), s = Wt(t.modelDefinition, n.getColumnByKey);
   return {
     selected: e.selected,
     filterOptions: e.filterOptions,
     qSelectRef: e.qSelectRef,
-    visibleColumns: t.visibleColumns,
-    sortedRows: t.sortedRows,
-    getSublineColumns: t.getSublineColumns,
+    visibleColumns: n.visibleColumns,
+    sortedRows: n.sortedRows,
+    getSublineColumns: n.getSublineColumns,
     createValue: e.createValue,
     filterFn: e.filterFn,
     chipColor: s.chipColor,
     chipTypeLabel: s.chipTypeLabel,
+    tokenIcon: s.tokenIcon,
+    tokenMatchCount: s.tokenMatchCount,
     optionBadgeColor: s.optionBadgeColor,
     suggestionCategoryLabel: s.suggestionCategoryLabel,
-    suggestionTitleSegments: t.suggestionTitleSegments,
-    toggleSort: t.toggleSort,
-    sortIcon: t.sortIcon,
-    cellSegments: t.cellSegments,
-    dateHint: t.dateHint,
-    getTooltip: t.getTooltip
+    suggestionTitleSegments: n.suggestionTitleSegments,
+    toggleSort: n.toggleSort,
+    sortIcon: n.sortIcon,
+    cellSegments: n.cellSegments,
+    dateHint: n.dateHint,
+    getTooltip: n.getTooltip
   };
-}, pt = { class: "table-suggest" }, yt = { class: "search-wrap" }, mt = { key: 0 }, St = { key: 1 }, xt = { class: "data-table" }, vt = ["onClick"], Dt = { class: "sort-icon-slot" }, wt = { key: 0 }, kt = ["title"], bt = { key: 0 }, Tt = ["title"], Ct = { key: 0 }, _t = ["title"], Et = { key: 0 }, Lt = /* @__PURE__ */ Le({
+}, Ht = { class: "table-suggest" }, zt = { class: "search-wrap" }, Gt = { key: 0 }, Ut = { key: 1 }, jt = { class: "data-table" }, Qt = ["onClick"], Yt = { class: "sort-icon-slot" }, Jt = { key: 0 }, Xt = ["title"], Zt = { key: 0 }, en = ["title"], tn = { key: 0 }, nn = ["title"], sn = { key: 0 }, rn = /* @__PURE__ */ Ge({
   __name: "TableSuggest",
   props: {
     items: {},
     modelDefinition: {}
   },
-  setup(n) {
-    const e = n, {
-      selected: t,
+  setup(t) {
+    const e = t, {
+      selected: n,
       filterOptions: s,
-      qSelectRef: o,
-      visibleColumns: i,
-      sortedRows: l,
-      getSublineColumns: g,
-      createValue: d,
-      filterFn: y,
-      chipColor: r,
-      chipTypeLabel: c,
-      optionBadgeColor: a,
-      suggestionCategoryLabel: f,
-      suggestionTitleSegments: m,
-      toggleSort: u,
-      sortIcon: D,
-      cellSegments: b,
-      dateHint: A,
-      getTooltip: S
-    } = ht(e);
-    return (T, C) => {
-      const Q = O("q-avatar"), oe = O("q-chip"), H = O("q-item-label"), j = O("q-icon"), ke = O("q-item-section"), be = O("q-item"), Te = O("q-select");
-      return p(), v("div", pt, [
-        I("div", yt, [
-          q(Te, {
+      qSelectRef: r,
+      visibleColumns: o,
+      sortedRows: u,
+      getSublineColumns: d,
+      createValue: g,
+      filterFn: m,
+      chipColor: i,
+      chipTypeLabel: f,
+      tokenIcon: l,
+      tokenMatchCount: a,
+      optionBadgeColor: h,
+      suggestionCategoryLabel: c,
+      suggestionTitleSegments: b,
+      toggleSort: C,
+      sortIcon: M,
+      cellSegments: p,
+      dateHint: D,
+      getTooltip: _
+    } = Kt(e);
+    return (ee, te) => {
+      const G = A("q-avatar"), Ve = A("q-chip"), ye = A("q-item-label"), ne = A("q-icon"), Ne = A("q-item-section"), qe = A("q-item"), We = A("q-select");
+      return S(), v("div", Ht, [
+        $("div", zt, [
+          N(We, {
             ref_key: "qSelectRef",
-            ref: o,
-            modelValue: w(t),
-            "onUpdate:modelValue": C[0] || (C[0] = (h) => $e(t) ? t.value = h : null),
+            ref: r,
+            modelValue: x(n),
+            "onUpdate:modelValue": te[0] || (te[0] = (y) => Ue(n) ? n.value = y : null),
             class: "search-field",
             "input-class": "search-input",
             label: "Search",
@@ -919,63 +931,63 @@ const V = new ut(), gt = (n) => {
             "input-debounce": "0",
             "option-label": "title",
             "option-value": "uid",
-            options: w(s),
-            onNewValue: w(d),
-            onFilter: w(y)
+            options: x(s),
+            onNewValue: x(g),
+            onFilter: x(m)
           }, {
-            "selected-item": N((h) => [
-              q(oe, {
+            "selected-item": V((y) => [
+              N(Ve, {
                 removable: "",
                 dense: "",
                 class: "chip",
-                color: w(r)(h.opt),
+                color: x(i)(y.opt),
                 "text-color": "white",
-                onRemove: (R) => h.removeAtIndex(h.index)
+                onRemove: (E) => y.removeAtIndex(y.index)
               }, {
-                default: N(() => [
-                  h.opt.icon ? (p(), Y(Q, {
+                default: V(() => [
+                  x(l)(y.opt) ? (S(), U(G, {
                     key: 0,
                     color: "white",
-                    "text-color": w(r)(h.opt),
-                    icon: h.opt.icon
-                  }, null, 8, ["text-color", "icon"])) : z("", !0),
-                  I("span", null, E(w(c)(h.opt)) + ":", 1),
-                  I("span", null, E(h.opt.title), 1)
+                    "text-color": x(i)(y.opt),
+                    icon: x(l)(y.opt)
+                  }, null, 8, ["text-color", "icon"])) : W("", !0),
+                  $("span", null, R(x(f)(y.opt)) + ":", 1),
+                  $("span", null, R(y.opt.title), 1)
                 ]),
                 _: 2
               }, 1032, ["color", "onRemove"])
             ]),
-            option: N((h) => [
-              h.opt.type !== "fulltext" ? (p(), Y(be, Re({ key: 0 }, h.itemProps, { class: "suggest-item" }), {
-                default: N(() => [
-                  q(ke, null, {
-                    default: N(() => [
-                      q(H, { class: "suggest-title" }, {
-                        default: N(() => [
-                          (p(!0), v(k, null, F(w(m)(h.opt.title), (R, $) => (p(), v(k, {
-                            key: `${h.opt.uid}-title-${$}`
+            option: V((y) => [
+              y.opt.type !== "fulltext" ? (S(), U(qe, je({ key: 0 }, y.itemProps, { class: "suggest-item" }), {
+                default: V(() => [
+                  N(Ne, null, {
+                    default: V(() => [
+                      N(ye, { class: "suggest-title" }, {
+                        default: V(() => [
+                          (S(!0), v(w, null, B(x(b)(y.opt.title), (E, I) => (S(), v(w, {
+                            key: `${y.opt.uid}-title-${I}`
                           }, [
-                            R.highlighted ? (p(), v("mark", mt, E(R.text), 1)) : (p(), v(k, { key: 1 }, [
-                              W(E(R.text), 1)
+                            E.highlighted ? (S(), v("mark", Gt, R(E.text), 1)) : (S(), v(w, { key: 1 }, [
+                              q(R(E.text), 1)
                             ], 64))
                           ], 64))), 128))
                         ]),
                         _: 2
                       }, 1024),
-                      q(H, {
+                      N(ye, {
                         caption: "",
                         class: "suggest-meta"
                       }, {
-                        default: N(() => [
-                          h.opt.icon ? (p(), Y(j, {
+                        default: V(() => [
+                          x(l)(y.opt) ? (S(), U(ne, {
                             key: 0,
-                            name: h.opt.icon,
-                            color: w(a)(h.opt),
+                            name: x(l)(y.opt),
+                            color: x(h)(y.opt),
                             size: "14px",
                             class: "suggest-icon"
-                          }, null, 8, ["name", "color"])) : z("", !0),
-                          W(" " + E(w(f)(h.opt)), 1),
-                          (h.opt.matchCount ?? 0) > 0 ? (p(), v("span", St, " - " + E(h.opt.matchCount) + " x", 1)) : z("", !0)
+                          }, null, 8, ["name", "color"])) : W("", !0),
+                          q(" " + R(x(c)(y.opt)), 1),
+                          x(a)(y.opt) > 0 ? (S(), v("span", Ut, " - " + R(x(a)(y.opt)) + " x", 1)) : W("", !0)
                         ]),
                         _: 2
                       }, 1024)
@@ -984,94 +996,94 @@ const V = new ut(), gt = (n) => {
                   }, 1024)
                 ]),
                 _: 2
-              }, 1040)) : z("", !0)
+              }, 1040)) : W("", !0)
             ]),
             _: 1
           }, 8, ["modelValue", "options", "onNewValue", "onFilter"])
         ]),
-        I("table", xt, [
-          I("colgroup", null, [
-            (p(!0), v(k, null, F(w(i), (h) => (p(), v("col", {
-              key: `col-${h.key}`,
-              style: Ie(h.key === "id" ? { width: "9ch" } : void 0)
+        $("table", jt, [
+          $("colgroup", null, [
+            (S(!0), v(w, null, B(x(o), (y) => (S(), v("col", {
+              key: `col-${y.key}`,
+              style: Qe(y.key === "id" ? { width: "9ch" } : void 0)
             }, null, 4))), 128))
           ]),
-          I("thead", null, [
-            I("tr", null, [
-              (p(!0), v(k, null, F(w(i), (h) => (p(), v("th", {
-                key: h.key,
-                onClick: (R) => w(u)(h.key)
+          $("thead", null, [
+            $("tr", null, [
+              (S(!0), v(w, null, B(x(o), (y) => (S(), v("th", {
+                key: y.key,
+                onClick: (E) => x(C)(y.key)
               }, [
-                h.icon ? (p(), Y(j, {
+                y.icon ? (S(), U(ne, {
                   key: 0,
-                  name: h.icon,
+                  name: y.icon,
                   size: "16px",
                   class: "header-icon"
-                }, null, 8, ["name"])) : z("", !0),
-                I("span", null, E(h.label), 1),
-                I("span", Dt, [
-                  q(j, {
-                    name: w(D)(h.key) ?? "arrow_upward",
+                }, null, 8, ["name"])) : W("", !0),
+                $("span", null, R(y.label), 1),
+                $("span", Yt, [
+                  N(ne, {
+                    name: x(M)(y.key) ?? "arrow_upward",
                     size: "14px",
-                    class: Fe(["sort-icon", { "sort-icon--hidden": !w(D)(h.key) }])
+                    class: Ye(["sort-icon", { "sort-icon--hidden": !x(M)(y.key) }])
                   }, null, 8, ["name", "class"])
                 ])
-              ], 8, vt))), 128))
+              ], 8, Qt))), 128))
             ])
           ]),
-          I("tbody", null, [
-            (p(!0), v(k, null, F(w(l), (h, R) => (p(), v("tr", { key: R }, [
-              (p(!0), v(k, null, F(w(i), ($) => (p(), v("td", {
-                key: $.key
+          $("tbody", null, [
+            (S(!0), v(w, null, B(x(u), (y, E) => (S(), v("tr", { key: E }, [
+              (S(!0), v(w, null, B(x(o), (I) => (S(), v("td", {
+                key: I.key
               }, [
-                w(g)($.key).length > 0 ? (p(), v(k, { key: 0 }, [
-                  I("div", null, [
-                    (p(!0), v(k, null, F(w(b)(h, $.key), (_, M) => (p(), v(k, {
-                      key: `${$.key}-${R}-${M}`
+                x(d)(I.key).length > 0 ? (S(), v(w, { key: 0 }, [
+                  $("div", null, [
+                    (S(!0), v(w, null, B(x(p)(y, I.key), (L, P) => (S(), v(w, {
+                      key: `${I.key}-${E}-${P}`
                     }, [
-                      _.highlighted ? (p(), v("mark", wt, E(_.text), 1)) : (p(), v(k, { key: 1 }, [
-                        W(E(_.text), 1)
+                      L.highlighted ? (S(), v("mark", Jt, R(L.text), 1)) : (S(), v(w, { key: 1 }, [
+                        q(R(L.text), 1)
                       ], 64))
                     ], 64))), 128))
                   ]),
-                  (p(!0), v(k, null, F(w(g)($.key), (_) => (p(), v("span", {
-                    key: `${$.key}-${_.key}-${R}`,
+                  (S(!0), v(w, null, B(x(d)(I.key), (L) => (S(), v("span", {
+                    key: `${I.key}-${L.key}-${E}`,
                     class: "subline-value",
-                    title: w(S)(h, _.key)
+                    title: x(_)(y, L.key)
                   }, [
-                    I("span", null, [
-                      (p(!0), v(k, null, F(w(b)(h, _.key), (M, Ce) => (p(), v(k, {
-                        key: `${_.key}-${R}-${Ce}`
+                    $("span", null, [
+                      (S(!0), v(w, null, B(x(p)(y, L.key), (P, Ke) => (S(), v(w, {
+                        key: `${L.key}-${E}-${Ke}`
                       }, [
-                        M.highlighted ? (p(), v("mark", bt, E(M.text), 1)) : (p(), v(k, { key: 1 }, [
-                          W(E(M.text), 1)
+                        P.highlighted ? (S(), v("mark", Zt, R(P.text), 1)) : (S(), v(w, { key: 1 }, [
+                          q(R(P.text), 1)
                         ], 64))
                       ], 64))), 128))
                     ])
-                  ], 8, kt))), 128))
-                ], 64)) : $.key === "date" ? (p(), v("span", {
+                  ], 8, Xt))), 128))
+                ], 64)) : I.key === "date" ? (S(), v("span", {
                   key: 1,
-                  title: w(A)(h)
+                  title: x(D)(y)
                 }, [
-                  (p(!0), v(k, null, F(w(b)(h, $.key), (_, M) => (p(), v(k, {
-                    key: `date-${R}-${M}`
+                  (S(!0), v(w, null, B(x(p)(y, I.key), (L, P) => (S(), v(w, {
+                    key: `date-${E}-${P}`
                   }, [
-                    _.highlighted ? (p(), v("mark", Ct, E(_.text), 1)) : (p(), v(k, { key: 1 }, [
-                      W(E(_.text), 1)
+                    L.highlighted ? (S(), v("mark", tn, R(L.text), 1)) : (S(), v(w, { key: 1 }, [
+                      q(R(L.text), 1)
                     ], 64))
                   ], 64))), 128))
-                ], 8, Tt)) : (p(), v("span", {
+                ], 8, en)) : (S(), v("span", {
                   key: 2,
-                  title: w(S)(h, $.key)
+                  title: x(_)(y, I.key)
                 }, [
-                  (p(!0), v(k, null, F(w(b)(h, $.key), (_, M) => (p(), v(k, {
-                    key: `${$.key}-${R}-${M}`
+                  (S(!0), v(w, null, B(x(p)(y, I.key), (L, P) => (S(), v(w, {
+                    key: `${I.key}-${E}-${P}`
                   }, [
-                    _.highlighted ? (p(), v("mark", Et, E(_.text), 1)) : (p(), v(k, { key: 1 }, [
-                      W(E(_.text), 1)
+                    L.highlighted ? (S(), v("mark", sn, R(L.text), 1)) : (S(), v(w, { key: 1 }, [
+                      q(R(L.text), 1)
                     ], 64))
                   ], 64))), 128))
-                ], 8, _t))
+                ], 8, nn))
               ]))), 128))
             ]))), 128))
           ])
@@ -1079,86 +1091,72 @@ const V = new ut(), gt = (n) => {
       ]);
     };
   }
-}), At = {
-  install(n) {
-    n.component("TableSuggest", Lt);
+}), dn = {
+  install(t) {
+    t.component("TableSuggest", rn);
   }
-}, $t = (n, e) => {
+}, on = (t, e) => {
   if (!e.modelName || !String(e.modelName).trim())
-    throw new Error(`Invalid model definition for ${n.name}: modelName is required`);
+    throw new Error(`Invalid model definition for ${t.name}: modelName is required`);
   if (!Array.isArray(e.columns) || e.columns.length === 0)
-    throw new Error(`Invalid model definition for ${n.name}: at least one column is required`);
-  const t = /* @__PURE__ */ new Set();
+    throw new Error(`Invalid model definition for ${t.name}: at least one column is required`);
+  const n = /* @__PURE__ */ new Set();
   e.columns.forEach((s) => {
     if (!s.key || !String(s.key).trim())
-      throw new Error(`Invalid model definition for ${n.name}: column key is required`);
-    if (t.has(s.key))
-      throw new Error(`Invalid model definition for ${n.name}: duplicate column key "${s.key}"`);
-    if (t.add(s.key), s.renderAsSublineOf && !e.columns.some((o) => o.key === s.renderAsSublineOf))
+      throw new Error(`Invalid model definition for ${t.name}: column key is required`);
+    if (n.has(s.key))
+      throw new Error(`Invalid model definition for ${t.name}: duplicate column key "${s.key}"`);
+    if (n.add(s.key), s.renderAsSublineOf && !e.columns.some((r) => r.key === s.renderAsSublineOf))
       throw new Error(
-        `Invalid model definition for ${n.name}: renderAsSublineOf references unknown key "${s.renderAsSublineOf}"`
+        `Invalid model definition for ${t.name}: renderAsSublineOf references unknown key "${s.renderAsSublineOf}"`
       );
   });
 };
-class Rt {
+class an {
   modelDefinitionStore = /* @__PURE__ */ new WeakMap();
-  define(e, t) {
-    $t(e, t), this.modelDefinitionStore.set(e, t);
+  define(e, n) {
+    on(e, n), this.modelDefinitionStore.set(e, n);
   }
   get(e) {
-    const t = this.modelDefinitionStore.get(e);
-    if (!t)
+    const n = this.modelDefinitionStore.get(e);
+    if (!n)
       throw new Error(`No model definition registered for ${e.name}`);
-    return t;
+    return n;
   }
 }
-const ve = new Rt(), It = (n, e) => {
-  ve.define(n, e);
-}, Ot = (n, e) => {
-  It(n, e);
-}, Nt = () => (n) => n, qt = (n) => ve.get(n);
-var se = /* @__PURE__ */ ((n) => (n.Last = "last", n.Next = "next", n))(se || {});
-const De = (n) => n === "last", we = (n) => n === "next", Ft = (n) => De(n) || we(n);
-class Wt {
-  static last = se.Last;
-  static next = se.Next;
-  static isLast(e) {
-    return De(e);
-  }
-  static isNext(e) {
-    return we(e);
-  }
-  static isValid(e) {
-    return Ft(e);
-  }
-}
+const Ae = new an(), ln = (t, e) => {
+  Ae.define(t, e);
+}, gn = (t, e) => {
+  ln(t, e);
+}, fn = () => (t) => t, hn = (t) => Ae.get(t);
 export {
-  Wt as DateReferenceValueObject,
-  he as DateRelation,
-  L as SearchSelection,
-  K as SearchTokenFactory,
-  x as SearchTokenTypeValueObject,
-  Lt as TableSuggest,
-  At as TableSuggestPlugin,
-  ue as buildSuggestions,
-  it as createSearchEngine,
-  Nt as createTypedModelDefinition,
-  B as dateDomainService,
-  At as default,
-  It as defineModelDefinition,
-  Ot as defineTypedModelDefinition,
-  lt as filterItems,
-  qt as getModelDefinition,
-  Bt as highlightText,
-  qe as isDateRelation,
-  ye as isDateRelationAfter,
-  pe as isDateRelationBefore,
-  me as isDateRelationOn,
-  Pt as isSearchDirection,
-  ne as isSearchDirectionAfter,
-  re as isSearchDirectionBefore,
-  We as isSearchDirectionOn,
-  At as plugin,
-  at as resolveEnglishLocale,
+  ie as DateReference,
+  De as DateRelation,
+  he as SearchSelection,
+  pe as SearchTokenFactory,
+  T as SearchTokenModel,
+  rn as TableSuggest,
+  dn as TableSuggestPlugin,
+  Te as buildSuggestions,
+  Pt as createSearchEngine,
+  fn as createTypedModelDefinition,
+  F as dateDomainService,
+  dn as default,
+  ln as defineModelDefinition,
+  gn as defineTypedModelDefinition,
+  Ft as filterItems,
+  hn as getModelDefinition,
+  un as highlightText,
+  me as isDateReference,
+  mt as isDateReferenceLast,
+  St as isDateReferenceNext,
+  rt as isDateRelation,
+  le as isDateRelationAfter,
+  ae as isDateRelationBefore,
+  _e as isDateRelationOn,
+  dn as plugin,
+  Ot as resolveEnglishLocale,
+  se as resolveTokenCategory,
+  ft as resolveTokenIcon,
   Z as searchEngine
 };

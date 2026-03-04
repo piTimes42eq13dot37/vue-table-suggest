@@ -1,11 +1,9 @@
 import type {
   RankedSearchToken,
-  SearchToken,
+  SearchToken as SearchTokenData,
 } from '../models/internal'
 import type { SearchModelDefinition } from '../models/external'
-import {
-  SearchSelection,
-} from '../models/search-selection'
+import { SearchTokenModel } from '../models/search-token'
 import { SearchTokenFactory } from '../models/search-token-factory'
 import {
   createSuggestionPolicies,
@@ -30,12 +28,12 @@ interface SuggestionServiceDependencies {
 interface SuggestionContext<TItem> {
   items: TItem[]
   modelDefinition: SearchModelDefinition<TItem>
-  selected: SearchToken[]
+  selected: SearchTokenData[]
   rawInput: string
   needle: string
 }
 
-type CandidateBuilder<TItem> = (context: SuggestionContext<TItem>) => SearchToken[]
+type CandidateBuilder<TItem> = (context: SuggestionContext<TItem>) => SearchTokenData[]
 
 const makeUid = (prefix: string, value: string): string => `${prefix}|${value}`
 
@@ -51,16 +49,16 @@ class SuggestionService {
 
   private getRelativeCandidates<TItem>(
     modelDefinition: SearchModelDefinition<TItem>,
-    selected: SearchToken[],
+    selected: SearchTokenData[],
     rawInput: string,
-  ): SearchToken[] {
+  ): SearchTokenData[] {
     return this.dependencies.policies.relativeDateSuggestionPolicy.suggest(modelDefinition, selected, rawInput)
   }
 
   private getDateOperationCandidates(
-    selected: SearchToken[],
+    selected: SearchTokenData[],
     rawInput: string,
-  ): SearchToken[] {
+  ): SearchTokenData[] {
     return this.dependencies.policies.dateOperationSuggestionPolicy.suggest(selected, rawInput)
   }
 
@@ -112,13 +110,13 @@ class SuggestionService {
   private buildNormalCandidates<TItem>(
     items: TItem[],
     modelDefinition: SearchModelDefinition<TItem>,
-    selected: SearchToken[],
+    selected: SearchTokenData[],
     needle: string,
-  ): SearchToken[] {
+  ): SearchTokenData[] {
     const selectedTypes = new Set(
       selected
         .map((token) => token.type)
-        .filter((tokenType) => tokenType && SearchSelection.isExactTokenType(tokenType)),
+        .filter((tokenType) => tokenType && SearchTokenModel.isExactCellValueType(tokenType)),
     )
 
     const candidates: RankedSearchToken[] = []
@@ -131,15 +129,15 @@ class SuggestionService {
         if (selectedTypes.has(column.key)) return
 
         new Set(baseRows.map((item) => readValue(item, column))).forEach((value) => {
-          const rawTitle = String(value ?? '')
-          if (!rawTitle) return
+          const columnValueText = String(value ?? '')
+          if (!columnValueText) return
 
-          const uid = makeUid(column.key, rawTitle)
+          const uid = makeUid(column.key, columnValueText)
           if (seen.has(uid)) return
           seen.add(uid)
 
-          const displayTitle = isNumberLikeColumn(column) ? formatGroupedNumber(rawTitle) : rawTitle
-          const scoreTitle = isNumberLikeColumn(column) ? rawTitle : displayTitle
+          const displayTitle = isNumberLikeColumn(column) ? formatGroupedNumber(columnValueText) : columnValueText
+          const scoreTitle = isNumberLikeColumn(column) ? columnValueText : displayTitle
           const score = this.dependencies.policies.textSuggestionScoringPolicy.score(scoreTitle, column.label, needle)
           if (score < 0 && needle.length > 0) return
 
@@ -148,8 +146,6 @@ class SuggestionService {
             type: column.key,
             key: column.key,
             title: displayTitle,
-            rawTitle,
-            category: column.label,
             icon: column.icon,
             _score: score,
             _columnType: column.key,
@@ -205,27 +201,30 @@ class SuggestionService {
       const token = { ...candidate }
       delete (token as Partial<RankedSearchToken>)._score
       delete (token as Partial<RankedSearchToken>)._columnType
-      return token as SearchToken
+      return token as SearchTokenData
     })
   }
 
   private buildScopeCandidates<TItem>(
     items: TItem[],
     modelDefinition: SearchModelDefinition<TItem>,
-    selected: SearchToken[],
+    selected: SearchTokenData[],
     needle: string,
-  ): SearchToken[] {
+  ): SearchTokenData[] {
     const fulltextTerms = selected
-      .filter((token) => SearchSelection.isFulltextToken(token))
+      .filter((token) => SearchTokenModel.isFulltext(token))
       .map((token) => String(token.title || '').toLowerCase())
       .filter((term) => term.length > 0)
 
-    const exactOnly = selected.filter((token) => SearchSelection.isExactFilterToken(token))
+    const exactOnly = selected.filter((token) => SearchTokenModel.isExactCellValue(token))
     const baseRows = this.dependencies.filterItems(items, modelDefinition, exactOnly)
 
     const selectedScope = new Set(
       selected
-        .filter((token) => SearchSelection.isScopeToken(token) && token.key)
+        .filter(
+          (token): token is SearchTokenData & { key: string } =>
+            SearchTokenModel.isScope(token) && 'key' in token,
+        )
         .map((token) => token.key),
     )
 
@@ -262,14 +261,14 @@ class SuggestionService {
     return scoped.map((candidate) => {
       const token = { ...candidate }
       delete (token as { _score?: number })._score
-      return token as SearchToken
+      return token as SearchTokenData
     })
   }
 
   private collectCandidates<TItem>(
     context: SuggestionContext<TItem>,
     builders: CandidateBuilder<TItem>[],
-  ): SearchToken[] {
+  ): SearchTokenData[] {
     const candidateLists = builders.map((builder) => builder(context))
     return this.dependencies.policies.uniqueSuggestionMergeService.merge(...candidateLists)
   }
@@ -277,9 +276,9 @@ class SuggestionService {
   buildSuggestions<TItem>(
     items: TItem[],
     modelDefinition: SearchModelDefinition<TItem>,
-    selected: SearchToken[],
+    selected: SearchTokenData[],
     rawInput: string,
-  ): SearchToken[] {
+  ): SearchTokenData[] {
     const needle = String(rawInput || '').trim().toLowerCase()
     const maxSuggestions = modelDefinition.maxSuggestions ?? 7
 
@@ -291,13 +290,16 @@ class SuggestionService {
       needle,
     }
 
-    const buildDateOperationCandidatesFromContext = (innerContext: SuggestionContext<TItem>): SearchToken[] =>
+    const buildDateOperationCandidatesFromContext =
+      (innerContext: SuggestionContext<TItem>): SearchTokenData[] =>
       this.getDateOperationCandidates(innerContext.selected, innerContext.rawInput)
 
-    const buildRelativeCandidatesFromContext = (innerContext: SuggestionContext<TItem>): SearchToken[] =>
+    const buildRelativeCandidatesFromContext =
+      (innerContext: SuggestionContext<TItem>): SearchTokenData[] =>
       this.getRelativeCandidates(innerContext.modelDefinition, innerContext.selected, innerContext.rawInput)
 
-    const buildScopeCandidatesFromContext = (innerContext: SuggestionContext<TItem>): SearchToken[] =>
+    const buildScopeCandidatesFromContext =
+      (innerContext: SuggestionContext<TItem>): SearchTokenData[] =>
       this.buildScopeCandidates(
         innerContext.items,
         innerContext.modelDefinition,
@@ -305,7 +307,8 @@ class SuggestionService {
         innerContext.needle,
       )
 
-    const buildNormalCandidatesFromContext = (innerContext: SuggestionContext<TItem>): SearchToken[] =>
+    const buildNormalCandidatesFromContext =
+      (innerContext: SuggestionContext<TItem>): SearchTokenData[] =>
       this.buildNormalCandidates(
         innerContext.items,
         innerContext.modelDefinition,
@@ -318,7 +321,7 @@ class SuggestionService {
       buildRelativeCandidatesFromContext,
     ])
 
-    const fulltextActive = selected.some((token) => SearchSelection.isFulltextToken(token))
+    const fulltextActive = selected.some((token) => SearchTokenModel.isFulltext(token))
 
     if (fulltextActive) {
       return this.collectCandidates(context, [
@@ -357,9 +360,16 @@ export const createSuggestionService = (
 
 const suggestionService = createSuggestionService()
 
+export const buildSuggestionsService = <TItem>(
+  items: TItem[],
+  modelDefinition: SearchModelDefinition<TItem>,
+  selected: SearchTokenData[],
+  rawInput: string,
+): SearchTokenData[] => suggestionService.buildSuggestions(items, modelDefinition, selected, rawInput)
+
 export const buildSuggestions = <TItem>(
   items: TItem[],
   modelDefinition: SearchModelDefinition<TItem>,
-  selected: SearchToken[],
+  selected: SearchTokenData[],
   rawInput: string,
-): SearchToken[] => suggestionService.buildSuggestions(items, modelDefinition, selected, rawInput)
+): SearchTokenData[] => buildSuggestionsService(items, modelDefinition, selected, rawInput)

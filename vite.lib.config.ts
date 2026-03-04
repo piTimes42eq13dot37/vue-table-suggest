@@ -10,7 +10,7 @@ export default defineConfig({
   build: {
     copyPublicDir: false,
     lib: {
-      entry: resolve(rootDir, 'src/index.ts'),
+      entry: resolve(rootDir, 'src/public-api.ts'),
       name: 'VueTableSuggest',
       formats: ['es', 'cjs', 'iife'],
       fileName: (format) => {

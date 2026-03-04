@@ -1,3 +1,5 @@
+export type SearchCellValue = string | number | boolean | Date | null | undefined
+
 export interface SearchColumnDefinition<TItem> {
   key: string
   label: string
@@ -6,7 +8,7 @@ export interface SearchColumnDefinition<TItem> {
   searchable?: boolean
   tooltipHint?: string | ((item: TItem) => string)
   scopeGroup?: string
-  accessor?: (item: TItem) => unknown
+  accessor?: (item: TItem) => SearchCellValue
   suggestionEnabled?: boolean
   valueType?: 'text' | 'number-like'
   renderAsSublineOf?: string

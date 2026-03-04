@@ -1,9 +1,9 @@
-import type { DateReferenceValue } from './date-reference'
-import type { DateRelationValue } from './date-relation'
+import type { DateReference } from './date-reference'
+import type { DateRelation } from './date-relation'
 
 export interface RelativeDateInput {
-  relation: DateRelationValue
-  reference: DateReferenceValue
+  dateRelation: DateRelation
+  reference: DateReference
   weekdayIndexMonday: number
   weekday: string
 }

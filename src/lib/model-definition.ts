@@ -1,5 +1,5 @@
 import type { SearchModelDefinition } from './models/external'
-import type { SearchColumnDefinition } from './models/search-column-definition'
+import type { SearchCellValue, SearchColumnDefinition } from './models/search-column-definition'
 
 type Constructor<T> = abstract new (...args: never[]) => T
 type ModelKey<TItem> = Extract<keyof TItem, string>
@@ -10,7 +10,7 @@ type TypedColumnWithKnownKey<TItem> = Omit<SearchColumnDefinition<TItem>, 'key'>
 
 type TypedColumnWithAccessor<TItem> = Omit<SearchColumnDefinition<TItem>, 'accessor'> & {
   key: string
-  accessor: (item: TItem) => unknown
+  accessor: (item: TItem) => SearchCellValue
 }
 
 export type TypedSearchColumnDefinition<TItem> =
@@ -55,19 +55,19 @@ const assertModelDefinitionValid = <TItem>(
 
 class ModelDefinitionRegistry {
   private readonly modelDefinitionStore = new WeakMap<
-    Constructor<unknown>,
-    SearchModelDefinition<unknown>
+    Constructor<object>,
+    SearchModelDefinition<object>
   >()
 
-  define<TItem>(
+  define<TItem extends object>(
     ctor: Constructor<TItem>,
     modelDefinition: SearchModelDefinition<TItem>,
   ): void {
     assertModelDefinitionValid(ctor, modelDefinition)
-    this.modelDefinitionStore.set(ctor, modelDefinition as SearchModelDefinition<unknown>)
+    this.modelDefinitionStore.set(ctor as Constructor<object>, modelDefinition as SearchModelDefinition<object>)
   }
 
-  get<TItem>(ctor: Constructor<TItem>): SearchModelDefinition<TItem> {
+  get<TItem extends object>(ctor: Constructor<TItem>): SearchModelDefinition<TItem> {
     const found = this.modelDefinitionStore.get(ctor)
     if (!found) {
       throw new Error(`No model definition registered for ${ctor.name}`)
@@ -78,25 +78,25 @@ class ModelDefinitionRegistry {
 
 const modelDefinitionRegistry = new ModelDefinitionRegistry()
 
-export const defineModelDefinition = <TItem>(
+export const defineModelDefinition = <TItem extends object>(
   ctor: Constructor<TItem>,
   modelDefinition: SearchModelDefinition<TItem>,
 ): void => {
   modelDefinitionRegistry.define(ctor, modelDefinition)
 }
 
-export const defineTypedModelDefinition = <TItem>(
+export const defineTypedModelDefinition = <TItem extends object>(
   ctor: Constructor<TItem>,
   modelDefinition: TypedSearchModelDefinition<TItem>,
 ): void => {
   defineModelDefinition(ctor, modelDefinition as SearchModelDefinition<TItem>)
 }
 
-export const createTypedModelDefinition = <TItem>() =>
+export const createTypedModelDefinition = <TItem extends object>() =>
   (modelDefinition: TypedSearchModelDefinition<TItem>): TypedSearchModelDefinition<TItem> =>
     modelDefinition
 
-export const getModelDefinition = <TItem>(
+export const getModelDefinition = <TItem extends object>(
   ctor: Constructor<TItem>,
 ): SearchModelDefinition<TItem> =>
   modelDefinitionRegistry.get(ctor)

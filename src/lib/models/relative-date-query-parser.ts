@@ -1,8 +1,9 @@
-import type { DateReference, SearchDirection } from './internal'
-import { DateRelation } from './date-relation'
+import type { DateReference } from './date-reference'
+import { isDateReference } from './date-reference'
+import { DateRelation, isDateRelation } from './date-relation'
 
 export interface RelativeDateQuery {
-  direction: SearchDirection
+  dateRelation: DateRelation
   reference: DateReference | null
   weekdayPart: string
   needle: string
@@ -19,15 +20,20 @@ class RelativeDateQueryParser {
     const fullMatch = normalizedNeedle.match(/^(before|after|on)(?:\s+(last|next))?\s+(.+)$/i)
 
     if (fullMatch) {
-      const direction = String(fullMatch[1]).toLowerCase() as SearchDirection
-      const reference = (String(fullMatch[2] || '').toLowerCase() as DateReference | '') || null
+      const dateRelationCandidate = String(fullMatch[1]).toLowerCase()
+      if (!isDateRelation(dateRelationCandidate)) {
+        return null
+      }
+
+      const referenceCandidate = String(fullMatch[2] || '').toLowerCase()
+      const reference = referenceCandidate ? (isDateReference(referenceCandidate) ? referenceCandidate : null) : null
       const weekdayPart = String(fullMatch[3] || '').trim().toLowerCase()
 
       if (!weekdayPart) {
         return null
       }
 
-      return { direction, reference, weekdayPart, needle: normalizedNeedle }
+      return { dateRelation: dateRelationCandidate, reference, weekdayPart, needle: normalizedNeedle }
     }
 
     const shortMatch = normalizedNeedle.match(/^(last|next)\s+(.+)$/i)
@@ -35,7 +41,12 @@ class RelativeDateQueryParser {
       return null
     }
 
-    const reference = String(shortMatch[1]).toLowerCase() as DateReference
+    const referenceCandidate = String(shortMatch[1]).toLowerCase()
+    if (!isDateReference(referenceCandidate)) {
+      return null
+    }
+
+    const reference = referenceCandidate
     const weekdayPart = String(shortMatch[2] || '').trim().toLowerCase()
 
     if (!weekdayPart) {
@@ -43,7 +54,7 @@ class RelativeDateQueryParser {
     }
 
     return {
-      direction: DateRelation.On as SearchDirection,
+      dateRelation: DateRelation.On,
       reference,
       weekdayPart,
       needle: normalizedNeedle,

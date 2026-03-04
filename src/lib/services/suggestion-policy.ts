@@ -1,18 +1,17 @@
 import { dateDomainService } from './date-service'
 import type {
-  DateReference as DateReference,
-  SearchDirection,
-  SearchToken,
+  DateRelation,
+  SearchToken as SearchTokenData,
 } from '../models/internal'
+import { DateReference } from '../models/date-reference'
 import type { SearchModelDefinition } from '../models/external'
 import { relativeDateQueryParser } from '../models/relative-date-query-parser'
 import { SearchTokenFactory } from '../models/search-token-factory'
-import { SearchSelection } from '../models/search-selection'
+import { SearchTokenModel } from '../models/search-token'
 import {
-  isSearchDirectionAfter,
-  isSearchDirectionBefore,
-} from '../models/search-direction'
-import { SearchTokenTypeValueObject } from '../models/search-token-type'
+  isDateRelationAfter,
+  isDateRelationBefore,
+} from '../models/date-relation'
 import { resolveEnglishLocale } from './highlight-service'
 
 export interface RelativeDateSuggestionPolicyConfig {
@@ -72,8 +71,8 @@ class RelativeDateSuggestionPolicy {
   constructor(private readonly config: RelativeDateSuggestionPolicyConfig) {
   }
 
-  private buildRelativeTitlePrefix(direction: SearchDirection, reference: DateReference): string {
-    if (isSearchDirectionBefore(direction)) {
+  private buildRelativeTitlePrefix(dateRelation: DateRelation, reference: DateReference): string {
+    if (isDateRelationBefore(dateRelation)) {
       if (reference === 'last') {
         return 'before last'
       }
@@ -81,7 +80,7 @@ class RelativeDateSuggestionPolicy {
       return 'before next'
     }
 
-    if (isSearchDirectionAfter(direction)) {
+    if (isDateRelationAfter(dateRelation)) {
       if (reference === 'last') {
         return 'after last'
       }
@@ -116,12 +115,12 @@ class RelativeDateSuggestionPolicy {
 
   suggest<TItem>(
     modelDefinition: SearchModelDefinition<TItem>,
-    selected: SearchToken[],
+    selected: SearchTokenData[],
     rawInput: string,
-  ): SearchToken[] {
+  ): SearchTokenData[] {
     if (
       String(rawInput || '').trim().length < this.config.minQueryLength ||
-      selected.some((token) => SearchSelection.isRelativeDateToken(token))
+      selected.some((token) => SearchTokenModel.isDateRelative(token))
     ) {
       return []
     }
@@ -140,15 +139,17 @@ class RelativeDateSuggestionPolicy {
       }))
       .filter((entry) => entry.weekdayLower.startsWith(parsed.weekdayPart))
 
-    const referenceModes: DateReference[] = parsed.reference ? [parsed.reference] : ['last', 'next']
-    const results: SearchToken[] = []
+    const referenceModes: DateReference[] = parsed.reference
+      ? [parsed.reference]
+      : [DateReference.Last, DateReference.Next]
+    const results: SearchTokenData[] = []
     const seen = new Set<string>()
 
     weekdays.forEach((entry) => {
       referenceModes.forEach((reference) => {
         const target = dateDomainService.getReferenceWeekdayDate(reference, entry.weekdayIndexMonday)
         const dateText = dateDomainService.formatDate(target)
-        const titlePrefix = this.buildRelativeTitlePrefix(parsed.direction, reference)
+        const titlePrefix = this.buildRelativeTitlePrefix(parsed.dateRelation, reference)
         const title = `${titlePrefix} ${entry.weekday}`
 
         if (seen.has(title)) {
@@ -158,7 +159,7 @@ class RelativeDateSuggestionPolicy {
         seen.add(title)
         results.push(
           SearchTokenFactory.createDateRelative({
-            direction: parsed.direction,
+            dateRelation: parsed.dateRelation,
             reference,
             weekdayIndexMonday: entry.weekdayIndexMonday,
             dateText,
@@ -175,7 +176,7 @@ class RelativeDateSuggestionPolicy {
 }
 
 class DateOperationSuggestionPolicy {
-  suggest(selected: SearchToken[], rawInput: string): SearchToken[] {
+  suggest(selected: SearchTokenData[], rawInput: string): SearchTokenData[] {
     const parsedDate = dateDomainService.parseDateInput(rawInput)
     if (!parsedDate) {
       return []
@@ -184,11 +185,7 @@ class DateOperationSuggestionPolicy {
     const selectedTypes = new Set(selected.map((token) => token.type))
     const dateText = dateDomainService.formatDate(parsedDate)
 
-    const defs = [
-      SearchTokenTypeValueObject.dateBefore,
-      SearchTokenTypeValueObject.dateAfter,
-      SearchTokenTypeValueObject.dateExact,
-    ]
+    const defs = SearchTokenModel.dateOperationTypes
 
     return defs
       .filter((type) => !selectedTypes.has(type))
@@ -271,8 +268,8 @@ class TextSuggestionScoringPolicy {
 }
 
 class UniqueSuggestionMergeService {
-  merge(...lists: SearchToken[][]): SearchToken[] {
-    const merged: SearchToken[] = []
+  merge(...lists: SearchTokenData[][]): SearchTokenData[] {
+    const merged: SearchTokenData[] = []
     const seen = new Set<string>()
 
     lists.flat().forEach((token) => {

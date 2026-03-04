@@ -1,5 +1,10 @@
 import type { SearchColumnDefinition, SearchModelDefinition } from '../../lib/models/external'
-import type { SearchToken } from '../../lib/models/search-token'
+import {
+  SearchTokenModel,
+  resolveTokenCategory,
+  resolveTokenIcon,
+  type SearchToken,
+} from '../../lib/models/search-token'
 
 const defaultTokenColorByType: Record<string, string> = {
   fulltext: 'teal-9',
@@ -20,8 +25,13 @@ export const useTableSuggestTokenView = <TItem extends object>(
   modelDefinition: SearchModelDefinition<TItem>,
   getColumnByKey: (key: string) => SearchColumnDefinition<TItem> | undefined,
 ) => {
+  const tokenKey = (token: SearchToken): string | undefined =>
+    token.type === 'scope' || !SearchTokenModel.isBuiltIn(token)
+      ? ('key' in token ? token.key : undefined)
+      : undefined
+
   const resolveColumnForToken = (token: SearchToken): SearchColumnDefinition<TItem> | undefined => {
-    const key = token.key ?? token.type
+    const key = tokenKey(token) ?? token.type
     const byKey = getColumnByKey(key)
     if (byKey) return byKey
 
@@ -47,15 +57,18 @@ export const useTableSuggestTokenView = <TItem extends object>(
       defaultTokenTypeLabelByType[token.type]
 
     if (mappedLabel) return mappedLabel
-    const key = token.key ?? token.type
+    const key = tokenKey(token) ?? token.type
     const column = getColumnByKey(key)
-    return column?.label ?? token.category ?? token.type
+    return column?.label ?? resolveTokenCategory(token, {
+      getColumnByKey: (columnKey) => getColumnByKey(columnKey),
+      suggestionCategoryLabelByType: modelDefinition.suggestionCategoryLabelByType,
+    })
   }
 
   const resolveDefaultTokenColor = (token: SearchToken): string | undefined => {
     if (defaultTokenColorByType[token.type]) return defaultTokenColorByType[token.type]
 
-    const key = token.key ?? token.type
+    const key = tokenKey(token) ?? token.type
     const column = getColumnByKey(key)
     if (column?.renderAsSublineOf) {
       return defaultTokenColorByType.subcolumn
@@ -93,16 +106,31 @@ export const useTableSuggestTokenView = <TItem extends object>(
       const parentLabel = column?.renderAsSublineOf
         ? getColumnByKey(column.renderAsSublineOf)?.label
         : undefined
-      return `${parentLabel ?? column?.label ?? token.category ?? token.type}-SubColumn`
+      return `${parentLabel ?? column?.label ?? resolveTokenCategory(token, {
+        getColumnByKey: (columnKey) => getColumnByKey(columnKey),
+        suggestionCategoryLabelByType: modelDefinition.suggestionCategoryLabelByType,
+      })}-SubColumn`
     }
 
-    return token.category ?? token.type
+    return resolveTokenCategory(token, {
+      getColumnByKey: (columnKey) => getColumnByKey(columnKey),
+      suggestionCategoryLabelByType: modelDefinition.suggestionCategoryLabelByType,
+    })
   }
+
+  const tokenIcon = (token: SearchToken): string | undefined => resolveTokenIcon(token)
+
+  const tokenMatchCount = (token: SearchToken): number =>
+    'matchCount' in token
+      ? (token.matchCount ?? 0)
+      : 0
 
   return {
     chipTypeLabel,
     chipColor,
     optionBadgeColor,
     suggestionCategoryLabel,
+    tokenIcon,
+    tokenMatchCount,
   }
 }

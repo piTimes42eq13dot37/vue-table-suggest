@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { demoModelDefinition, demoRows } from '../../testing/demo-fixtures'
+import { DateReference } from '../models/date-reference'
+import { DateRelation } from '../models/date-relation'
 import type { SearchModelDefinition } from '../models/external'
+import type { SearchToken as SearchTokenData } from '../models/internal'
+import { SearchTokenModel, resolveTokenCategory } from '../models/search-token'
 import { buildSuggestions } from './suggestion-service'
 
 describe('suggestion-service', () => {
@@ -88,8 +92,8 @@ describe('suggestion-service', () => {
           type: 'date_relative',
           title: 'before next monday',
           rawTitle: '09.03.2026',
-          direction: 'before',
-          reference: 'next',
+          dateRelation: DateRelation.Before,
+          reference: DateReference.Next,
         },
       ],
       'before next mon',
@@ -172,12 +176,16 @@ describe('suggestion-service', () => {
       '',
     )
 
-    const scopeSuggestions = suggestions.filter((token) => token.type === 'scope')
-    const hangarScope = scopeSuggestions.find((token) => token.key === 'hangar')
-    const hangarCodeScope = scopeSuggestions.find((token) => token.key === 'hangarCode')
+    const fulltextScopeSuggestions = suggestions
+      .filter(
+        (token): token is SearchTokenData & { key: string; matchCount?: number } =>
+          SearchTokenModel.isScope(token) && 'key' in token,
+      )
+    const hangarFulltextScope = fulltextScopeSuggestions.find((token) => token.key === 'hangar')
+    const hangarCodeFulltextScope = fulltextScopeSuggestions.find((token) => token.key === 'hangarCode')
 
-    expect(hangarScope?.matchCount).toBe(4)
-    expect(hangarCodeScope).toBeUndefined()
+    expect(hangarFulltextScope?.matchCount).toBe(4)
+    expect(hangarCodeFulltextScope).toBeUndefined()
   })
 
   it('keeps deterministic suggestion ordering for moon query (golden master)', () => {
@@ -223,7 +231,7 @@ describe('suggestion-service', () => {
         uid: token.uid,
         type: token.type,
         title: token.title,
-        category: token.category,
+        category: resolveTokenCategory(token),
       })),
     ).toMatchInlineSnapshot(`
       [

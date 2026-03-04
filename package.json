@@ -5,13 +5,13 @@
   "type": "module",
   "main": "./dist/lib/index.cjs",
   "module": "./dist/lib/index.js",
-  "types": "./dist/lib/index.d.ts",
+  "types": "./dist/lib/public-api.d.ts",
   "sideEffects": [
     "**/*.css"
   ],
   "exports": {
     ".": {
-      "types": "./dist/lib/index.d.ts",
+      "types": "./dist/lib/public-api.d.ts",
       "import": "./dist/lib/index.js",
       "require": "./dist/lib/index.cjs"
     },

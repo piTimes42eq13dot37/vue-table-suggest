@@ -1,4 +1,4 @@
-import type { SearchToken } from '../models/internal';
+import type { SearchToken as SearchTokenData } from '../models/internal';
 import type { SearchModelDefinition } from '../models/external';
 export interface RelativeDateSuggestionPolicyConfig {
     minQueryLength: number;
@@ -25,10 +25,10 @@ declare class RelativeDateSuggestionPolicy {
     constructor(config: RelativeDateSuggestionPolicyConfig);
     private buildRelativeTitlePrefix;
     private getPriority;
-    suggest<TItem>(modelDefinition: SearchModelDefinition<TItem>, selected: SearchToken[], rawInput: string): SearchToken[];
+    suggest<TItem>(modelDefinition: SearchModelDefinition<TItem>, selected: SearchTokenData[], rawInput: string): SearchTokenData[];
 }
 declare class DateOperationSuggestionPolicy {
-    suggest(selected: SearchToken[], rawInput: string): SearchToken[];
+    suggest(selected: SearchTokenData[], rawInput: string): SearchTokenData[];
 }
 declare class TextSuggestionScoringPolicy {
     private readonly config;
@@ -38,7 +38,7 @@ declare class TextSuggestionScoringPolicy {
     score(title: string, category: string, needle: string): number;
 }
 declare class UniqueSuggestionMergeService {
-    merge(...lists: SearchToken[][]): SearchToken[];
+    merge(...lists: SearchTokenData[][]): SearchTokenData[];
 }
 export interface SuggestionPolicies {
     relativeDateSuggestionPolicy: RelativeDateSuggestionPolicy;

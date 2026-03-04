@@ -1,6 +1,7 @@
-import type { DateReference, SearchDirection } from './internal';
+import type { DateReference } from './date-reference';
+import { DateRelation } from './date-relation';
 export interface RelativeDateQuery {
-    direction: SearchDirection;
+    dateRelation: DateRelation;
     reference: DateReference | null;
     weekdayPart: string;
     needle: string;

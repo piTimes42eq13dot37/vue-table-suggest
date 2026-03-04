@@ -18,6 +18,8 @@ const {
   filterFn,
   chipColor,
   chipTypeLabel,
+  tokenIcon,
+  tokenMatchCount,
   optionBadgeColor,
   suggestionCategoryLabel,
   suggestionTitleSegments,
@@ -60,10 +62,10 @@ void qSelectRef
             @remove="scope.removeAtIndex(scope.index)"
           >
             <q-avatar
-              v-if="scope.opt.icon"
+              v-if="tokenIcon(scope.opt)"
               color="white"
               :text-color="chipColor(scope.opt)"
-              :icon="scope.opt.icon"
+              :icon="tokenIcon(scope.opt)"
             />
             <span>{{ chipTypeLabel(scope.opt) }}:</span>
             <span>{{ scope.opt.title }}</span>
@@ -93,13 +95,13 @@ void qSelectRef
                 class="suggest-meta"
               >
                 <q-icon
-                  v-if="scope.opt.icon"
-                  :name="scope.opt.icon"
+                  v-if="tokenIcon(scope.opt)"
+                  :name="tokenIcon(scope.opt)"
                   :color="optionBadgeColor(scope.opt)"
                   size="14px"
                   class="suggest-icon"
                 />
-                {{ suggestionCategoryLabel(scope.opt) }}<span v-if="(scope.opt.matchCount ?? 0) > 0"> - {{ scope.opt.matchCount }} x</span>
+                {{ suggestionCategoryLabel(scope.opt) }}<span v-if="tokenMatchCount(scope.opt) > 0"> - {{ tokenMatchCount(scope.opt) }} x</span>
               </q-item-label>
             </q-item-section>
           </q-item>

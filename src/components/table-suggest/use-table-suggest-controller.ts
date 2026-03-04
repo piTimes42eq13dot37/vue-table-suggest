@@ -36,6 +36,8 @@ export const useTableSuggestController = <TItem extends object>(props: TableSugg
     filterFn: searchState.filterFn,
     chipColor: tokenView.chipColor,
     chipTypeLabel: tokenView.chipTypeLabel,
+    tokenIcon: tokenView.tokenIcon,
+    tokenMatchCount: tokenView.tokenMatchCount,
     optionBadgeColor: tokenView.optionBadgeColor,
     suggestionCategoryLabel: tokenView.suggestionCategoryLabel,
     suggestionTitleSegments: tableState.suggestionTitleSegments,

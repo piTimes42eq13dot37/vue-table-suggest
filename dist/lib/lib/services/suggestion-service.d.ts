@@ -1,4 +1,4 @@
-import type { SearchToken } from '../models/internal';
+import type { SearchToken as SearchTokenData } from '../models/internal';
 import type { SearchModelDefinition } from '../models/external';
 import { type SuggestionPolicies } from './suggestion-policy';
 import { filterItems } from './filter-service';
@@ -16,8 +16,9 @@ declare class SuggestionService {
     private buildNormalCandidates;
     private buildScopeCandidates;
     private collectCandidates;
-    buildSuggestions<TItem>(items: TItem[], modelDefinition: SearchModelDefinition<TItem>, selected: SearchToken[], rawInput: string): SearchToken[];
+    buildSuggestions<TItem>(items: TItem[], modelDefinition: SearchModelDefinition<TItem>, selected: SearchTokenData[], rawInput: string): SearchTokenData[];
 }
 export declare const createSuggestionService: (overrides?: Partial<SuggestionServiceDependencies>) => Pick<SuggestionService, "buildSuggestions">;
-export declare const buildSuggestions: <TItem>(items: TItem[], modelDefinition: SearchModelDefinition<TItem>, selected: SearchToken[], rawInput: string) => SearchToken[];
+export declare const buildSuggestionsService: <TItem>(items: TItem[], modelDefinition: SearchModelDefinition<TItem>, selected: SearchTokenData[], rawInput: string) => SearchTokenData[];
+export declare const buildSuggestions: <TItem>(items: TItem[], modelDefinition: SearchModelDefinition<TItem>, selected: SearchTokenData[], rawInput: string) => SearchTokenData[];
 export {};

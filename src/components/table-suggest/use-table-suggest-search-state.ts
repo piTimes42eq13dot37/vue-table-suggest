@@ -2,7 +2,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import type { Ref } from 'vue'
 import { buildSuggestions } from '../../lib/search-engine'
 import type { SearchModelDefinition } from '../../lib/models/external'
-import type { SearchToken } from '../../lib/models/search-token'
+import { SearchTokenModel, type SearchToken } from '../../lib/models/search-token'
 
 export type SelectInputUpdater = (value: string, noFilter?: boolean, keepInputValue?: boolean) => void
 export type CreateValueDone = (value: null) => void
@@ -47,7 +47,12 @@ export const useTableSuggestSearchState = <TItem extends object>(
   )
 
   const scopedKeys = computed(() =>
-    selected.value.filter((token) => token.type === 'scope' && token.key).map((token) => token.key!),
+    selected.value
+      .filter(
+        (token): token is SearchToken & { key: string } =>
+          SearchTokenModel.isScope(token) && 'key' in token,
+      )
+      .map((token) => token.key),
   )
 
   const addToken = (token: SearchToken): void => {
@@ -106,13 +111,11 @@ export const useTableSuggestSearchState = <TItem extends object>(
       return
     }
 
-    addToken({
-      uid: `fulltext|${value}`,
-      type: 'fulltext',
-      title: value,
-      category: 'Fulltext',
-      icon: 'search',
-    })
+      addToken({
+        uid: `fulltext|${value}`,
+        type: 'fulltext',
+        title: value,
+      })
   }
 
   const createValue = (value: string, done: CreateValueDone): void => {

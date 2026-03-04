@@ -1,11 +1,14 @@
 import type { SearchColumnDefinition, SearchModelDefinition } from '../models/external'
 
+type PrimitiveCellValue = string | number | boolean | Date | null | undefined
+type PrimitiveRecord = Record<string, PrimitiveCellValue>
+
 class ValueService {
-  normalizeNumberLike(value: unknown): string {
+  normalizeNumberLike(value: PrimitiveCellValue): string {
     return String(value ?? '').replace(/[^0-9]/g, '')
   }
 
-  formatGroupedNumber(value: unknown): string {
+  formatGroupedNumber(value: PrimitiveCellValue): string {
     const digits = this.normalizeNumberLike(value)
     if (!digits) return String(value ?? '')
     return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
@@ -73,15 +76,15 @@ class ValueService {
   ): string {
     const column = modelDefinition.columns.find((entry) => entry.key === key)
     if (column) return this.readValue(item, column)
-    return String((item as Record<string, unknown>)[key] ?? '')
+    return String((item as PrimitiveRecord)[key] ?? '')
   }
 }
 
 const valueService = new ValueService()
 
-export const normalizeNumberLike = (value: unknown): string => valueService.normalizeNumberLike(value)
+export const normalizeNumberLike = (value: PrimitiveCellValue): string => valueService.normalizeNumberLike(value)
 
-export const formatGroupedNumber = (value: unknown): string => valueService.formatGroupedNumber(value)
+export const formatGroupedNumber = (value: PrimitiveCellValue): string => valueService.formatGroupedNumber(value)
 
 export const readValue = <TItem>(item: TItem, column: SearchColumnDefinition<TItem>): string =>
   valueService.readValue(item, column)

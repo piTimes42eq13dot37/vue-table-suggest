@@ -6,27 +6,30 @@ export type {
 
 export type {
   DateReference,
-} from './search-date-reference'
+} from './date-reference'
 
 export type {
-  SearchDirection,
-} from './search-direction'
+  DateRelation,
+} from './date-relation'
 
 export type {
+  BuiltInSearchTokenType,
+  DateOperationToken,
+  DateSearchToken,
+  DateRelativeToken,
+  FulltextColumnScopeToken,
+  ExactCellValueToken,
   SearchToken,
+  SearchTokenType,
 } from './search-token'
 
-export type {
-  SearchTokenType,
-} from './search-token-type'
-
 export interface ParsedSearchSelectionState {
-  fullTextTokens: SearchToken[]
+  fulltextTokens: SearchToken[]
   exactTokens: SearchToken[]
   scopedColumnKeys: string[]
 }
 
-export interface RankedSearchToken extends SearchToken {
+export type RankedSearchToken = SearchToken & {
   _score: number
   _columnType: string
 }

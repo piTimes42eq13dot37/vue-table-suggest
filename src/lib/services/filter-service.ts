@@ -2,6 +2,7 @@ import { dateDomainService } from './date-service'
 import {
   SearchSelection,
 } from '../models/search-selection'
+import { SearchTokenModel } from '../models/search-token'
 import type { SearchModelDefinition } from '../models/external'
 import type { SearchToken } from '../models/internal'
 import { getScopeColumns, normalizeNumberLike, readValue } from './value-service'
@@ -13,16 +14,16 @@ class FilterService {
     selected: SearchToken[],
   ): TItem[] {
     const selection = SearchSelection.from(selected)
-    const { fullTextTokens, exactTokens, scopedColumnKeys } = selection.toParsedState()
+    const { fulltextTokens, exactTokens, scopedColumnKeys } = selection.toParsedState()
     const scopedColumns = getScopeColumns(modelDefinition, scopedColumnKeys)
 
     return items.filter((item) => {
       for (const term of exactTokens) {
-        const resolvedKey = selection.resolveTermKey(term)
+        const resolvedKey = SearchTokenModel.resolveTermKey(term)
         const column = modelDefinition.columns.find((value) => value.key === resolvedKey)
         const value = column ? readValue(item, column) : ''
 
-        if (selection.isDateToken(term)) {
+        if (SearchTokenModel.isDate(term)) {
           const rowDate = dateDomainService.parseDateInput(value)
           const termDate = dateDomainService.parseDateInput(term.rawTitle || term.title)
           if (!rowDate || !termDate) return false
@@ -30,15 +31,15 @@ class FilterService {
           const rowTime = rowDate.getTime()
           const termTime = termDate.getTime()
 
-          if (SearchSelection.isBeforeDirection(term) && !(rowTime < termTime)) {
+          if (SearchTokenModel.isBeforeDirection(term) && !(rowTime < termTime)) {
             return false
           }
 
-          if (SearchSelection.isAfterDirection(term) && !(rowTime > termTime)) {
+          if (SearchTokenModel.isAfterDirection(term) && !(rowTime > termTime)) {
             return false
           }
 
-          if (SearchSelection.isOnDirection(term) && rowTime !== termTime) {
+          if (SearchTokenModel.isOnDirection(term) && rowTime !== termTime) {
             return false
           }
 
@@ -57,7 +58,7 @@ class FilterService {
         }
       }
 
-      for (const token of fullTextTokens) {
+      for (const token of fulltextTokens) {
         const needle = String(token.title || '').toLowerCase()
         if (!needle) continue
 
@@ -74,9 +75,16 @@ class FilterService {
 
 const filterService = new FilterService()
 
-export const filterItems = <TItem>(
+export const filterItemsService = <TItem>(
   items: TItem[],
   modelDefinition: SearchModelDefinition<TItem>,
   selected: SearchToken[],
 ): TItem[] =>
   filterService.filterItems(items, modelDefinition, selected)
+
+export const filterItems = <TItem>(
+  items: TItem[],
+  modelDefinition: SearchModelDefinition<TItem>,
+  selected: SearchToken[],
+): TItem[] =>
+  filterItemsService(items, modelDefinition, selected)

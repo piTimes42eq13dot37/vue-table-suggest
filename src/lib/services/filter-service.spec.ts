@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { dateDomainService } from './date-service'
 import { demoModelDefinition, demoRows } from '../../testing/demo-fixtures'
+import { DateReference } from '../models/date-reference'
+import { DateRelation } from '../models/date-relation'
 import { filterItems } from './filter-service'
 
 describe('filter-service', () => {
@@ -115,9 +117,8 @@ describe('filter-service', () => {
         type: 'date_relative',
         title: 'after last Thursday',
         rawTitle: referenceDateText,
-        direction: 'after',
-        reference: 'last',
-        category: 'date after',
+        dateRelation: DateRelation.After,
+        reference: DateReference.Last,
       },
     ])
 
@@ -168,9 +169,8 @@ describe('filter-service', () => {
         type: 'date_relative',
         title: 'before next Thursday',
         rawTitle: referenceDateText,
-        direction: 'before',
-        reference: 'next',
-        category: 'date before',
+        dateRelation: DateRelation.Before,
+        reference: DateReference.Next,
       },
     ])
 
@@ -220,9 +220,8 @@ describe('filter-service', () => {
         type: 'date_relative',
         title: 'after last tuesday',
         rawTitle: dateDomainService.formatDate(referenceDate),
-        direction: 'after',
-        reference: 'last',
-        category: 'date after',
+        dateRelation: DateRelation.After,
+        reference: DateReference.Last,
       },
     ])
 

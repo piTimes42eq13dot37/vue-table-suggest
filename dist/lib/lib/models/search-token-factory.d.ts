@@ -1,21 +1,18 @@
-import type { DateReference as DateReference, SearchDirection, SearchToken } from './internal';
-import { SearchTokenTypeValueObject } from './search-token-type';
-type DateOperationTokenType = typeof SearchTokenTypeValueObject.dateBefore | typeof SearchTokenTypeValueObject.dateAfter | typeof SearchTokenTypeValueObject.dateExact;
+import type { DateOperationToken, DateRelativeToken, DateReference, DateRelation, FulltextColumnScopeToken } from './internal';
+type DateOperationTokenType = 'date_before' | 'date_after' | 'date_exact';
 export declare class SearchTokenFactory {
-    private static getDateCategoryFromDirection;
-    private static getDateOperationMetadata;
     static createDateRelative(input: {
-        direction: SearchDirection;
+        dateRelation: DateRelation;
         reference: DateReference;
         weekdayIndexMonday: number;
         dateText: string;
         title: string;
-    }): SearchToken;
-    static createDateOperation(type: DateOperationTokenType, dateText: string): SearchToken;
+    }): DateRelativeToken;
+    static createDateOperation(type: DateOperationTokenType, dateText: string): DateOperationToken;
     static createScope(input: {
         key: string;
         title: string;
         icon?: string;
-    }): SearchToken;
+    }): FulltextColumnScopeToken;
 }
 export {};

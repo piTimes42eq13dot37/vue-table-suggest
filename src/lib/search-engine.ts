@@ -1,15 +1,17 @@
 import type { SearchModelDefinition } from './models/external'
 import type { SearchToken } from './models/internal'
 import {
-  highlightText as highlightTextService,
-  resolveEnglishLocale as resolveEnglishLocaleService,
+  highlightTextService,
+  resolveEnglishLocaleService,
 } from './services/highlight-service'
-import { filterItems as filterItemsService } from './services/filter-service'
-import { buildSuggestions as buildSuggestionsService } from './services/suggestion-service'
+import { filterItemsService } from './services/filter-service'
+import { buildSuggestionsService } from './services/suggestion-service'
+
+type HighlightableValue = string | number | boolean | Date | null | undefined
 
 export interface SearchEngineDependencies {
   resolveEnglishLocale: () => string
-  highlightText: (value: unknown, terms: string[]) => string
+  highlightText: (value: HighlightableValue, terms: string[]) => string
   filterItems: <TItem>(
     items: TItem[],
     modelDefinition: SearchModelDefinition<TItem>,
@@ -31,7 +33,7 @@ class SearchEngineApplicationService {
     return this.dependencies.resolveEnglishLocale()
   }
 
-  highlightText(value: unknown, terms: string[]): string {
+  highlightText(value: HighlightableValue, terms: string[]): string {
     return this.dependencies.highlightText(value, terms)
   }
 
@@ -71,7 +73,7 @@ export const createSearchEngine = (
 
   return {
     resolveEnglishLocale: (): string => searchEngineApplicationService.resolveEnglishLocale(),
-    highlightText: (value: unknown, terms: string[]): string =>
+    highlightText: (value: HighlightableValue, terms: string[]): string =>
       searchEngineApplicationService.highlightText(value, terms),
     filterItems: <TItem>(
       items: TItem[],
@@ -93,7 +95,7 @@ export const searchEngine = createSearchEngine()
 
 export const resolveEnglishLocale = (): string => searchEngine.resolveEnglishLocale()
 
-export const highlightText = (value: unknown, terms: string[]): string =>
+export const highlightText = (value: HighlightableValue, terms: string[]): string =>
   searchEngine.highlightText(value, terms)
 
 export const filterItems = <TItem>(

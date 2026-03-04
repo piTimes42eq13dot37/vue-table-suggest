@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { nextTick } from 'vue'
 import { defineComponent, h } from 'vue'
 import TableSuggest from './TableSuggest.vue'
+import type { SearchToken } from '../../lib/models/search-token'
 import { demoModelDefinition, demoRows } from '../../testing/demo-fixtures'
 
 const QSelectStub = defineComponent({
@@ -20,17 +21,17 @@ const QSelectStub = defineComponent({
   emits: ['update:modelValue', 'new-value', 'filter'],
   methods: {
     removeAtIndex(index: number) {
-      const next = [...(this.modelValue as unknown[])]
+      const next = [...(this.modelValue as SearchToken[])]
       next.splice(index, 1)
       this.$emit('update:modelValue', next)
     },
-    selectOption(option: unknown) {
-      this.$emit('update:modelValue', [...(this.modelValue as unknown[]), option])
+    selectOption(option: SearchToken) {
+      this.$emit('update:modelValue', [...(this.modelValue as SearchToken[]), option])
     },
   },
   render() {
-    const selected = (this.modelValue as unknown[]) || []
-    const options = (this.options as unknown[]) || []
+    const selected = (this.modelValue as SearchToken[]) || []
+    const options = (this.options as SearchToken[]) || []
 
     return h('div', { class: 'q-select-stub' }, [
       h(
@@ -147,10 +148,10 @@ const QAvatarStub = defineComponent({
 const mountTableSuggest = () =>
   mount(TableSuggest, {
     props: {
-      items: demoRows() as unknown as object[],
-      modelDefinition: demoModelDefinition() as unknown as {
+      items: demoRows() as object[],
+      modelDefinition: demoModelDefinition() as {
         modelName: string
-        columns: Array<{ key: string; label: string }>
+        columns: Array<{ key: string; label: string; sortable?: boolean; searchable?: boolean }>
       },
     },
     global: {
@@ -232,13 +233,13 @@ describe('TableSuggest', () => {
 
     const wrapper = mount(TableSuggest, {
       props: {
-        items: demoRows() as unknown as object[],
+        items: demoRows() as object[],
         modelDefinition: {
           ...modelDefinition,
           columns: columnsWithoutId,
-        } as unknown as {
+        } as {
           modelName: string
-          columns: Array<{ key: string; label: string }>
+          columns: Array<{ key: string; label: string; sortable?: boolean; searchable?: boolean }>
         },
       },
       global: {
@@ -268,7 +269,7 @@ describe('TableSuggest', () => {
 
     const wrapper = mount(TableSuggest, {
       props: {
-        items: rows as unknown as object[],
+        items: rows as object[],
         modelDefinition: {
           modelName: 'SortModel',
           columns: [
@@ -276,9 +277,9 @@ describe('TableSuggest', () => {
             { key: 'product', label: 'Product', sortable: true, searchable: true },
             { key: 'date', label: 'date', sortable: true, searchable: true },
           ],
-        } as unknown as {
+        } as {
           modelName: string
-          columns: Array<{ key: string; label: string }>
+          columns: Array<{ key: string; label: string; sortable?: boolean; searchable?: boolean }>
         },
       },
       global: {
@@ -307,7 +308,7 @@ describe('TableSuggest', () => {
 
     const wrapper = mount(TableSuggest, {
       props: {
-        items: rows as unknown as object[],
+        items: rows as object[],
         modelDefinition: {
           modelName: 'DateSortModel',
           columns: [
@@ -315,9 +316,9 @@ describe('TableSuggest', () => {
             { key: 'product', label: 'Product', sortable: true, searchable: true },
             { key: 'date', label: 'date', sortable: true, searchable: true },
           ],
-        } as unknown as {
+        } as {
           modelName: string
-          columns: Array<{ key: string; label: string }>
+          columns: Array<{ key: string; label: string; sortable?: boolean; searchable?: boolean }>
         },
       },
       global: {
@@ -368,15 +369,15 @@ describe('TableSuggest', () => {
 
     const wrapper = mount(TableSuggest, {
       props: {
-        items: demoRows() as unknown as object[],
+        items: demoRows() as object[],
         modelDefinition: {
           ...modelDefinition,
           tokenTypeLabelByType: {
             fulltext: 'Anywhere',
           },
-        } as unknown as {
+        } as {
           modelName: string
-          columns: Array<{ key: string; label: string }>
+          columns: Array<{ key: string; label: string; sortable?: boolean; searchable?: boolean }>
         },
       },
       global: {
@@ -416,7 +417,6 @@ describe('TableSuggest', () => {
         type: 'scope',
         key: 'hangarCode',
         title: 'Hangar Code',
-        category: 'Fulltext scope',
       },
     ])
     await nextTick()
@@ -439,7 +439,6 @@ describe('TableSuggest', () => {
         uid: 'scope|hangarCode',
         type: 'scope',
         title: 'Hangar Code',
-        category: 'Fulltext scope',
       },
     ])
     await nextTick()
@@ -485,7 +484,6 @@ describe('TableSuggest', () => {
         type: 'scope',
         key: 'hangar',
         title: 'Hangar',
-        category: 'Fulltext scope',
       },
     ])
     await nextTick()
@@ -498,15 +496,15 @@ describe('TableSuggest', () => {
 
     const wrapper = mount(TableSuggest, {
       props: {
-        items: demoRows() as unknown as object[],
+        items: demoRows() as object[],
         modelDefinition: {
           ...modelDefinition,
           suggestionCategoryLabelByType: {
             scope: 'Search Scope',
           },
-        } as unknown as {
+        } as {
           modelName: string
-          columns: Array<{ key: string; label: string }>
+          columns: Array<{ key: string; label: string; sortable?: boolean; searchable?: boolean }>
         },
       },
       global: {
@@ -671,7 +669,6 @@ describe('TableSuggest', () => {
         type: 'hangarCode',
         key: 'hangarCode',
         title: '10000021304',
-        category: 'Hangar Code',
         icon: 'pin',
       },
     ])
@@ -683,11 +680,11 @@ describe('TableSuggest', () => {
   it('supports overriding dynamic colors from model metadata', async () => {
     const wrapper = mount(TableSuggest, {
       props: {
-        items: demoRows() as unknown as object[],
+        items: demoRows() as object[],
         modelDefinition: {
-          ...(demoModelDefinition() as unknown as {
+          ...(demoModelDefinition() as {
             modelName: string
-            columns: Array<{ key: string; label: string }>
+            columns: Array<{ key: string; label: string; sortable?: boolean; searchable?: boolean }>
           }),
           tokenColorByType: {
             fulltext: 'amber-8',
@@ -743,8 +740,6 @@ describe('TableSuggest', () => {
       uid: 'fulltext|alpha',
       type: 'fulltext',
       title: 'alpha',
-      category: 'Fulltext',
-      icon: 'search',
     }
 
     select.vm.$emit('update:modelValue', [duplicate, duplicate])
@@ -759,16 +754,15 @@ describe('TableSuggest', () => {
     const wrapper = mountTableSuggest()
     const select = wrapper.findComponent({ name: 'QSelect' })
 
-    const scopeToken = {
+    const fulltextScopeToken = {
       uid: 'scope|owner',
       type: 'scope',
       key: 'owner',
       title: 'owner',
-      category: 'In Column',
       icon: 'arrow_right_alt',
     }
 
-    select.vm.$emit('update:modelValue', [scopeToken])
+    select.vm.$emit('update:modelValue', [fulltextScopeToken])
     await nextTick()
 
     expect(wrapper.findAll('.chip').length).toBe(0)

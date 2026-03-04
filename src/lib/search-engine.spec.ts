@@ -6,8 +6,11 @@ import {
   highlightText,
   searchEngine,
 } from './search-engine'
+import { DateReference } from './models/date-reference'
+import { DateRelation } from './models/date-relation'
+import { SearchTokenModel } from './models/search-token'
 import { DemoItem, demoModelDefinition, demoRows } from '../testing/demo-fixtures'
-import type { SearchToken } from './models/internal'
+import type { SearchToken as SearchTokenData } from './models/internal'
 
 describe('search-engine', () => {
   it('filters by hangarCode exact through nested hangar object', () => {
@@ -49,14 +52,14 @@ describe('search-engine', () => {
       },
     ]
 
-    const tokens: SearchToken[] = [
+    const tokens: SearchTokenData[] = [
       {
         uid: 'date_relative|on|next|1|03.03.2026',
         type: 'date_relative',
         title: 'on next Tuesday',
         rawTitle: '03.03.2026',
-        direction: 'on',
-        category: 'date exact',
+        dateRelation: DateRelation.On,
+        reference: DateReference.Next,
       },
     ]
 
@@ -82,9 +85,13 @@ describe('search-engine', () => {
       '',
     )
 
-    const scopeSuggestions = suggestions.filter((token) => token.type === 'scope')
-    expect(scopeSuggestions.length).toBeGreaterThan(0)
-    expect(scopeSuggestions.some((token) => (token.matchCount ?? 0) > 0)).toBe(true)
+    const fulltextScopeSuggestions = suggestions
+      .filter(
+        (token): token is SearchTokenData & { key: string; matchCount?: number } =>
+          SearchTokenModel.isScope(token) && 'key' in token,
+      )
+    expect(fulltextScopeSuggestions.length).toBeGreaterThan(0)
+    expect(fulltextScopeSuggestions.some((token) => (token.matchCount ?? 0) > 0)).toBe(true)
   })
 
   it('returns only date suggestions when query is a date and no fulltext token is active', () => {

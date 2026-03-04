@@ -4,16 +4,14 @@ export enum DateRelation {
   On = 'on',
 }
 
-export type DateRelationValue = `${DateRelation}`
-
-export const isDateRelationBefore = (value: unknown): value is DateRelationValue =>
+export const isDateRelationBefore = (value: string): value is DateRelation =>
   value === DateRelation.Before
 
-export const isDateRelationAfter = (value: unknown): value is DateRelationValue =>
+export const isDateRelationAfter = (value: string): value is DateRelation =>
   value === DateRelation.After
 
-export const isDateRelationOn = (value: unknown): value is DateRelationValue =>
+export const isDateRelationOn = (value: string): value is DateRelation =>
   value === DateRelation.On
 
-export const isDateRelation = (value: unknown): value is DateRelationValue =>
+export const isDateRelation = (value: string): value is DateRelation =>
   isDateRelationBefore(value) || isDateRelationAfter(value) || isDateRelationOn(value)

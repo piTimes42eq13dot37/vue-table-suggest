@@ -1,79 +1,34 @@
 import type { ParsedSearchSelectionState } from './internal'
-import type { SearchToken } from './internal'
-import {
-  isSearchDirectionAfter,
-  isSearchDirectionBefore,
-  isSearchDirectionOn,
-} from './search-direction'
-import { SearchTokenTypeValueObject } from './search-token-type'
+import type { SearchToken as SearchTokenData } from './internal'
+import { SearchTokenModel } from './search-token'
 
 export class SearchSelection {
-  private readonly selected: SearchToken[]
+  private readonly selected: SearchTokenData[]
 
-  private readonly fulltext: SearchToken[]
+  private readonly fulltext: SearchTokenData[]
 
-  private readonly exact: SearchToken[]
+  private readonly exact: SearchTokenData[]
 
   private readonly scopedKeys: string[]
 
-  private constructor(selected: SearchToken[]) {
+  private constructor(selected: SearchTokenData[]) {
     this.selected = selected
-    this.fulltext = this.selected.filter((token) => SearchTokenTypeValueObject.isFulltext(token.type))
-    this.exact = this.selected.filter((token) => SearchTokenTypeValueObject.isExactFilterType(token.type))
+    this.fulltext = this.selected.filter((token) => SearchTokenModel.isFulltext(token))
+    this.exact = this.selected.filter((token) => SearchTokenModel.isExactCellValue(token))
     this.scopedKeys = this.selected
-      .filter((token) => SearchTokenTypeValueObject.isScope(token.type) && token.key)
-      .map((token) => token.key!)
+      .filter((token) => SearchTokenModel.isScope(token))
+      .map((token) => token.key)
   }
 
-  static from(selected: SearchToken[]): SearchSelection {
+  static from(selected: SearchTokenData[]): SearchSelection {
     return new SearchSelection(selected)
   }
 
-  static isExactTokenType(tokenType: string): boolean {
-    return SearchTokenTypeValueObject.isExactFilterType(tokenType)
-  }
-
-  static isDateToken(token: SearchToken): boolean {
-    return SearchTokenTypeValueObject.isDate(token.type)
-  }
-
-  static isFulltextToken(token: SearchToken): boolean {
-    return SearchTokenTypeValueObject.isFulltext(token.type)
-  }
-
-  static isScopeToken(token: SearchToken): boolean {
-    return SearchTokenTypeValueObject.isScope(token.type)
-  }
-
-  static isRelativeDateToken(token: SearchToken): boolean {
-    return SearchTokenTypeValueObject.isDateRelative(token.type)
-  }
-
-  static isExactFilterToken(token: SearchToken): boolean {
-    return SearchSelection.isExactTokenType(token.type)
-  }
-
-  static resolveTermKey(token: SearchToken): string {
-    return token.key ?? (SearchTokenTypeValueObject.isDate(token.type) ? 'date' : token.type)
-  }
-
-  static isBeforeDirection(token: SearchToken): boolean {
-    return SearchTokenTypeValueObject.isDateBefore(token.type) || isSearchDirectionBefore(token.direction)
-  }
-
-  static isAfterDirection(token: SearchToken): boolean {
-    return SearchTokenTypeValueObject.isDateAfter(token.type) || isSearchDirectionAfter(token.direction)
-  }
-
-  static isOnDirection(token: SearchToken): boolean {
-    return SearchTokenTypeValueObject.isDateExact(token.type) || isSearchDirectionOn(token.direction)
-  }
-
-  get fullTextTokens(): SearchToken[] {
+  get fulltextTokens(): SearchTokenData[] {
     return this.fulltext
   }
 
-  get exactTokens(): SearchToken[] {
+  get exactTokens(): SearchTokenData[] {
     return this.exact
   }
 
@@ -83,17 +38,9 @@ export class SearchSelection {
 
   toParsedState(): ParsedSearchSelectionState {
     return {
-      fullTextTokens: this.fullTextTokens,
+      fulltextTokens: this.fulltextTokens,
       exactTokens: this.exactTokens,
       scopedColumnKeys: this.scopedColumnKeys,
     }
-  }
-
-  isDateToken(token: SearchToken): boolean {
-    return SearchSelection.isDateToken(token)
-  }
-
-  resolveTermKey(token: SearchToken): string {
-    return SearchSelection.resolveTermKey(token)
   }
 }

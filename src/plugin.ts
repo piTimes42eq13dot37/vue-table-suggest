@@ -1,8 +1,8 @@
-import type { App as VueApp, Plugin } from 'vue'
+import type { App, Plugin } from 'vue'
 import TableSuggest from './components/table-suggest/TableSuggest.vue'
 
 export const TableSuggestPlugin: Plugin = {
-  install(app: VueApp) {
+  install(app: App) {
     app.component('TableSuggest', TableSuggest)
   },
 }

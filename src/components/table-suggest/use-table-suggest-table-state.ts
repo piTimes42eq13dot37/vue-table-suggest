@@ -3,6 +3,7 @@ import type { Ref } from 'vue'
 import { dateDomainService } from '../../lib/services/date-service'
 import { filterItems, resolveEnglishLocale } from '../../lib/search-engine'
 import type { SearchColumnDefinition, SearchModelDefinition } from '../../lib/models/external'
+import type { SearchCellValue } from '../../lib/models/search-column-definition'
 import type { SearchToken } from '../../lib/models/search-token'
 import { formatGroupedNumber } from '../../lib/services/value-service'
 import {
@@ -69,7 +70,7 @@ export const useTableSuggestTableState = <TItem extends object>(
 
   const renderCellValue = (item: TItem, key: string): string => {
     const column = getColumnByKey(key)
-    const toDisplay = (raw: unknown): string => {
+    const toDisplay = (raw: SearchCellValue): string => {
       if (column?.valueType === 'number-like') {
         return formatGroupedNumber(raw)
       }
@@ -80,7 +81,7 @@ export const useTableSuggestTableState = <TItem extends object>(
       return toDisplay(column.accessor(item))
     }
 
-    const data = item as Record<string, unknown>
+    const data = item as Record<string, SearchCellValue>
     return toDisplay(data[key])
   }
 

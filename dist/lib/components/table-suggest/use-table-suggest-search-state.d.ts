@@ -1,6 +1,6 @@
 import type { Ref } from 'vue';
 import type { SearchModelDefinition } from '../../lib/models/external';
-import type { SearchToken } from '../../lib/models/search-token';
+import { type SearchToken } from '../../lib/models/search-token';
 export type SelectInputUpdater = (value: string, noFilter?: boolean, keepInputValue?: boolean) => void;
 export type CreateValueDone = (value: null) => void;
 export type FilterUpdateHandler = (fn: () => void) => void;

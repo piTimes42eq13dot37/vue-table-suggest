@@ -3,4 +3,7 @@
 - Prefer small pure functions for date parsing, scoring, and suggestion generation.
 - Add or update tests for any behavior change in filter/suggestion/date logic.
 - Avoid hardcoded UI copy when values can be configured via props or metadata.
-- absolute goal is to have the same functionality as the current implementation, but with better code structure and maintainability. use the legacy tabsearch codepen implementation as the behavioral baseline.
+- apply ddd style modeling of all data.
+- Use consistent naming for types, functions, and variables.
+- never use as during imports.
+- never use unknown or any types. Instead, create specific types or use type guards.

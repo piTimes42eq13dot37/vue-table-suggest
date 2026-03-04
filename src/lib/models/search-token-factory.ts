@@ -1,61 +1,31 @@
 import type {
-  DateReference as DateReference,
-  SearchDirection,
-  SearchToken,
+  DateOperationToken,
+  DateRelativeToken,
+  DateReference,
+  DateRelation,
+  FulltextColumnScopeToken,
 } from './internal'
-import {
-  isSearchDirectionAfter,
-  isSearchDirectionBefore,
-} from './search-direction'
-import { SearchTokenTypeValueObject } from './search-token-type'
+import { SearchTokenModel } from './search-token'
 
 type DateOperationTokenType =
-  | typeof SearchTokenTypeValueObject.dateBefore
-  | typeof SearchTokenTypeValueObject.dateAfter
-  | typeof SearchTokenTypeValueObject.dateExact
+  | 'date_before'
+  | 'date_after'
+  | 'date_exact'
 
 export class SearchTokenFactory {
-  private static getDateCategoryFromDirection(direction: SearchDirection): string {
-    if (isSearchDirectionBefore(direction)) {
-      return 'date before'
-    }
-
-    if (isSearchDirectionAfter(direction)) {
-      return 'date after'
-    }
-
-    return 'date exact'
-  }
-
-  private static getDateOperationMetadata(
-    type: DateOperationTokenType,
-  ): { category: string; icon: string } {
-    if (SearchTokenTypeValueObject.isDateBefore(type)) {
-      return { category: 'date before', icon: 'event_busy' }
-    }
-
-    if (SearchTokenTypeValueObject.isDateAfter(type)) {
-      return { category: 'date after', icon: 'event_available' }
-    }
-
-    return { category: 'date exact', icon: 'event' }
-  }
-
   static createDateRelative(input: {
-    direction: SearchDirection
+    dateRelation: DateRelation
     reference: DateReference
     weekdayIndexMonday: number
     dateText: string
     title: string
-  }): SearchToken {
+  }): DateRelativeToken {
     return {
-      uid: `${SearchTokenTypeValueObject.dateRelative}|${input.direction}|${input.reference}|${input.weekdayIndexMonday}|${input.dateText}`,
-      type: SearchTokenTypeValueObject.dateRelative,
+      uid: `${SearchTokenModel.dateRelative}|${input.dateRelation}|${input.reference}|${input.weekdayIndexMonday}|${input.dateText}`,
+      type: 'date_relative',
       title: input.title,
       rawTitle: input.dateText,
-      category: SearchTokenFactory.getDateCategoryFromDirection(input.direction),
-      icon: 'event_repeat',
-      direction: input.direction,
+      dateRelation: input.dateRelation,
       reference: input.reference,
     }
   }
@@ -63,16 +33,12 @@ export class SearchTokenFactory {
   static createDateOperation(
     type: DateOperationTokenType,
     dateText: string,
-  ): SearchToken {
-    const metadata = SearchTokenFactory.getDateOperationMetadata(type)
-
+  ): DateOperationToken {
     return {
       uid: `${type}|${dateText}`,
       type,
       title: dateText,
       rawTitle: dateText,
-      category: metadata.category,
-      icon: metadata.icon,
     }
   }
 
@@ -80,13 +46,12 @@ export class SearchTokenFactory {
     key: string
     title: string
     icon?: string
-  }): SearchToken {
+  }): FulltextColumnScopeToken {
     return {
-      uid: `${SearchTokenTypeValueObject.scope}|${input.key}`,
-      type: SearchTokenTypeValueObject.scope,
+      uid: `${SearchTokenModel.scope}|${input.key}`,
+      type: 'scope',
       key: input.key,
       title: input.title,
-      category: 'Fulltext scope',
       icon: input.icon,
     }
   }

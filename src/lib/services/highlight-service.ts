@@ -1,11 +1,13 @@
 import { normalizeNumberLike } from './value-service'
 
+type HighlightableValue = string | number | boolean | Date | null | undefined
+
 class HighlightService {
   private escapeRegExp(value: string): string {
     return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   }
 
-  private escapeHtml(value: unknown): string {
+  private escapeHtml(value: HighlightableValue): string {
     return String(value ?? '')
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -29,7 +31,7 @@ class HighlightService {
     )
   }
 
-  highlightText(value: unknown, terms: string[]): string {
+  highlightText(value: HighlightableValue, terms: string[]): string {
     const html = this.escapeHtml(value)
     const cleanTerms = terms
       .map((term) => String(term || '').trim())
@@ -56,7 +58,12 @@ class HighlightService {
 
 const highlightService = new HighlightService()
 
-export const resolveEnglishLocale = (): string => highlightService.resolveEnglishLocale()
+export const resolveEnglishLocaleService = (): string => highlightService.resolveEnglishLocale()
 
-export const highlightText = (value: unknown, terms: string[]): string =>
+export const highlightTextService = (value: HighlightableValue, terms: string[]): string =>
   highlightService.highlightText(value, terms)
+
+export const resolveEnglishLocale = (): string => resolveEnglishLocaleService()
+
+export const highlightText = (value: HighlightableValue, terms: string[]): string =>
+  highlightTextService(value, terms)

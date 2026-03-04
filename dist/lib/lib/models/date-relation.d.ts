@@ -3,8 +3,7 @@ export declare enum DateRelation {
     After = "after",
     On = "on"
 }
-export type DateRelationValue = `${DateRelation}`;
-export declare const isDateRelationBefore: (value: unknown) => value is DateRelationValue;
-export declare const isDateRelationAfter: (value: unknown) => value is DateRelationValue;
-export declare const isDateRelationOn: (value: unknown) => value is DateRelationValue;
-export declare const isDateRelation: (value: unknown) => value is DateRelationValue;
+export declare const isDateRelationBefore: (value: string) => value is DateRelation;
+export declare const isDateRelationAfter: (value: string) => value is DateRelation;
+export declare const isDateRelationOn: (value: string) => value is DateRelation;
+export declare const isDateRelation: (value: string) => value is DateRelation;

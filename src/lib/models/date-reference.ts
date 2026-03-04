@@ -3,13 +3,11 @@ export enum DateReference {
   Next = 'next',
 }
 
-export type DateReferenceValue = `${DateReference}`
-
-export const isDateReferenceLast = (value: unknown): value is DateReferenceValue =>
+export const isDateReferenceLast = (value: string): value is DateReference =>
   value === DateReference.Last
 
-export const isDateReferenceNext = (value: unknown): value is DateReferenceValue =>
+export const isDateReferenceNext = (value: string): value is DateReference =>
   value === DateReference.Next
 
-export const isDateReference = (value: unknown): value is DateReferenceValue =>
+export const isDateReference = (value: string): value is DateReference =>
   isDateReferenceLast(value) || isDateReferenceNext(value)
