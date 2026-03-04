@@ -23,6 +23,10 @@ export type {
   SearchTokenType,
 } from './search-token'
 
+export {
+  parseSearchSelectionState,
+} from './search-selection'
+
 export interface ParsedSearchSelectionState {
   fulltextTokens: SearchToken[]
   exactTokens: SearchToken[]

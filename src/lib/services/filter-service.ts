@@ -1,8 +1,7 @@
 import { dateDomainService } from './date-service'
-import { parseSearchSelectionState } from '../models/search-selection'
 import { SearchTokenModel } from '../models/search-token'
 import type { SearchModelDefinition } from '../models/external'
-import type { SearchToken } from '../models/internal'
+import { parseSearchSelectionState, type SearchToken } from '../models/internal'
 import { getScopeColumns, normalizeNumberLike, readValue } from './value-service'
 
 export const filterItems = <TItem>(
